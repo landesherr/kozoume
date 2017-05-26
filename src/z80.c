@@ -1,5 +1,6 @@
 #include "globaldefs.h"
 #include "z80.h"
+#include "memory.h"
 #include <stdbool.h>
 
 byte registers[12];
@@ -24,15 +25,15 @@ unsigned cycles = 0;
 
 void ld_nn_n(reg8 reg)
 {
-	//*reg = memory_get(*PC + 1);
+	*reg = memory_get8(*PC + 1);
 	*PC += 2;
 	cycles += 8;
 }
 
 void add_a_n()
 {
-	byte result, n = 9;
-	//n = memory_get(*PC + 1);
+	byte result, n;
+	n = memory_get8(*PC + 1);
 	result = *A + n;
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
