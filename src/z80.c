@@ -4,14 +4,14 @@
 
 byte registers[12];
 
-reg8 A = &registers[0];
-reg8 F = &registers[1];
-reg8 B = &registers[2];
-reg8 C = &registers[3];
-reg8 D = &registers[4];
-reg8 E = &registers[5];
-reg8 H = &registers[6];
-reg8 L = &registers[7];
+reg8 A = &registers[1];
+reg8 F = &registers[0];
+reg8 B = &registers[3];
+reg8 C = &registers[2];
+reg8 D = &registers[5];
+reg8 E = &registers[4];
+reg8 H = &registers[7];
+reg8 L = &registers[6];
 
 reg16 AF = (word*) &registers[0];
 reg16 BC = (word*) &registers[2];

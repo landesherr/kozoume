@@ -19,6 +19,7 @@ void basic_sanity_check()
 	{
 		add_a_n();
 		printf("Value of A: %X\n", *A);
+		printf("Value of AF: %X\n", *AF);
 		if(*F & 0b00100000)
 		{
 			printf("Half carry!\n");
