@@ -13,8 +13,25 @@ extern reg16 AF, BC, DE, HL, SP, PC;
 extern unsigned cycles;
 
 //generic CPU ops
+//TODO: refactor opcode funcs that take params as inline
 void ld_nn_n(reg8);
 void add_a_n(void);
+void ld_reg8_reg8(reg8,reg8);
+void ld_reg8_mem(reg8);
+void ld_mem_reg8(reg8);
+void ld_mem_n(void);
+void ld_a_mem(reg16);
+void ld_a_nnmem(void);
+void ld_mem_a(reg16);
+void ld_nnmem_a(void);
+void ld_a_c_relative(void);
+void ld_c_relative_a(void);
+void ld_a_hld(void);
+void ld_hld_a(void);
+void ld_a_hli(void);
+void ld_hli_a(void);
+void ldh_n_a(void);
+void ldh_a_n(void);
 
 //flag operations
 inline void calc_carry_8(byte, byte, bool);
