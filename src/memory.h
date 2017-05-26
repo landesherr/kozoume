@@ -5,7 +5,7 @@
 
 typedef struct mem_range
 {
-	word upper, lower;
+	word lower, upper;
 } mem_range;
 
 extern byte *memory_map;
