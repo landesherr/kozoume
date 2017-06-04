@@ -149,7 +149,6 @@ void ldhl_sp_n()
 	//int calc = *SP;
 	//calc += (signed char) memory_get8(*PC + 1);
 	word result;
-	bool isSubtract;
 	*HL = *SP;
 	tempvalue = (signed char) memory_get8(*PC + 1);
 	if(tempvalue > 0)
@@ -192,14 +191,69 @@ void pop_nn(reg16 reg)
 //8-BIT ARITHMETIC
 void add_a_n()
 {
-	byte result, n;
-	n = memory_get8(*PC + 1);
-	result = *A + n;
+	byte result;
+	result = *A + memory_get8(*PC + 1);
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
 	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 2;
+	cycles += 8;
+}
+void add_a_reg8(reg8 reg)
+{
+	byte result = *A + *reg;
+	calc_halfcarry_8(result, *A, false);
+	calc_carry_8(result, *A, false);
+	if(!result) set_zero(true);
+	set_subtract(false);
+	*A = result;
+	*PC += 1;
+	cycles += 4;
+}
+void add_a_hl()
+{
+	byte result = *A + memory_get8(*HL);
+	calc_halfcarry_8(result, *A, false);
+	calc_carry_8(result, *A, false);
+	if(!result) set_zero(true);
+	set_subtract(false);
+	*A = result;
+	*PC += 1;
+	cycles += 8;
+}
+void adc_a_n()
+{
+	byte result;
+	result = *A + memory_get8(*PC + 1) + get_carry();
+	calc_halfcarry_8(result, *A, false);
+	calc_carry_8(result, *A, false);
+	if(!result) set_zero(true);
+	set_subtract(false);
+	*A = result;
+	*PC += 2;
+	cycles += 8;
+}
+void adc_a_reg8(reg8 reg)
+{
+	byte result = *A + *reg + get_carry();
+	calc_halfcarry_8(result, *A, false);
+	calc_carry_8(result, *A, false);
+	if(!result) set_zero(true);
+	set_subtract(false);
+	*A = result;
+	*PC += 1;
+	cycles += 4;
+}
+void adc_a_hl()
+{
+	byte result = *A + memory_get8(*HL) + get_carry();
+	calc_halfcarry_8(result, *A, false);
+	calc_carry_8(result, *A, false);
+	if(!result) set_zero(true);
+	set_subtract(false);
+	*A = result;
+	*PC += 1;
 	cycles += 8;
 }

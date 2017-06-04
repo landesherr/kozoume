@@ -58,6 +58,11 @@ inline void set_zero(bool);
 inline void set_subtract(bool);
 inline void set_halfcarry(bool);
 inline void set_carry(bool);
+inline bool get_flag(byte);
+inline bool get_zero();
+inline bool get_subtract();
+inline bool get_halfcarry();
+inline bool get_carry();
 
 //inline function defs
 inline void set_flag(byte flag, bool set)
@@ -80,6 +85,26 @@ inline void set_subtract(bool set)
 inline void set_zero(bool set)
 {
 	set_flag(7, set);
+}
+inline bool get_flag(byte flag)
+{
+	return *F & (1 << flag);
+}
+inline bool get_carry()
+{
+	return get_flag(4);
+}
+inline bool get_halfcarry()
+{
+	return get_flag(5);
+}
+inline bool get_subtract()
+{
+	return get_flag(6);
+}
+inline bool get_zero()
+{
+	return get_flag(7);
 }
 
 inline void calc_carry_8(byte result, byte registervalue, bool isSubtract)
