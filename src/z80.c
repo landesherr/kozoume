@@ -131,6 +131,63 @@ void ldh_a_n()
 	cycles += 12;
 }
 //16-BIT LOADS
+void ld_n_nn(reg16 dest)
+{
+	*dest = memory_get16(*PC + 1);
+	*PC += 3;
+	cycles += 12;
+}
+void ld_sp_hl()
+{
+	*SP = *HL;
+	*PC += 1;
+	cycles += 8;
+}
+void ldhl_sp_n()
+{
+	signed char tempvalue;
+	//int calc = *SP;
+	//calc += (signed char) memory_get8(*PC + 1);
+	word result;
+	bool isSubtract;
+	*HL = *SP;
+	tempvalue = (signed char) memory_get8(*PC + 1);
+	if(tempvalue > 0)
+	{
+		result = *HL + tempvalue;
+		calc_carry_16(result, *HL, false);
+	}
+	else if(tempvalue < 0)
+	{
+		result = *HL - (0 - tempvalue);
+		calc_carry_16(result, *HL, true);
+	}
+	set_zero(false);
+	set_subtract(false);
+	*PC += 2;
+	cycles += 12;
+}
+void ld_nn_sp()
+{
+	memory_set16(memory_get16(*PC + 1), *SP);
+	*PC += 3;
+	cycles += 20;
+}
+void push_nn(reg16 reg)
+{
+	*SP -= 2;
+	memory_set16(*SP, *reg);
+	*PC += 1;
+	cycles += 16;
+}
+void pop_nn(reg16 reg)
+{
+	*reg = memory_get16(*SP);
+	*SP += 2;
+	*PC += 1;
+	cycles += 12;
+}
+
 
 //8-BIT ARITHMETIC
 void add_a_n()

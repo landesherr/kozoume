@@ -15,7 +15,6 @@ extern unsigned cycles;
 //generic CPU ops
 //TODO: refactor opcode funcs that take params as inline
 void ld_nn_n(reg8);
-void add_a_n(void);
 void ld_reg8_reg8(reg8,reg8);
 void ld_reg8_mem(reg8);
 void ld_mem_reg8(reg8);
@@ -32,6 +31,22 @@ void ld_a_hli(void);
 void ld_hli_a(void);
 void ldh_n_a(void);
 void ldh_a_n(void);
+
+//16 bit loads
+void ld_n_nn(reg16);
+void ld_sp_hl(void);
+void ldhl_sp_n(void);
+void ld_nn_sp(void);
+void push_nn(reg16);
+void pop_nn(reg16);
+
+//8 bit ALU
+void add_a_n(void);
+void add_a_reg8(reg8);
+void add_a_hl(void);
+void adc_a_n(void);
+void adc_a_reg8(reg8);
+void adc_a_hl(void);
 
 //flag operations
 inline void calc_carry_8(byte, byte, bool);
