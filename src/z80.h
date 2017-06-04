@@ -47,6 +47,12 @@ void add_a_hl(void);
 void adc_a_n(void);
 void adc_a_reg8(reg8);
 void adc_a_hl(void);
+void sub_a_n(void);
+void sub_a_reg8(reg8);
+void sub_a_hl(void);
+void sbc_a_n(void);
+void sbc_a_reg8(reg8);
+void sbc_a_hl(void);
 void and_n(void);
 void and_reg8(reg8);
 void and_hl(void);
@@ -56,6 +62,13 @@ void or_hl(void);
 void xor_n(void);
 void xor_reg8(reg8);
 void xor_hl(void);
+void cp_n(void);
+void cp_reg8(reg8);
+void cp_hl(void);
+void inc_reg8(reg8);
+void inc_hl(void);
+void dec_reg8(reg8);
+void dec_hl(void);
 
 //flag operations
 inline void calc_carry_8(byte, byte, bool);
@@ -68,10 +81,10 @@ inline void set_subtract(bool);
 inline void set_halfcarry(bool);
 inline void set_carry(bool);
 inline bool get_flag(byte);
-inline bool get_zero();
-inline bool get_subtract();
-inline bool get_halfcarry();
-inline bool get_carry();
+inline bool get_zero(void);
+inline bool get_subtract(void);
+inline bool get_halfcarry(void);
+inline bool get_carry(void);
 
 //inline function defs
 inline void set_flag(byte flag, bool set)

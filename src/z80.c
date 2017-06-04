@@ -257,6 +257,102 @@ void adc_a_hl()
 	*PC += 1;
 	cycles += 8;
 }
+void sub_a_n()
+{
+	byte result = *A - memory_get8(*PC + 1);
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*A = result;
+	*PC += 2;
+	cycles += 8;
+}
+void sub_a_reg8(reg8 reg)
+{
+	byte result = *A - *reg;
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*A = result;
+	*PC += 1;
+	cycles += 4;
+}
+void sub_a_hl()
+{
+	byte result = *A - memory_get8(*HL);
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*A = result;
+	*PC += 1;
+	cycles += 8;
+}
+void sbc_a_n()
+{
+	byte result = *A - (memory_get8(*PC + 1) + get_carry());
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*A = result;
+	*PC += 2;
+	cycles += 8;
+}
+void sbc_a_reg8(reg8 reg)
+{
+	byte result = *A - (*reg + get_carry());
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*A = result;
+	*PC += 1;
+	cycles += 4;
+}
+void sbc_a_hl()
+{
+	byte result = *A - (memory_get8(*HL) + get_carry());
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*A = result;
+	*PC += 1;
+	cycles += 8;
+}
+void cp_n()
+{
+	byte result = *A - memory_get8(*PC + 1);
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*PC += 2;
+	cycles += 8;
+}
+void cp_reg8(reg8 reg)
+{
+	byte result = *A - *reg;
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*PC += 1;
+	cycles += 4;
+}
+void cp_hl()
+{
+	byte result = *A - *HL;
+	calc_halfcarry_8(result, *A, true);
+	calc_carry_8(result, *A, true);
+	if(!result) set_zero(true);
+	set_subtract(true);
+	*PC += 1;
+	cycles += 8;
+}
 void and_n()
 {
 	*A &= memory_get8(*PC + 1);
@@ -347,5 +443,43 @@ void xor_hl()
 	*PC += 1;
 	cycles += 8;
 }
-
-
+void inc_reg8(reg8 reg)
+{
+	byte result = *reg + 1;
+	calc_halfcarry_8(*reg, result, false);
+	set_subtract(false);
+	if(!result) set_zero(true);
+	*reg = result;
+	*PC += 1;
+	cycles += 4;
+}
+void inc_hl()
+{
+	byte result = memory_get8(*HL) + 1;
+	calc_halfcarry_8(memory_get8(*HL), result, false);
+	set_subtract(false);
+	if(!result) set_zero(true);
+	memory_set8(*HL, result);
+	*PC += 1;
+	cycles += 12;
+}
+void dec_reg8(reg8 reg)
+{
+	byte result = *reg - 1;
+	calc_halfcarry_8(*reg, result, true);
+	set_subtract(true);
+	if(!result) set_zero(true);
+	*reg = result;
+	*PC += 1;
+	cycles += 4;
+}
+void dec_hl()
+{
+	byte result = memory_get8(*HL) - 1;
+	calc_halfcarry_8(memory_get8(*HL), result, true);
+	set_subtract(true);
+	if(!result) set_zero(true);
+	memory_set8(*HL, result);
+	*PC += 1;
+	cycles += 12;
+}
