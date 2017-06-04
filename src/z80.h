@@ -47,6 +47,15 @@ void add_a_hl(void);
 void adc_a_n(void);
 void adc_a_reg8(reg8);
 void adc_a_hl(void);
+void and_n(void);
+void and_reg8(reg8);
+void and_hl(void);
+void or_n(void);
+void or_reg8(reg8);
+void or_hl(void);
+void xor_n(void);
+void xor_reg8(reg8);
+void xor_hl(void);
 
 //flag operations
 inline void calc_carry_8(byte, byte, bool);

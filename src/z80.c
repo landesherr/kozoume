@@ -257,3 +257,95 @@ void adc_a_hl()
 	*PC += 1;
 	cycles += 8;
 }
+void and_n()
+{
+	*A &= memory_get8(*PC + 1);
+	if(!*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(true);
+	set_carry(false);
+	*PC += 2;
+	cycles += 8;
+}
+void and_reg8(reg8 reg)
+{
+	*A &= *reg;
+	if(*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(true);
+	set_carry(false);
+	*PC += 1;
+	cycles += 4;
+}
+void and_hl()
+{
+	*A &= memory_get8(*HL);
+	if(!*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(true);
+	set_carry(false);
+	*PC += 1;
+	cycles += 8;
+}
+void or_n()
+{
+	*A |= memory_get8(*PC + 1);
+	if(!*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 2;
+	cycles += 8;
+}
+void or_reg8(reg8 reg)
+{
+	*A |= *reg;
+	if(*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 1;
+	cycles += 4;
+}
+void or_hl()
+{
+	*A |= memory_get8(*HL);
+	if(!*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 1;
+	cycles += 8;
+}
+void xor_n()
+{
+	*A ^= memory_get8(*PC + 1);
+	if(!*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 2;
+	cycles += 8;
+}
+void xor_reg8(reg8 reg)
+{
+	*A ^= *reg;
+	if(*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 1;
+	cycles += 4;
+}
+void xor_hl()
+{
+	*A ^= memory_get8(*HL);
+	if(!*A) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 1;
+	cycles += 8;
+}
+
+
