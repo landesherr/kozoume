@@ -7,8 +7,8 @@
 #define BANK_SIZE 0x4000
 
 static inline unsigned get_cart_size(FILE*);
-static inline byte rom_banks(byte);
-static inline unsigned ram_size(byte);
+static inline byte calc_rom_banks(byte);
+static inline unsigned calc_ram_size(byte);
 static inline bool calculate_checksum(FILE*);
 
 cartridge* load_cart(char *path)
@@ -20,20 +20,18 @@ cartridge* load_cart(char *path)
 		printf("Unable to load ROM!\n");
 		exit(1);
 	}
-	cartridge *loaded_cart = malloc(sizeof(cartridge));
-	if(get_cart_size(cart) < BANK_SIZE)
+	unsigned cart_filesize = get_cart_size(cart);
+	if(cart_filesize < BANK_SIZE || cart_filesize % 0x2000 != 0)
 	{
 		printf("Invalid ROM!\n");
 		exit(1);
 	}
+	cartridge *loaded_cart = malloc(sizeof(cartridge));
 	//load base ROM
 	printf("Reading from ROM...\n");
-	fread(&memory_map[0], BANK_SIZE, 1, cart);
-	printf("ROM size - %X\n", memory_get8(0x148));
-	printf("RAM size - %X\n", memory_get8(0x149));
-	int i;
+	fread(memory_map, BANK_SIZE, 1, cart);
 	char name[17];
-	for(i=0;i<16;i++)
+	for(unsigned i=0;i<16;i++)
 	{
 		name[i] = memory_get8(0x134 + i);
 	}
@@ -41,11 +39,17 @@ cartridge* load_cart(char *path)
 	loaded_cart->gamename = name;
 	loaded_cart->filename = path;
 	loaded_cart->bank = 0;
-
+	loaded_cart->type = (cart_type) memory_get8(0x147);
+	printf("Current ROM is type %X\n", loaded_cart->type);
+	loaded_cart->is_gbc = (memory_get8(0x143) == 0x80);
+	printf("Current ROM %s a GBC ROM\n", loaded_cart->is_gbc ? "IS" : "IS NOT");
+	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
+	loaded_cart->ram_bytes = calc_ram_size(memory_get8(0x149));
+	printf("%d banks ROM, %d bytes RAM\n", loaded_cart->rom_banks, loaded_cart->ram_bytes);
 	printf("Name - %s\n", name);
 	calculate_checksum(cart);
 	fclose(cart);
-	return NULL;
+	return loaded_cart;
 }
 
 static inline unsigned get_cart_size(FILE *cart)
@@ -63,7 +67,23 @@ static inline bool calculate_checksum(FILE *cart)
 	word checksum = ((word) memory_get8(0x14E)) << 8;
 	checksum |= ((word) memory_get8(0x14F));
 	word actual = 1;
-	while(!feof(cart) && !ferror(cart)) actual += fgetc(cart);
+	byte header = 0;
+	unsigned i = 0;
+	while(!feof(cart) && !ferror(cart))
+	{
+		if(i >= 0x134 && i <= 0x14D)
+		{
+			byte temp = fgetc(cart);
+			if(i == 0x14D)
+			{
+				printf("Testing Header Checksum - Desired %X, Actual %X\n", temp, header);
+			}
+			else header -= (temp + 1);
+			actual += temp;
+		}
+		else actual += fgetc(cart);
+		++i;
+	}
 	//Apparently, the checksum bytes themselves aren't included
 	byte *checksum_bytes = (byte*) &checksum;
 	actual -= checksum_bytes[0];
@@ -73,7 +93,7 @@ static inline bool calculate_checksum(FILE *cart)
 	return (actual == checksum);
 }
 
-static inline byte rom_banks(byte identifier)
+static inline byte calc_rom_banks(byte identifier)
 {
 	if(identifier < 7) return (2 << identifier);
 	switch(identifier)
@@ -89,7 +109,7 @@ static inline byte rom_banks(byte identifier)
 			exit(1);
 	}
 }
-static inline unsigned ram_size(byte identifier)
+static inline unsigned calc_ram_size(byte identifier)
 {
 	switch(identifier)
 	{

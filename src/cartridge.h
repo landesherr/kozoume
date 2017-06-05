@@ -40,8 +40,7 @@ typedef struct cartridge
 	cart_type type;
 	bool is_gbc;
 	byte rom_banks;
-	byte ram_banks;
-	word checksum;
+	unsigned ram_bytes;
 } cartridge;
 
 cartridge* load_cart(char*);
