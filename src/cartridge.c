@@ -41,7 +41,7 @@ cartridge* load_cart(char *path)
 	loaded_cart->bank = 0;
 	loaded_cart->type = (cart_type) memory_get8(0x147);
 	dbgwrite("Current ROM is type %X\n", loaded_cart->type);
-	loaded_cart->is_gbc = (memory_get8(0x143) == 0x80);
+	loaded_cart->is_gbc = (memory_get8(0x143) == 0xC0);
 	dbgwrite("Current ROM %s a GBC ROM\n", loaded_cart->is_gbc ? "IS" : "IS NOT");
 	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
 	loaded_cart->ram_bytes = calc_ram_size(memory_get8(0x149));
