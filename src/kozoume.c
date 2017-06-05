@@ -4,6 +4,9 @@
 #include "z80.h"
 #include "cartridge.h"
 #include "globaldefs.h"
+#include "opcodes.h"
+
+#define INIT_PC() (*PC = 0x100)
 
 void basic_sanity_check(void);
 void powerup(void);
@@ -18,7 +21,10 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 	load_cart(argv[1]);
-	basic_sanity_check();
+	INIT_PC();
+	allocate_bytecode_tables();
+	//basic_sanity_check();
+	free_bytecode_tables();
 	memory_free();
 	return 0;
 }
@@ -30,9 +36,12 @@ void basic_sanity_check()
 	dbgwrite("FF10 is %X - %s\n", memory_get8(0xFF10), memory_get8(0xFF10) == 0x80 ? "OK" : "FAIL");
 	dbgwrite("FF1E is %X - %s\n", memory_get8(0xFF1E), memory_get8(0xFF1E) == 0xBF ? "OK" : "FAIL");
 	dbgwrite("FF26 is %X - %s\n", memory_get8(0xFF26), memory_get8(0xFF26) == 0xF1 ? "OK" : "FAIL");
+	dbgwrite("Testing opcode function addresses...\n");
+	dbgwrite("opcode_00 is %llX, standard_opcodes[0x00] is %llX\n", &opcode_00, standard_opcodes[0x00]);
+	dbgwrite("opcode_aa is %llX, standard_opcodes[0xaa] is %llX\n", &opcode_aa, standard_opcodes[0xaa]);
 	dbgwrite("Testing sanity with some basic arithmetic and flags...\n");
 	unsigned i;
-	memory_set8(1,0xFF);
+	memory_set8(*PC+1,0xFF);
 	ld_nn_n(A);
 	dbgwrite("Value of A after LD: %X\n",*A);
 	*A = 0;
