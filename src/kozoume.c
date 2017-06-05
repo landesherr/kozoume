@@ -2,15 +2,22 @@
 #include <stdlib.h>
 #include "memory.h"
 #include "z80.h"
+#include "cartridge.h"
 #include "globaldefs.h"
 
 void basic_sanity_check(void);
 void powerup(void);
 
-int main()
+int main(int argc, char *argv[])
 {
 	memory_init();
 	powerup();
+	if(argc < 2)
+	{
+		dbgwrite("No ROM specified\n");
+		exit(0);
+	}
+	load_cart(argv[1]);
 	basic_sanity_check();
 	memory_free();
 	return 0;
@@ -18,40 +25,46 @@ int main()
 
 void basic_sanity_check()
 {
-	printf("Testing memory values per power up sequence...\n");
-	printf("FF10 is %X - %s\n", memory_get8(0xFF10), memory_get8(0xFF10) == 0x80 ? "OK" : "FAIL");
-	printf("FF10 is %X - %s\n", memory_get8(0xFF1E), memory_get8(0xFF1E) == 0xBF ? "OK" : "FAIL");
-	printf("FF10 is %X - %s\n", memory_get8(0xFF26), memory_get8(0xFF26) == 0xF0 ? "OK" : "FAIL");
-	printf("Testing sanity with some basic arithmetic and flags...\n");
+	bool doOnce = true;
+	dbgwrite("Testing memory values per power up sequence...\n");
+	dbgwrite("FF10 is %X - %s\n", memory_get8(0xFF10), memory_get8(0xFF10) == 0x80 ? "OK" : "FAIL");
+	dbgwrite("FF1E is %X - %s\n", memory_get8(0xFF1E), memory_get8(0xFF1E) == 0xBF ? "OK" : "FAIL");
+	dbgwrite("FF26 is %X - %s\n", memory_get8(0xFF26), memory_get8(0xFF26) == 0xF1 ? "OK" : "FAIL");
+	dbgwrite("Testing sanity with some basic arithmetic and flags...\n");
 	unsigned i;
 	memory_set8(1,0xFF);
 	ld_nn_n(A);
-	printf("Value of A after LD: %X\n",*A);
+	dbgwrite("Value of A after LD: %X\n",*A);
 	*A = 0;
 	for(i=0;i<100;i++)
 	{
 		memory_set8(*PC + 1,0x09);
 		add_a_n();
-		//printf("Value of A: %X\n", *A);
-		//printf("Value of AF: %X\n", *AF);
+		//dbgwrite("Value of A: %X\n", *A);
+		//dbgwrite("Value of AF: %X\n", *AF);
 		if(*F & 0b00100000)
 		{
-			//printf("Half carry!\n");
+			if(doOnce)
+			{
+				dbgwrite("Half Carry OK\n");
+				doOnce = false;
+			}
 			*F &= 0b11011111;
 		}
 		if(*F & 0b00010000)
 		{
-			printf("Carry!\n");
+			dbgwrite("Carry OK\n");
 			return;
 		}
 	}
-	printf("Too many iterations. Something's wrong.\n");
+	dbgwrite("Too many iterations. Something's wrong.\n");
 	exit(1);
 }
 
 //set memory/register values to defaults
 void powerup()
 {
+	*F = 0xB0;
 	*BC = 0x13;
 	*DE = 0xD8;
 	*HL = 0x14D;
