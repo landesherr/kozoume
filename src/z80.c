@@ -146,23 +146,14 @@ void ld_sp_hl()
 void ldhl_sp_n()
 {
 	signed char tempvalue;
-	//int calc = *SP;
-	//calc += (signed char) memory_get8(*PC + 1);
 	word result;
-	*HL = *SP;
 	tempvalue = (signed char) memory_get8(*PC + 1);
-	if(tempvalue > 0)
-	{
-		result = *HL + tempvalue;
-		calc_carry_16(result, *HL, false);
-	}
-	else if(tempvalue < 0)
-	{
-		result = *HL - (0 - tempvalue);
-		calc_carry_16(result, *HL, true);
-	}
+	result = do_signed_add_reg16_byte(*SP, tempvalue);
+	calc_halfcarry_16(result, *SP, false);
+	calc_carry_16(result, *SP, false);
 	set_zero(false);
 	set_subtract(false);
+	*HL = result;
 	*PC += 2;
 	cycles += 12;
 }
@@ -482,4 +473,42 @@ void dec_hl()
 	memory_set8(*HL, result);
 	*PC += 1;
 	cycles += 12;
+}
+
+//16-bit ALU
+void add_hl_reg16(reg16 reg)
+{
+	word result = *HL + *reg;
+	calc_halfcarry_16(result, *HL, false);
+	calc_carry_16(result, *HL, false);
+	set_subtract(false);
+	*HL = result;
+	*PC += 1;
+	cycles += 8;
+}
+void add_sp_n()
+{
+	word result;
+	signed char tempval = memory_get8(*PC + 1);
+	result = do_signed_add_reg16_byte(SP, tempval);
+	calc_halfcarry_16(result, *SP, false);
+	calc_carry_16(result, *SP, false);
+	set_zero(false);
+	set_subtract(false);
+	*SP = result;
+	*PC += 2;
+	cycles += 16;
+}
+//No flags affected on 16-bit inc/dec
+void inc_reg16(reg16 reg)
+{
+	*reg += 1;
+	*PC += 1;
+	cycles += 8;
+}
+void dec_reg16(reg16 reg)
+{
+	*reg -= 1;
+	*PC += 1;
+	cycles += 8;
 }

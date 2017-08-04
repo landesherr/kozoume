@@ -14,6 +14,7 @@ extern unsigned cycles;
 
 //generic CPU ops
 //TODO: refactor opcode funcs that take params as inline
+//8 bit loads
 void ld_nn_n(reg8);
 void ld_reg8_reg8(reg8,reg8);
 void ld_reg8_mem(reg8);
@@ -70,7 +71,85 @@ void inc_hl(void);
 void dec_reg8(reg8);
 void dec_hl(void);
 
-//flag operations
+//16 bit ALU
+void add_hl_reg16(reg16);
+void add sp_n(void);
+void inc_reg16(reg16);
+void dec_reg16(reg16);
+/*
+//Misc
+void swap_reg8(reg8);
+void swap_hl(void);
+void daa(void);
+void ccf(void);
+void scf(void);
+void nop(void);
+void halt(void);
+void stop(void);
+void di(void);
+void ei(void);
+
+//Rotates + shifts
+void rlca(void);
+void rla(void);
+void rrca(void);
+void rra(void);
+void rlc_reg8(reg8);
+void rlc_hl(void);
+void rl_reg8(reg8);
+void rl_hl(void);
+void rrc_reg8(reg8);
+void rrc_hl(void);
+void rr_reg8(void);
+void rr_hl(void);
+void sla_reg8(reg8);
+void sla_hl(void);
+void sra_reg8(reg8);
+void sra_hl(void);
+void srl_reg8(reg8);
+void srl_hl(void);
+
+//Bit opcodes
+void bit_reg8(byte, reg8);
+void bit_hl(byte);
+void set_reg8(byte, reg8);
+void set_hl(byte);
+void res_reg8(byte, reg8);
+void res_hl(byte);
+
+//Jumps
+void jp(void);
+void jp_nz(void);
+void jp_z(void);
+void jp_nc(void);
+void jp_c(void);
+void jp_hl(void);
+void jr(void);
+void jr_nz(void);
+void jr_z(void);
+void jr_nc(void);
+void jr_c(void);
+
+//Calls
+void call(void);
+void call_nz(void);
+void call_z(void);
+void call_nc(void);
+void call_c(void);
+
+//Restarts
+void rst(void);
+
+//Returns
+void ret(void);
+void ret_nz(void);
+void ret_z(void);
+void ret_nc(void);
+void ret_c(void);
+void reti(void);
+*/
+
+//flag operations and other inline funcs
 inline void calc_carry_8(byte, byte, bool);
 inline void calc_halfcarry_16(word, word, bool);
 inline void calc_carry_8(byte, byte, bool);
@@ -85,6 +164,8 @@ inline bool get_zero(void);
 inline bool get_subtract(void);
 inline bool get_halfcarry(void);
 inline bool get_carry(void);
+
+inline word do_signed_add_reg16_byte(reg16, signed char);
 
 //inline function defs
 inline void set_flag(byte flag, bool set)
@@ -159,4 +240,19 @@ inline void calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
 inline void calc_halfcarry_16(word result, word registervalue, bool isSubtract)
 {
 	calc_halfcarry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
+}
+
+inline word do_signed_add_reg16_byte(reg16 dest, signed char value)
+{
+	word result;
+	if(value > 0)
+	{
+		result = *dest + value;
+	}
+	else if(value < 0)
+	{
+		isSubtract = true;
+		result = *dest - (0 - value);
+	}
+	return result;
 }
