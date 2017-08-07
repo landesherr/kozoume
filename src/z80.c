@@ -873,8 +873,12 @@ void jp_cc(conditional c)
 			increment = true;
 			break;
 	}
-	if(increment) *PC += 1;
-	cycles += 12;
+	if(increment)
+	{
+		*PC += 1;
+		cycles += 12;
+	}
+	else cycles += 16;
 }
 void jr()
 {
@@ -910,7 +914,11 @@ void jr_cc(conditional c)
 			increment = true;
 			break;
 	}
-	if(increment) *PC += 1;
-	cycles += 8;
+	if(increment)
+	{
+		*PC += 1;
+		cycles += 8;
+	}
+	else cycles += 12;
 
 }
