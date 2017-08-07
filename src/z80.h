@@ -148,13 +148,13 @@ void jp_cc(conditional);
 void jr(void);
 void jr_cc(conditional);
 
-/*
 //Calls
 void call(void);
 void call_cc(conditional);
 
+/*
 //Restarts
-void rst(void);
+void rst(byte);
 
 //Returns
 void ret(void);

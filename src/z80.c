@@ -922,3 +922,64 @@ void jr_cc(conditional c)
 	else cycles += 12;
 
 }
+void call()
+{
+	*SP -= 2;
+	memory_set16(*SP, *PC + 3);
+	*PC = memory_get16(*PC + 1);
+	cycles += 12;
+}
+void call_cc(conditional c)
+{
+	word address = memory_get16(*PC + 1);
+	bool increment = false;
+	switch(c)
+	{
+		case NOTZERO:
+			if(!get_zero())
+			{
+				*SP -= 2;
+				memory_set16(*SP, *PC + 3);
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		case ZERO:
+			if(get_zero())
+			{
+				*SP -= 2;
+				memory_set16(*SP, *PC + 3);
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		case NOTCARRY:
+			if(!get_carry())
+			{
+				*SP -= 2;
+				memory_set16(*SP, *PC + 3);
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		case CARRY:
+			if(get_carry())
+			{
+				*SP -= 2;
+				memory_set16(*SP, *PC + 3);
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		default:
+			//Should never happen
+			increment = true;
+			break;
+	}
+	if(increment)
+	{
+		*PC += 3;
+		cycles += 12;
+	}
+	else cycles += 24;
+}
