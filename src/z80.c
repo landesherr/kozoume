@@ -983,3 +983,77 @@ void call_cc(conditional c)
 	}
 	else cycles += 24;
 }
+
+//Restart
+void rst(byte address)
+{
+	*SP -= 2;
+	memory_set16(*SP, *PC + 3);
+	*PC = address;
+	cycles += 32;
+}
+
+//Returns
+void ret()
+{
+	word address = memory_get16(*SP);
+	*SP += 2;
+	*PC = address;
+	cycles += 8;
+}
+void ret_cc(conditional c)
+{
+	word address = memory_get16(*SP);
+	bool increment = false;
+	switch(c)
+	{
+		case NOTZERO:
+			if(!get_zero())
+			{
+				*SP += 2;
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		case ZERO:
+			if(get_zero())
+			{
+				*SP += 2;
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		case NOTCARRY:
+			if(!get_carry())
+			{
+				*SP += 2;
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		case CARRY:
+			if(get_carry())
+			{
+				*SP += 2;
+				*PC = address;
+			}
+			else increment = true;
+			break;
+		default:
+			//Should never happen
+			increment = true;
+			break;
+	}
+	if(increment)
+	{
+		*PC += 1;
+		cycles += 8;
+	}
+	else cycles += 20;
+
+}
+void reti()
+{
+	interruptsEnabled = true;
+	ret();
+}

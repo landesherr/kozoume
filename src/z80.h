@@ -152,7 +152,6 @@ void jr_cc(conditional);
 void call(void);
 void call_cc(conditional);
 
-/*
 //Restarts
 void rst(byte);
 
@@ -160,7 +159,7 @@ void rst(byte);
 void ret(void);
 void ret_cc(conditional);
 void reti(void);
-*/
+
 
 //flag operations and other inline funcs
 inline void calc_carry_8(byte, byte, bool);
