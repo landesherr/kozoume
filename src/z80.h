@@ -125,7 +125,6 @@ void sra_hl(void);
 void srl_reg8(reg8);
 void srl_hl(void);
 
-/*
 //Bit opcodes
 void bit_reg8(byte, reg8);
 void bit_hl(byte);
@@ -134,6 +133,7 @@ void set_hl(byte);
 void res_reg8(byte, reg8);
 void res_hl(byte);
 
+/*
 //Jumps
 void jp(void);
 void jp_nz(void);

@@ -785,5 +785,52 @@ void srl_hl()
 	set_halfcarry(false);
 	memory_set8(*HL, value);
 	*PC += 1;
+	cycles += 16;
+}
+
+//Bit opcodes
+void bit_reg8(byte bit, reg8 reg)
+{
+	set_zero( ((*reg >> bit) & 0x1) == 0 );
+	set_subtract(false);
+	set_halfcarry(true);
+	*PC += 1;
 	cycles += 8;
+}
+void bit_hl(byte bit)
+{
+	byte value = memory_get8(*HL);
+	set_zero( ((value >> bit) & 0x1) == 0 );
+	set_subtract(false);
+	set_halfcarry(true);
+	*PC += 1;
+	cycles += 16;
+}
+void set_reg8(byte bit, reg8 reg)
+{
+	*reg |= (1 << bit);
+	*PC += 1;
+	cycles += 8;
+}
+void set_hl(byte bit)
+{
+	byte value = memory_get8(*HL);
+	value |= (1 << bit);
+	memory_set8(*HL, value);
+	*PC += 1;
+	cycles += 16;
+}
+void res_reg8(byte bit, reg8 reg)
+{
+	*reg &= ~(1 << bit);
+	*PC += 1;
+	cycles += 8;
+}
+void res_hl(byte bit)
+{
+	byte value = memory_get8(*HL);
+	value &= ~(1 << bit);
+	memory_set8(*HL, value);
+	*PC += 1;
+	cycles += 16;
 }
