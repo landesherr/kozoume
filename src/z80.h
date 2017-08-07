@@ -11,6 +11,8 @@ extern reg8 A, F, B, C, D, E, H, L;
 extern reg16 AF, BC, DE, HL, SP, PC;
 
 extern unsigned cycles;
+extern bool isHalting, isStopped;
+extern bool interruptsEnabled;
 
 //generic CPU ops
 //TODO: refactor opcode funcs that take params as inline
@@ -76,7 +78,7 @@ void add_hl_reg16(reg16);
 void add sp_n(void);
 void inc_reg16(reg16);
 void dec_reg16(reg16);
-/*
+
 //Misc
 void swap_reg8(reg8);
 void swap_hl(void);
@@ -89,6 +91,7 @@ void stop(void);
 void di(void);
 void ei(void);
 
+/*
 //Rotates + shifts
 void rlca(void);
 void rla(void);

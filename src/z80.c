@@ -22,6 +22,8 @@ reg16 SP = (word*) &registers[8];
 reg16 PC = (word*) &registers[10];
 
 unsigned cycles = 0;
+bool isHalting = false, isStopped = false;
+bool interruptsEnabled = true;
 
 //8-BIT LOADS
 void ld_nn_n(reg8 reg)
@@ -511,4 +513,84 @@ void dec_reg16(reg16 reg)
 	*reg -= 1;
 	*PC += 1;
 	cycles += 8;
+}
+
+//Misc
+void swap_reg8(reg8 reg)
+{
+	byte temp = *reg & 0xF;
+	*reg = (*reg >> 4);
+	*reg |= (temp << 4);
+	if(!*reg) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 1;
+	cycles += 8;
+}
+void swap_hl()
+{
+	byte value = memory_get8(*HL);
+	byte temp = value & 0xF;
+	value = (value >> 4);
+	value |= (temp << 4);
+	memory_set8(*HL, value);
+	if(!value) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_carry(false);
+	*PC += 1;
+	cycles += 16;
+}
+void daa()
+{
+	//TODO copy implementation from VM
+}
+void ccf()
+{
+	set_carry(!get_carry());
+	set_subtract(false);
+	set_halfcarry(false);
+	*PC += 1;
+	cycles += 4;
+}
+void scf()
+{
+	set_carry(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	*PC += 1;
+	cycles += 4;
+}
+void nop()
+{
+	*PC += 1;
+	cycles += 4;
+}
+void halt()
+{
+	isHalting = true;
+	*PC += 1;
+	cycles += 4;
+}
+void stop()
+{
+	isStopped = true;
+	*PC += 1;
+	cycles += 4;
+}
+//Technically, enabling or disabling interrupts shouldn't happen immediately
+//It should be delayed by one instruction on actual GB hardware
+//However, the GBC doesn't behave like this, and compatibility is fine
+void di()
+{
+	interruptsEnabled = false;
+	*PC += 1;
+	cycles += 4;
+}
+void ei()
+{
+	interruptsEnabled = true;
+	*PC += 1;
+	cycles += 4;
 }
