@@ -611,3 +611,179 @@ void ei()
 	*PC += 1;
 	cycles += 4;
 }
+
+//Rotates + Shifts
+void rlc_reg8(reg8 reg)
+{
+	//8-bit rotation, bit 7 goes to both CF and bit 0
+	byte temp = *reg << 1;
+	temp |= (*reg >> 7);
+	if(!temp) set_zero(true);
+	set_carry( (*reg & 0x8) );
+	set_subtract(false);
+	set_halfcarry(false);
+	*reg = temp;
+	*PC += 1;
+	cycles += 4;
+}
+void rlc_hl()
+{
+	byte value = memory_get8(*HL);
+	byte temp = value << 1;
+	temp |= (value >> 7);
+	if(!temp) set_zero(true);
+	set_carry( (value & 0x8) );
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, temp);
+	*PC += 1;
+	cycles += 16;
+}
+void rl_reg8(reg8 reg)
+{
+	//9-bit rotation, CF to bit 0, bit 7 to CF
+	byte temp = *reg << 1;
+	temp |= get_carry();
+	if(!temp) set_zero(true);
+	set_carry(*reg >> 7);
+	set_subtract(false);
+	set_halfcarry(false);
+	*reg = temp;
+	*PC += 1;
+	cyles += 4;
+}
+void rl_hl()
+{
+	byte value = memory_get8(*HL);
+	byte temp = value << 1;
+	temp |= get_carry();
+	if(!temp) set_zero(true);
+	set_carry(value >> 7);
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, temp)
+	*PC += 1;
+	cyles += 16;
+}
+void rrc_reg8(reg8 reg)
+{
+	//8-bit rotation, bit 0 goes to bit 7 and CF
+	byte temp = *reg >> 1;
+	temp |= (*reg << 7);
+	if(!temp) set_zero(true);
+	set_carry(*reg & 0x1);
+	set_subtract(false);
+	set_halfcarry(false);
+	*reg = temp;
+	*PC += 1;
+	cycles += 4;
+}
+void rrc_hl()
+{
+	byte value = memory_get8(*HL);
+	byte temp = value >> 1;
+	temp |= (value << 7);
+	if(!temp) set_zero(true);
+	set_carry(value & 0x1);
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, temp);
+	*PC += 1;
+	cycles += 16;
+}
+void rr_reg8(reg8 reg)
+{
+	//9-bit rotation, CF goes to bit 7, bit 0 to CF
+	byte temp = *reg >> 1;
+	temp |= get_carry() << 7;
+	if(!temp) set_zero(true);
+	set_carry(*reg & 0x1);
+	set_subtract(false);
+	set_halfcarry(false);
+	*reg = temp;
+	*PC += 1;
+	cycles += 4;
+}
+void rr_hl()
+{
+	byte value = memory_get8(*HL);
+	byte temp = value >> 1;
+	temp |= get_carry() << 7;
+	if(!temp) set_zero(true);
+	set_carry(value & 0x1);
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, temp);
+	*PC += 1;
+	cycles += 16;
+}
+void sla_reg8(reg8 reg)
+{
+	set_carry(*reg & 0x80);
+	*reg <<= 1;
+	if(!*reg) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	*PC += 1;
+	cycles += 8;
+}
+void sla_hl()
+{
+	byte value = memory_get8(*HL);
+	set_carry(value & 0x80);
+	value <<= 1;
+	if(!value) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, value);
+	*PC += 1;
+	cycles += 16;
+}
+void sra_reg8(reg8 reg)
+{
+	//bit 7 remains unchanged
+	byte temp = *reg >> 1;
+	set_carry(*reg & 0x1);
+	*reg = (*reg & 0x80) | temp;
+	if(!*reg) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	*PC += 1;
+	cycles += 8;
+}
+void sra_hl()
+{
+	byte value = memory_get8(*HL);
+	byte temp = value >> 1;
+	set_carry(value & 0x1);
+	value = (value & 0x80) | temp;
+	if(!value) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, value);
+	*PC += 1;
+	cycles += 16;
+}
+void srl_reg8(reg8 reg)
+{
+	//bit 7 reset to 0
+	set_carry(*reg & 0x1);
+	*reg >>= 1;
+	if(!*reg) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	*PC += 1;
+	cycles += 8;
+}
+void srl_hl()
+{
+	byte value = memory_get8(*HL);
+	set_carry(value & 0x1);
+	value >>= 1;
+	if(!value) set_zero(true);
+	set_subtract(false);
+	set_halfcarry(false);
+	memory_set8(*HL, value);
+	*PC += 1;
+	cycles += 8;
+}

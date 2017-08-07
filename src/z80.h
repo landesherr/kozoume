@@ -109,19 +109,14 @@ void stop(void);
 void di(void);
 void ei(void);
 
-/*
 //Rotates + shifts
-void rlca(void);
-void rla(void);
-void rrca(void);
-void rra(void);
 void rlc_reg8(reg8);
 void rlc_hl(void);
 void rl_reg8(reg8);
 void rl_hl(void);
 void rrc_reg8(reg8);
 void rrc_hl(void);
-void rr_reg8(void);
+void rr_reg8(reg8);
 void rr_hl(void);
 void sla_reg8(reg8);
 void sla_hl(void);
@@ -130,6 +125,7 @@ void sra_hl(void);
 void srl_reg8(reg8);
 void srl_hl(void);
 
+/*
 //Bit opcodes
 void bit_reg8(byte, reg8);
 void bit_hl(byte);
