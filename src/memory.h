@@ -46,6 +46,7 @@ extern const mem_range \
 extern const word interrupt_enable_flag;
 
 byte memory_get8(word);
+signed char memory_get8s(word);
 word memory_get16(word);
 
 void memory_set8(word, byte);

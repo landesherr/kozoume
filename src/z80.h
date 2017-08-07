@@ -32,6 +32,14 @@ extern unsigned cycles;
 extern bool isHalting, isStopped;
 extern bool interruptsEnabled;
 
+typedef enum conditional
+{
+	NOTZERO,
+	ZERO,
+	NOTCARRY,
+	CARRY
+} conditional;
+
 //generic CPU ops
 //TODO: refactor opcode funcs that take params as inline
 //8 bit loads
@@ -133,36 +141,24 @@ void set_hl(byte);
 void res_reg8(byte, reg8);
 void res_hl(byte);
 
-/*
 //Jumps
 void jp(void);
-void jp_nz(void);
-void jp_z(void);
-void jp_nc(void);
-void jp_c(void);
 void jp_hl(void);
+void jp_cc(conditional);
 void jr(void);
-void jr_nz(void);
-void jr_z(void);
-void jr_nc(void);
-void jr_c(void);
+void jr_cc(conditional);
 
+/*
 //Calls
 void call(void);
-void call_nz(void);
-void call_z(void);
-void call_nc(void);
-void call_c(void);
+void call_cc(conditional);
 
 //Restarts
 void rst(void);
 
 //Returns
 void ret(void);
-void ret_nz(void);
-void ret_z(void);
-void ret_nc(void);
-void ret_c(void);
+void ret_cc(conditional);
 void reti(void);
 */
 
@@ -183,6 +179,7 @@ inline bool get_halfcarry(void);
 inline bool get_carry(void);
 
 inline word do_signed_add_reg16_byte(reg16, signed char);
+inline word do_signed_add_word_byte(reg16, signed char);
 
 //inline function defs
 inline void set_flag(byte flag, bool set)
@@ -262,14 +259,13 @@ inline void calc_halfcarry_16(word result, word registervalue, bool isSubtract)
 inline word do_signed_add_reg16_byte(reg16 dest, signed char value)
 {
 	word result;
-	if(value > 0)
-	{
-		result = *dest + value;
-	}
-	else if(value < 0)
-	{
-		isSubtract = true;
-		result = *dest - (0 - value);
-	}
+	if(value > 0) result = *dest + value;
+	else if(value < 0) result = *dest - (byte) (0 - value);
+	return result;
+}
+inline word do_signed_add_word_byte(word dest, signed char value)
+{
+	if(value > 0) dest += value;
+	else if(value < 0) dest -= (byte) (0 - value);
 	return result;
 }

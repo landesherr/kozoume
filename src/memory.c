@@ -52,6 +52,10 @@ byte memory_get8(word address)
 {
 	return memory_map[address];
 }
+signed char memory_get8s(word address)
+{
+	return *(char*)&memory_map[address];
+}
 word memory_get16(word address)
 {
 	return *((word*)&memory_map[address]);

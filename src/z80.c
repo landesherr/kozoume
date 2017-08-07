@@ -166,7 +166,7 @@ void ldhl_sp_n()
 {
 	signed char tempvalue;
 	word result;
-	tempvalue = (signed char) memory_get8(*PC + 1);
+	tempvalue = memory_get8s(*PC + 1);
 	result = do_signed_add_reg16_byte(*SP, tempvalue);
 	calc_halfcarry_16(result, *SP, false);
 	calc_carry_16(result, *SP, false);
@@ -508,7 +508,7 @@ void add_hl_reg16(reg16 reg)
 void add_sp_n()
 {
 	word result;
-	signed char tempval = memory_get8(*PC + 1);
+	signed char tempval = memory_get8s(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempval);
 	calc_halfcarry_16(result, *SP, false);
 	calc_carry_16(result, *SP, false);
@@ -833,4 +833,84 @@ void res_hl(byte bit)
 	memory_set8(*HL, value);
 	*PC += 1;
 	cycles += 16;
+}
+
+//Jumps
+void jp()
+{
+	*PC = memory_get16(*PC + 1);
+	cycles += 12;
+}
+void jp_hl()
+{
+	*PC = memory_get16(*HL);
+	cycles += 4;
+}
+void jp_cc(conditional c)
+{
+	word address = memory_get16(*PC + 1);
+	bool increment = false;
+	switch(c)
+	{
+		case NOTZERO:
+			if(!get_zero()) *PC = address;
+			else increment = true;
+			break;
+		case ZERO:
+			if(get_zero()) *PC = address;
+			else increment = true;
+			break;
+		case NOTCARRY:
+			if(!get_carry()) *PC = address;
+			else increment = true;
+			break;
+		case CARRY:
+			if(get_carry()) *PC = address;
+			else increment = true;
+			break;
+		default:
+			//Should never happen
+			increment = true;
+			break;
+	}
+	if(increment) *PC += 1;
+	cycles += 12;
+}
+void jr()
+{
+	signed char relative_address = memory_get8s(*PC + 1);
+	*PC = do_signed_add_word_byte(*PC, relative_address);
+	cycles += 8;
+}
+void jr_cc(conditional c)
+{
+	signed char relative_address = memory_get8s(*PC + 1);
+	word new_address = do_signed_add_word_byte(*PC, relative_address);
+	bool increment = false;
+	switch(c)
+	{
+		case NOTZERO:
+			if(!get_zero()) *PC = address;
+			else increment = true;
+			break;
+		case ZERO:
+			if(get_zero()) *PC = address;
+			else increment = true;
+			break;
+		case NOTCARRY:
+			if(!get_carry()) *PC = address;
+			else increment = true;
+			break;
+		case CARRY:
+			if(get_carry()) *PC = address;
+			else increment = true;
+			break;
+		default:
+			//Should never happen
+			increment = true;
+			break;
+	}
+	if(increment) *PC += 1;
+	cycles += 8;
+
 }
