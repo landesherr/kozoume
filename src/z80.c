@@ -168,7 +168,7 @@ void ldhl_sp_n()
 	signed char tempvalue;
 	word result;
 	tempvalue = memory_get8s(*PC + 1);
-	result = do_signed_add_reg16_byte(*SP, tempvalue);
+	result = do_signed_add_reg16_byte(SP, tempvalue);
 	calc_halfcarry_16(result, *SP, false);
 	calc_carry_16(result, *SP, false);
 	set_zero(false);
@@ -571,12 +571,12 @@ void daa()
 	}
 	else
 	{
-		if(get_halfcarry() || (*A & 0xF > 9)) *A += 6;
+		if(get_halfcarry() || ( (*A & 0xF) > 9)) *A += 6;
 		if(get_carry() || *A > 0x9F) *A += 0x60;
 	}
-	calc_carry8(*A, prev, false);
+	calc_carry_8(*A, prev, false);
 	set_halfcarry(false);
-	set_zero(*A == 0)
+	set_zero(*A == 0);
 
 }
 void ccf()
@@ -666,7 +666,7 @@ void rl_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cyles += 4;
+	cycles += 4;
 }
 void rl_hl()
 {
@@ -677,9 +677,9 @@ void rl_hl()
 	set_carry(value >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, temp)
+	memory_set8(*HL, temp);
 	*PC += 1;
-	cyles += 16;
+	cycles += 16;
 }
 void rrc_reg8(reg8 reg)
 {
@@ -910,19 +910,19 @@ void jr_cc(conditional c)
 	switch(c)
 	{
 		case NOTZERO:
-			if(!get_zero()) *PC = address;
+			if(!get_zero()) *PC = new_address;
 			else increment = true;
 			break;
 		case ZERO:
-			if(get_zero()) *PC = address;
+			if(get_zero()) *PC = new_address;
 			else increment = true;
 			break;
 		case NOTCARRY:
-			if(!get_carry()) *PC = address;
+			if(!get_carry()) *PC = new_address;
 			else increment = true;
 			break;
 		case CARRY:
-			if(get_carry()) *PC = address;
+			if(get_carry()) *PC = new_address;
 			else increment = true;
 			break;
 		default:
