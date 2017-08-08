@@ -561,7 +561,22 @@ void swap_hl()
 }
 void daa()
 {
-	//TODO copy implementation from VM
+	byte prev = *A;
+
+	if(get_subtract())
+	{
+		if(get_halfcarry()) *A -= 6;
+		if(get_carry()) *A -= 0x60;
+	}
+	else
+	{
+		if(get_halfcarry() || (*A & 0xF > 9)) *A += 6;
+		if(get_carry() || *A > 0x9F) *A += 0x60;
+	}
+	calc_carry8(*A, prev, false);
+	set_halfcarry(false);
+	set_zero(*A == 0)
+
 }
 void ccf()
 {
