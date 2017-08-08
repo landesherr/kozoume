@@ -110,6 +110,7 @@ void dec_reg16(reg16);
 void swap_reg8(reg8);
 void swap_hl(void);
 void daa(void);
+void cpl(void);
 void ccf(void);
 void scf(void);
 void nop(void);

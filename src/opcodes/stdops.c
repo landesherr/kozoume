@@ -849,7 +849,7 @@ void opcode_a5()
 
 void opcode_a6()
 {
-	and_hl
+	and_hl();
 }
 
 void opcode_a7()
@@ -1059,7 +1059,7 @@ void opcode_cf()
 
 void opcode_d0()
 {
-	ret(NOTCARRY);
+	ret_cc(NOTCARRY);
 }
 
 void opcode_d1()
@@ -1269,7 +1269,7 @@ void opcode_f9()
 
 void opcode_fa()
 {
-	ld_a_n();
+	ld_a_nnmem();
 }
 
 void opcode_fb()

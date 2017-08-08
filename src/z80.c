@@ -579,6 +579,14 @@ void daa()
 	set_zero(*A == 0);
 
 }
+void cpl()
+{
+	*A = ~*A;
+	set_subtract(true);
+	set_halfcarry(true);
+	*PC += 1;
+	cycles += 4;
+}
 void ccf()
 {
 	set_carry(!get_carry());
