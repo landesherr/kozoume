@@ -102,7 +102,7 @@ void dec_hl(void);
 
 //16 bit ALU
 void add_hl_reg16(reg16);
-void add sp_n(void);
+void add_sp_n(void);
 void inc_reg16(reg16);
 void dec_reg16(reg16);
 
@@ -182,7 +182,7 @@ inline bool get_halfcarry(void);
 inline bool get_carry(void);
 
 inline word do_signed_add_reg16_byte(reg16, signed char);
-inline word do_signed_add_word_byte(reg16, signed char);
+inline word do_signed_add_word_byte(word, signed char);
 
 //inline function defs
 inline void set_flag(byte flag, bool set)
@@ -270,5 +270,5 @@ inline word do_signed_add_word_byte(word dest, signed char value)
 {
 	if(value > 0) dest += value;
 	else if(value < 0) dest -= (byte) (0 - value);
-	return result;
+	return value;
 }
