@@ -41,6 +41,7 @@ reg16 PC = (word*) &registers[10];
 unsigned cycles = 0;
 bool isHalting = false, isStopped = false;
 bool interruptsEnabled = true;
+bool prefixCB = false;
 
 //8-BIT LOADS
 void ld_nn_n(reg8 reg)
@@ -1071,4 +1072,12 @@ void reti()
 {
 	interruptsEnabled = true;
 	ret();
+}
+
+//Prefix CB
+void prefix_cb()
+{
+	prefixCB = true;
+	*PC += 1;
+	cycles += 4;
 }

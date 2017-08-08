@@ -30,6 +30,7 @@ extern reg16 AF, BC, DE, HL, SP, PC;
 
 extern unsigned cycles;
 extern bool isHalting, isStopped;
+extern bool prefixCB;
 extern bool interruptsEnabled;
 
 typedef enum conditional
@@ -159,6 +160,9 @@ void rst(byte);
 void ret(void);
 void ret_cc(conditional);
 void reti(void);
+
+//Prefix CB
+void prefix_cb(void);
 
 
 //flag operations and other inline funcs
