@@ -20,6 +20,8 @@
 #include "globaldefs.h"
 #include <stdbool.h>
 
+#define Z80_CYCLES 0x400000
+
 typedef byte* reg8;
 typedef word* reg16;
 

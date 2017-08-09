@@ -37,7 +37,6 @@ const mem_range \
 	unusable_mem = {0xFEA0,0xFEFF}, \
 	hardware_io = {0xFF00,0xFF7F}, \
 	zero_page = {0xFF80,0xFFFE};
-const word interrupt_enable_flag = 0xFFFF;
 
 void memory_init()
 {
@@ -69,3 +68,4 @@ void memory_set16(word address, word value)
 {
 	*((word*)&memory_map[address]) = value;
 }
+
