@@ -56,11 +56,12 @@ void tima_tick()
 		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick)
 		{
 			value = memory_get8(TIMA) + 1;
-			memory_set8(TIMA, value);
 			if(!value)
 			{
 				//TODO: Interrupt on overflow
+				memory_set8(TIMA, memory_get8(TMA));
 			}
+			else memory_set8(TIMA, value);
 		}
 	}
 }
