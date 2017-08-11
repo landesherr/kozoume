@@ -41,7 +41,7 @@ void ppu_tick()
 			{
 				mode_cycles -= MODE_0_CYCLES;
 				hblank_count++;
-				if(hblank_count == 10)
+				if(hblank_count == SCREEN_RES_Y)
 				{
 					ppu_mode = VBLANK;
 					hblank_count = 0;
