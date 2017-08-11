@@ -18,6 +18,7 @@
 
 #include "globaldefs.h"
 #include "memory.h"
+#include "ppu.h"
 #include <stdlib.h>
 
 byte *memory_map;
@@ -69,3 +70,47 @@ void memory_set16(word address, word value)
 	*((word*)&memory_map[address]) = value;
 }
 
+void memory_set8_logical(word address, byte value)
+{
+	if(MEMORY_IN_RANGE(address, echo_ram))
+	{
+		//propagate value in echo and regular ram areas
+		//this is inefficient, but it's nice to have a flat memory model
+		memory_map[address - 0x2000] = value;
+	}
+	else if(MEMORY_IN_RANGE(address, unusable_mem)) return;
+	else if(MEMORY_IN_RANGE(address, oam))
+	{
+		if(ppu_mode == SEARCH || ppu_mode == TRANSFER) return;
+	}
+	else if(MEMORY_IN_RANGE(address, char_ram) \
+		|| MEMORY_IN_RANGE(address, bg_map_1) \
+		|| MEMORY_IN_RANGE(address, bg_map_2))
+	{
+		if(ppu_mode == TRANSFER) return;
+	}
+	//TODO IO register behavior, OAM/VRAM, cart RAM if available
+	memory_map[address] = value;
+}
+void memory_set16_logical(word address, byte value)
+{
+	if(MEMORY_IN_RANGE(address, echo_ram))
+	{
+		//propagate value in echo and regular ram areas
+		//this is inefficient, but it's nice to have a flat memory model
+		*((word*)&memory_map[address - 0x2000]) = value;
+	}
+	else if(MEMORY_IN_RANGE(address, unusable_mem)) return;
+	else if(MEMORY_IN_RANGE(address, oam))
+	{
+		if(ppu_mode == SEARCH || ppu_mode == TRANSFER) return;
+	}
+	else if(MEMORY_IN_RANGE(address, char_ram) \
+		|| MEMORY_IN_RANGE(address, bg_map_1) \
+		|| MEMORY_IN_RANGE(address, bg_map_2))
+	{
+		if(ppu_mode == TRANSFER) return;
+	}
+	//TODO IO register behavior, OAM/VRAM, cart RAM if available
+	*((word*)&memory_map[address]) = value;
+}

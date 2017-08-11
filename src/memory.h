@@ -95,8 +95,12 @@ byte memory_get8(word);
 signed char memory_get8s(word);
 word memory_get16(word);
 
+//set memory values exactly as specified (faster, for use in emulator logic)
 void memory_set8(word, byte);
 void memory_set16(word, word);
+//set memory values per GB memory map logic (slower, for use in emulated ops)
+void memory_set8_logical(word, byte);
+void memory_set16_logical(word, word);
 
 void memory_init(void);
 void memory_free(void);

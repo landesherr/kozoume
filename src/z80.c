@@ -64,13 +64,13 @@ void ld_reg8_mem(reg8 dest)
 }
 void ld_mem_reg8(reg8 source)
 {
-	memory_set8(*HL, *source);
+	memory_set8_logical(*HL, *source);
 	*PC += 1;
 	cycles += 8;
 }
 void ld_mem_n()
 {
-	memory_set8(*HL, memory_get8(*PC + 1));
+	memory_set8_logical(*HL, memory_get8(*PC + 1));
 	*PC += 2;
 	cycles += 12;
 }
@@ -88,13 +88,13 @@ void ld_a_nnmem()
 }
 void ld_mem_a(reg16 address)
 {
-	memory_set8(memory_get16(*address), *A);
+	memory_set8_logical(memory_get16(*address), *A);
 	*PC += 1;
 	cycles += 8;
 }
 void ld_nnmem_a()
 {
-	memory_set8(memory_get16(*PC + 1), *A);
+	memory_set8_logical(memory_get16(*PC + 1), *A);
 	*PC += 3;
 	cycles += 16;
 }
@@ -106,7 +106,7 @@ void ld_a_c_relative()
 }
 void ld_c_relative_a()
 {
-	memory_set8(0xFF00 + *C, *A);
+	memory_set8_logical(0xFF00 + *C, *A);
 	*PC += 1;
 	cycles += 8;
 }
@@ -119,7 +119,7 @@ void ld_a_hld()
 }
 void ld_hld_a()
 {
-	memory_set8(*HL,*A);
+	memory_set8_logical(*HL,*A);
 	*HL -= 1;
 	*PC += 1;
 	cycles += 8;
@@ -133,14 +133,14 @@ void ld_a_hli()
 }
 void ld_hli_a()
 {
-	memory_set8(*HL,*A);
+	memory_set8_logical(*HL,*A);
 	*HL += 1;
 	*PC += 1;
 	cycles += 8;
 }
 void ldh_n_a()
 {
-	memory_set8(0xFF00 + memory_get8(*PC + 1), *A);
+	memory_set8_logical(0xFF00 + memory_get8(*PC + 1), *A);
 	*PC += 2;
 	cycles += 12;
 }
@@ -179,14 +179,14 @@ void ldhl_sp_n()
 }
 void ld_nn_sp()
 {
-	memory_set16(memory_get16(*PC + 1), *SP);
+	memory_set16_logical(memory_get16(*PC + 1), *SP);
 	*PC += 3;
 	cycles += 20;
 }
 void push_nn(reg16 reg)
 {
 	*SP -= 2;
-	memory_set16(*SP, *reg);
+	memory_set16_logical(*SP, *reg);
 	*PC += 1;
 	cycles += 16;
 }
@@ -470,7 +470,7 @@ void inc_hl()
 	calc_halfcarry_8(memory_get8(*HL), result, false);
 	set_subtract(false);
 	if(!result) set_zero(true);
-	memory_set8(*HL, result);
+	memory_set8_logical(*HL, result);
 	*PC += 1;
 	cycles += 12;
 }
@@ -490,7 +490,7 @@ void dec_hl()
 	calc_halfcarry_8(memory_get8(*HL), result, true);
 	set_subtract(true);
 	if(!result) set_zero(true);
-	memory_set8(*HL, result);
+	memory_set8_logical(*HL, result);
 	*PC += 1;
 	cycles += 12;
 }
@@ -552,7 +552,7 @@ void swap_hl()
 	byte temp = value & 0xF;
 	value = (value >> 4);
 	value |= (temp << 4);
-	memory_set8(*HL, value);
+	memory_set8_logical(*HL, value);
 	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -659,7 +659,7 @@ void rlc_hl()
 	set_carry( (value & 0x8) );
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, temp);
+	memory_set8_logical(*HL, temp);
 	*PC += 1;
 	cycles += 16;
 }
@@ -685,7 +685,7 @@ void rl_hl()
 	set_carry(value >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, temp);
+	memory_set8_logical(*HL, temp);
 	*PC += 1;
 	cycles += 16;
 }
@@ -711,7 +711,7 @@ void rrc_hl()
 	set_carry(value & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, temp);
+	memory_set8_logical(*HL, temp);
 	*PC += 1;
 	cycles += 16;
 }
@@ -737,7 +737,7 @@ void rr_hl()
 	set_carry(value & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, temp);
+	memory_set8_logical(*HL, temp);
 	*PC += 1;
 	cycles += 16;
 }
@@ -759,7 +759,7 @@ void sla_hl()
 	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, value);
+	memory_set8_logical(*HL, value);
 	*PC += 1;
 	cycles += 16;
 }
@@ -784,7 +784,7 @@ void sra_hl()
 	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, value);
+	memory_set8_logical(*HL, value);
 	*PC += 1;
 	cycles += 16;
 }
@@ -807,7 +807,7 @@ void srl_hl()
 	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
-	memory_set8(*HL, value);
+	memory_set8_logical(*HL, value);
 	*PC += 1;
 	cycles += 16;
 }
@@ -840,7 +840,7 @@ void set_hl(byte bit)
 {
 	byte value = memory_get8(*HL);
 	value |= (1 << bit);
-	memory_set8(*HL, value);
+	memory_set8_logical(*HL, value);
 	*PC += 1;
 	cycles += 16;
 }
@@ -854,7 +854,7 @@ void res_hl(byte bit)
 {
 	byte value = memory_get8(*HL);
 	value &= ~(1 << bit);
-	memory_set8(*HL, value);
+	memory_set8_logical(*HL, value);
 	*PC += 1;
 	cycles += 16;
 }
@@ -949,7 +949,7 @@ void jr_cc(conditional c)
 void call()
 {
 	*SP -= 2;
-	memory_set16(*SP, *PC + 3);
+	memory_set16_logical(*SP, *PC + 3);
 	*PC = memory_get16(*PC + 1);
 	cycles += 12;
 }
@@ -963,7 +963,7 @@ void call_cc(conditional c)
 			if(!get_zero())
 			{
 				*SP -= 2;
-				memory_set16(*SP, *PC + 3);
+				memory_set16_logical(*SP, *PC + 3);
 				*PC = address;
 			}
 			else increment = true;
@@ -972,7 +972,7 @@ void call_cc(conditional c)
 			if(get_zero())
 			{
 				*SP -= 2;
-				memory_set16(*SP, *PC + 3);
+				memory_set16_logical(*SP, *PC + 3);
 				*PC = address;
 			}
 			else increment = true;
@@ -981,7 +981,7 @@ void call_cc(conditional c)
 			if(!get_carry())
 			{
 				*SP -= 2;
-				memory_set16(*SP, *PC + 3);
+				memory_set16_logical(*SP, *PC + 3);
 				*PC = address;
 			}
 			else increment = true;
@@ -990,7 +990,7 @@ void call_cc(conditional c)
 			if(get_carry())
 			{
 				*SP -= 2;
-				memory_set16(*SP, *PC + 3);
+				memory_set16_logical(*SP, *PC + 3);
 				*PC = address;
 			}
 			else increment = true;
@@ -1012,7 +1012,7 @@ void call_cc(conditional c)
 void rst(byte address)
 {
 	*SP -= 2;
-	memory_set16(*SP, *PC + 3);
+	memory_set16_logical(*SP, *PC + 3);
 	*PC = address;
 	cycles += 32;
 }
