@@ -165,7 +165,7 @@ void ld_sp_hl()
 }
 void ldhl_sp_n()
 {
-	signed char tempvalue;
+	byte tempvalue;
 	word result;
 	tempvalue = memory_get8s(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempvalue);
@@ -509,7 +509,7 @@ void add_hl_reg16(reg16 reg)
 void add_sp_n()
 {
 	word result;
-	signed char tempval = memory_get8s(*PC + 1);
+	byte tempval = memory_get8s(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempval);
 	calc_halfcarry_16(result, *SP, false);
 	calc_carry_16(result, *SP, false);
@@ -906,13 +906,13 @@ void jp_cc(conditional c)
 }
 void jr()
 {
-	signed char relative_address = memory_get8s(*PC + 1);
+	byte relative_address = memory_get8s(*PC + 1);
 	*PC = do_signed_add_word_byte(*PC, relative_address);
 	cycles += 8;
 }
 void jr_cc(conditional c)
 {
-	signed char relative_address = memory_get8s(*PC + 1);
+	byte relative_address = memory_get8s(*PC + 1);
 	word new_address = do_signed_add_word_byte(*PC, relative_address);
 	bool increment = false;
 	switch(c)

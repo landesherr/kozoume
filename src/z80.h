@@ -184,8 +184,8 @@ static inline bool get_subtract(void);
 static inline bool get_halfcarry(void);
 static inline bool get_carry(void);
 
-static inline word do_signed_add_reg16_byte(reg16, signed char);
-static inline word do_signed_add_word_byte(word, signed char);
+static inline word do_signed_add_reg16_byte(reg16, byte);
+static inline word do_signed_add_word_byte(word, byte);
 
 //inline function defs
 static inline void set_flag(byte flag, bool set)
@@ -262,16 +262,16 @@ static inline void calc_halfcarry_16(word result, word registervalue, bool isSub
 	calc_halfcarry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
 }
 
-static inline word do_signed_add_reg16_byte(reg16 dest, signed char value)
+static inline word do_signed_add_reg16_byte(reg16 dest, byte value)
 {
 	word result;
-	if(value > 0) result = *dest + value;
-	else if(value < 0) result = *dest - (byte) (0 - value);
+	if(!value & (1 << 7)) result = *dest + value;
+	else result = *dest - ((~value) + 1);
 	return result;
 }
-static inline word do_signed_add_word_byte(word dest, signed char value)
+static inline word do_signed_add_word_byte(word dest, byte value)
 {
-	if(value > 0) dest += value;
-	else if(value < 0) dest -= (byte) (0 - value);
+	if(!value & (1 << 7)) dest += value;
+	else dest -= (~value) + 1
 	return value;
 }
