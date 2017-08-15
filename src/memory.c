@@ -78,6 +78,11 @@ void memory_set8_logical(word address, byte value)
 		//this is inefficient, but it's nice to have a flat memory model
 		memory_map[address - 0x2000] = value;
 	}
+	else if(MEMORY_IN_RANGE(address, internal_ram_bank_0) \
+		|| MEMORY_IN_RANGE(address, internal_ram_bank_switch))
+	{
+		memory_map[address + 0x2000] = value;
+	}
 	else if(MEMORY_IN_RANGE(address, unusable_mem)) return;
 	else if(MEMORY_IN_RANGE(address, oam))
 	{
@@ -88,6 +93,13 @@ void memory_set8_logical(word address, byte value)
 		|| MEMORY_IN_RANGE(address, bg_map_2))
 	{
 		if(ppu_mode == TRANSFER) return;
+	}
+	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
+		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
+		|| MEMORY_IN_RANGE(address, cart_header))
+	{
+		//can't write to ROM
+		return;
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available
 	memory_map[address] = value;
@@ -100,6 +112,11 @@ void memory_set16_logical(word address, byte value)
 		//this is inefficient, but it's nice to have a flat memory model
 		*((word*)&memory_map[address - 0x2000]) = value;
 	}
+	else if(MEMORY_IN_RANGE(address, internal_ram_bank_0) \
+		|| MEMORY_IN_RANGE(address, internal_ram_bank_switch))
+	{
+		*((word*)&memory_map[address + 0x2000]) = value;
+	}
 	else if(MEMORY_IN_RANGE(address, unusable_mem)) return;
 	else if(MEMORY_IN_RANGE(address, oam))
 	{
@@ -110,6 +127,13 @@ void memory_set16_logical(word address, byte value)
 		|| MEMORY_IN_RANGE(address, bg_map_2))
 	{
 		if(ppu_mode == TRANSFER) return;
+	}
+	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
+		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
+		|| MEMORY_IN_RANGE(address, cart_header))
+	{
+		//can't write to ROM
+		return;
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available
 	*((word*)&memory_map[address]) = value;
