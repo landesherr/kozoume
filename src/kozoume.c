@@ -23,6 +23,7 @@
 #include "cartridge.h"
 #include "globaldefs.h"
 #include "opcodes.h"
+#include "interpreter.h"
 
 #define INIT_PC() (*PC = 0x100)
 
@@ -31,6 +32,8 @@ void powerup(void);
 
 int main(int argc, char *argv[])
 {
+	unsigned go = 1;
+	unsigned in;
 	memory_init();
 	powerup();
 	if(argc < 2)
@@ -42,6 +45,16 @@ int main(int argc, char *argv[])
 	INIT_PC();
 	allocate_bytecode_tables();
 	//basic_sanity_check();
+	while(go)
+	{
+		dbgwrite("Current PC: %X - Opcode: %X \n", *PC, memory_get8(*PC));
+		interpreter_step();
+		dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
+		dbgwrite("Stack Pointer is %X \n", *SP);
+		dbgwrite("Quit? ");
+		in = getchar();
+		if(in == 'y') go = 0;
+	}
 	free_bytecode_tables();
 	memory_free();
 	return 0;
