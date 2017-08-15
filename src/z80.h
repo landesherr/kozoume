@@ -272,6 +272,6 @@ static inline word do_signed_add_reg16_byte(reg16 dest, byte value)
 static inline word do_signed_add_word_byte(word dest, byte value)
 {
 	if(!value & (1 << 7)) dest += value;
-	else dest -= (~value) + 1
-	return value;
+	else dest -= (~value) + 1;
+	return dest;
 }

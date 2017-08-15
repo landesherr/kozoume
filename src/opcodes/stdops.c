@@ -1034,7 +1034,7 @@ void opcode_ca()
 
 void opcode_cb()
 {
-	//TODO Handle CB
+	prefix_cb();
 }
 
 void opcode_cc()
