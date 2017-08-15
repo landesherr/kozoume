@@ -27,7 +27,7 @@ unsigned cycles_prev;
 
 void interpreter_step()
 {
-	//io_tick();
+	io_tick();
 	//if(interruptsEnabled) do_interrupts();
 	cycles_prev = cycles;
 

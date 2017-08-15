@@ -20,6 +20,13 @@
 #include "interpreter.h"
 #include "z80.h"
 
+void io_tick()
+{
+	div_tick();
+	tima_tick();
+	//TODO more IO regs
+}
+
 void div_tick()
 {
 	byte value;
