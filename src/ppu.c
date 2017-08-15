@@ -22,8 +22,9 @@
 #include "interpreter.h"
 #include "globaldefs.h"
 #include <stdbool.h>
+#include <stdio.h> //remove for debug
 
-static ppu_mode mode = SEARCH;
+ppu_mode gfxmode = SEARCH;
 static unsigned hblank_count, mode_cycles;
 
 void ppu_tick()
@@ -34,7 +35,7 @@ void ppu_tick()
 	//vblank = 4560 cycles
 	//refresh = 70224 cycles
 	mode_cycles += (cycles - cycles_prev);
-	switch(ppu_mode)
+	switch(gfxmode)
 	{
 		case HBLANK:
 			if(mode_cycles >= MODE_0_CYCLES)
@@ -43,16 +44,16 @@ void ppu_tick()
 				hblank_count++;
 				if(hblank_count == SCREEN_RES_Y)
 				{
-					ppu_mode = VBLANK;
+					gfxmode = VBLANK;
 					hblank_count = 0;
 					VBLANK_INTERRUPT(true);
 				}
 				else
 				{
-					ppu_mode = SEARCH;
+					gfxmode = SEARCH;
 					OAM_INTERRUPT(true);
 				}
-				set_mode_flag(ppu_mode);
+				set_mode_flag(gfxmode);
 			}
 			//TODO actual HBLANK logic
 			break;
@@ -61,9 +62,9 @@ void ppu_tick()
 			if(mode_cycles >= MODE_1_CYCLES)
 			{
 				mode_cycles -= MODE_1_CYCLES;
-				ppu_mode = SEARCH;
+				gfxmode = SEARCH;
 				OAM_INTERRUPT(true);
-				set_mode_flag(ppu_mode);
+				set_mode_flag(gfxmode);
 			}
 			//TODO actual VBLANK logic
 			break;
@@ -73,8 +74,8 @@ void ppu_tick()
 			if(mode_cycles >= MODE_2_CYCLES)
 			{
 				mode_cycles -= MODE_1_CYCLES;
-				ppu_mode = TRANSFER;
-				set_mode_flag(ppu_mode);
+				gfxmode = TRANSFER;
+				set_mode_flag(gfxmode);
 			}
 			//TODO actual SEARCH logic
 			break;
@@ -83,14 +84,13 @@ void ppu_tick()
 			if(mode_cycles >= MODE_3_CYCLES)
 			{
 				mode_cycles -= MODE_3_CYCLES;
-				ppu_mode = HBLANK;
+				gfxmode = HBLANK;
 				HBLANK_INTERRUPT(true);
-				set_mode_flag(ppu_mode);
+				set_mode_flag(gfxmode);
 			}
 			//TODO actual TRANSFER logic
 			break;
 		default:
 			dbgwrite("Invalid PPU mode! How did this even happen?\n");
-			exit(1);
 	}
 }

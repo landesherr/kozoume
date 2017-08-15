@@ -44,20 +44,22 @@ typedef enum ppu_mode
 	TRANSFER = 3
 } ppu_mode;
 
-void ppu_tick();
+extern ppu_mode gfxmode;
 
-inline void set_stat(byte, bool);
-inline void set_mode_flag(ppu_mode);
+void ppu_tick(void);
 
-inline void set_stat(byte bit, bool set)
+static inline void set_stat(byte, bool);
+static inline void set_mode_flag(ppu_mode);
+
+static inline void set_stat(byte bit, bool set)
 {
 	byte value = memory_get8(STAT);
 	if(set) value |= (1 << bit);
 	else value &= ~(1 << bit);
 	memory_set8(STAT, value);
 }
-inline void set_mode_flag(ppu_mode m)
+static inline void set_mode_flag(ppu_mode m)
 {
-	set_stat(0, ppu_mode & 1);
-	set_stat(1, (ppu_mode >> 1) & 1);
+	set_stat(0, m & 1);
+	set_stat(1, (m >> 1) & 1);
 }

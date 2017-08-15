@@ -169,68 +169,68 @@ void prefix_cb(void);
 
 
 //flag operations and other inline funcs
-inline void calc_carry_8(byte, byte, bool);
-inline void calc_halfcarry_16(word, word, bool);
-inline void calc_carry_8(byte, byte, bool);
-inline void calc_halfcarry_16(word, word, bool);
-inline void set_flag(byte, bool);
-inline void set_zero(bool);
-inline void set_subtract(bool);
-inline void set_halfcarry(bool);
-inline void set_carry(bool);
-inline bool get_flag(byte);
-inline bool get_zero(void);
-inline bool get_subtract(void);
-inline bool get_halfcarry(void);
-inline bool get_carry(void);
+static inline void calc_carry_8(byte, byte, bool);
+static inline void calc_halfcarry_16(word, word, bool);
+static inline void calc_carry_8(byte, byte, bool);
+static inline void calc_halfcarry_16(word, word, bool);
+static inline void set_flag(byte, bool);
+static inline void set_zero(bool);
+static inline void set_subtract(bool);
+static inline void set_halfcarry(bool);
+static inline void set_carry(bool);
+static inline bool get_flag(byte);
+static inline bool get_zero(void);
+static inline bool get_subtract(void);
+static inline bool get_halfcarry(void);
+static inline bool get_carry(void);
 
-inline word do_signed_add_reg16_byte(reg16, signed char);
-inline word do_signed_add_word_byte(word, signed char);
+static inline word do_signed_add_reg16_byte(reg16, signed char);
+static inline word do_signed_add_word_byte(word, signed char);
 
 //inline function defs
-inline void set_flag(byte flag, bool set)
+static inline void set_flag(byte flag, bool set)
 {
 	if(set) *F |= (1 << flag);
 	else *F &= ~(1 << flag);
 }
-inline void set_carry(bool set)
+static inline void set_carry(bool set)
 {
 	set_flag(4, set);
 }
-inline void set_halfcarry(bool set)
+static inline void set_halfcarry(bool set)
 {
 	set_flag(5, set);
 }
-inline void set_subtract(bool set)
+static inline void set_subtract(bool set)
 {
 	set_flag(6, set);
 }
-inline void set_zero(bool set)
+static inline void set_zero(bool set)
 {
 	set_flag(7, set);
 }
-inline bool get_flag(byte flag)
+static inline bool get_flag(byte flag)
 {
 	return *F & (1 << flag);
 }
-inline bool get_carry()
+static inline bool get_carry()
 {
 	return get_flag(4);
 }
-inline bool get_halfcarry()
+static inline bool get_halfcarry()
 {
 	return get_flag(5);
 }
-inline bool get_subtract()
+static inline bool get_subtract()
 {
 	return get_flag(6);
 }
-inline bool get_zero()
+static inline bool get_zero()
 {
 	return get_flag(7);
 }
 
-inline void calc_carry_8(byte result, byte registervalue, bool isSubtract)
+static inline void calc_carry_8(byte result, byte registervalue, bool isSubtract)
 {
 	if(!isSubtract)
 	{
@@ -241,12 +241,12 @@ inline void calc_carry_8(byte result, byte registervalue, bool isSubtract)
 		if(result > registervalue) set_carry(true);
 	}
 }
-inline void calc_carry_16(word result, word registervalue, bool isSubtract)
+static inline void calc_carry_16(word result, word registervalue, bool isSubtract)
 {
 	calc_carry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
 }
 
-inline void calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
+static inline void calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
 {
 	if(!isSubtract)
 	{
@@ -257,19 +257,19 @@ inline void calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
 		if((result & 0xF) > (registervalue & 0xF)) set_halfcarry(true);
 	}
 }
-inline void calc_halfcarry_16(word result, word registervalue, bool isSubtract)
+static inline void calc_halfcarry_16(word result, word registervalue, bool isSubtract)
 {
 	calc_halfcarry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
 }
 
-inline word do_signed_add_reg16_byte(reg16 dest, signed char value)
+static inline word do_signed_add_reg16_byte(reg16 dest, signed char value)
 {
 	word result;
 	if(value > 0) result = *dest + value;
 	else if(value < 0) result = *dest - (byte) (0 - value);
 	return result;
 }
-inline word do_signed_add_word_byte(word dest, signed char value)
+static inline word do_signed_add_word_byte(word dest, signed char value)
 {
 	if(value > 0) dest += value;
 	else if(value < 0) dest -= (byte) (0 - value);
