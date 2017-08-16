@@ -19,6 +19,7 @@
 #pragma once
 #include "globaldefs.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 #define Z80_CYCLES 0x400000
 
@@ -284,12 +285,12 @@ static inline word do_signed_add_reg16_byte(reg16 dest, byte value)
 {
 	word result;
 	if(!(value & (1 << 7))) result = *dest + value;
-	else result = *dest - ((~value) + 1);
+	else result = *dest - ((~value & 0xFF) + 1);
 	return result;
 }
 static inline word do_signed_add_word_byte(word dest, byte value)
 {
 	if(!(value & (1 << 7))) dest += value;
-	else dest -= (~value) + 1;
+	else dest -= (~value & 0xFF) + 1;
 	return dest;
 }
