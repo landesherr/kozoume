@@ -899,7 +899,7 @@ void jp_cc(conditional c)
 	}
 	if(increment)
 	{
-		*PC += 1;
+		*PC += 3;
 		cycles += 12;
 	}
 	else cycles += 16;
