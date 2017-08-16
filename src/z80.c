@@ -479,7 +479,7 @@ void dec_reg8(reg8 reg)
 	byte result = *reg - 1;
 	calc_halfcarry_8(*reg, result, true);
 	set_subtract(true);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	*reg = result;
 	*PC += 1;
 	cycles += 4;
@@ -489,7 +489,7 @@ void dec_hl()
 	byte result = memory_get8(*HL) - 1;
 	calc_halfcarry_8(memory_get8(*HL), result, true);
 	set_subtract(true);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	memory_set8_logical(*HL, result);
 	*PC += 1;
 	cycles += 12;
