@@ -940,7 +940,7 @@ void jr_cc(conditional c)
 	}
 	if(increment)
 	{
-		*PC += 1;
+		*PC += 2;
 		cycles += 8;
 	}
 	else cycles += 12;

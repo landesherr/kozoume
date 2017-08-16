@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 		interpreter_step();
 		dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
 		dbgwrite("Stack Pointer is %X \n", *SP);
+		dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
 		dbgwrite("Quit? ");
 		in = getchar();
 		if(in == 'y') go = 0;
@@ -104,6 +105,7 @@ void basic_sanity_check()
 //set memory/register values to defaults
 void powerup()
 {
+	*A = 0x01;
 	*F = 0xB0;
 	*BC = 0x13;
 	*DE = 0xD8;
