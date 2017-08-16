@@ -907,12 +907,14 @@ void jp_cc(conditional c)
 void jr()
 {
 	byte relative_address = memory_get8s(*PC + 1);
+	*PC += 2;
 	*PC = do_signed_add_word_byte(*PC, relative_address);
 	cycles += 8;
 }
 void jr_cc(conditional c)
 {
 	byte relative_address = memory_get8s(*PC + 1);
+	*PC += 2;
 	word new_address = do_signed_add_word_byte(*PC, relative_address);
 	bool increment = false;
 	switch(c)
@@ -940,7 +942,6 @@ void jr_cc(conditional c)
 	}
 	if(increment)
 	{
-		*PC += 2;
 		cycles += 8;
 	}
 	else cycles += 12;
