@@ -206,7 +206,7 @@ void add_a_n()
 	result = *A + memory_get8(*PC + 1);
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 2;
@@ -217,7 +217,7 @@ void add_a_reg8(reg8 reg)
 	byte result = *A + *reg;
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -228,7 +228,7 @@ void add_a_hl()
 	byte result = *A + memory_get8(*HL);
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -240,7 +240,7 @@ void adc_a_n()
 	result = *A + memory_get8(*PC + 1) + get_carry();
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 2;
@@ -251,7 +251,7 @@ void adc_a_reg8(reg8 reg)
 	byte result = *A + *reg + get_carry();
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -262,7 +262,7 @@ void adc_a_hl()
 	byte result = *A + memory_get8(*HL) + get_carry();
 	calc_halfcarry_8(result, *A, false);
 	calc_carry_8(result, *A, false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -273,7 +273,7 @@ void sub_a_n()
 	byte result = *A - memory_get8(*PC + 1);
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*A = result;
 	*PC += 2;
@@ -284,7 +284,7 @@ void sub_a_reg8(reg8 reg)
 	byte result = *A - *reg;
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -295,7 +295,7 @@ void sub_a_hl()
 	byte result = *A - memory_get8(*HL);
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -306,7 +306,7 @@ void sbc_a_n()
 	byte result = *A - (memory_get8(*PC + 1) + get_carry());
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*A = result;
 	*PC += 2;
@@ -317,7 +317,7 @@ void sbc_a_reg8(reg8 reg)
 	byte result = *A - (*reg + get_carry());
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -328,7 +328,7 @@ void sbc_a_hl()
 	byte result = *A - (memory_get8(*HL) + get_carry());
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -339,7 +339,7 @@ void cp_n()
 	byte result = *A - memory_get8(*PC + 1);
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*PC += 2;
 	cycles += 8;
@@ -349,7 +349,7 @@ void cp_reg8(reg8 reg)
 	byte result = *A - *reg;
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*PC += 1;
 	cycles += 4;
@@ -359,7 +359,7 @@ void cp_hl()
 	byte result = *A - *HL;
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	set_subtract(true);
 	*PC += 1;
 	cycles += 8;
@@ -367,7 +367,7 @@ void cp_hl()
 void and_n()
 {
 	*A &= memory_get8(*PC + 1);
-	set_zero(!*A);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -377,7 +377,7 @@ void and_n()
 void and_reg8(reg8 reg)
 {
 	*A &= *reg;
-	set_zero(*A);
+	if(*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -387,7 +387,7 @@ void and_reg8(reg8 reg)
 void and_hl()
 {
 	*A &= memory_get8(*HL);
-	set_zero(!*A);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -397,7 +397,7 @@ void and_hl()
 void or_n()
 {
 	*A |= memory_get8(*PC + 1);
-	set_zero(!*A);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -407,7 +407,7 @@ void or_n()
 void or_reg8(reg8 reg)
 {
 	*A |= *reg;
-	set_zero(*A);
+	if(*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -417,7 +417,7 @@ void or_reg8(reg8 reg)
 void or_hl()
 {
 	*A |= memory_get8(*HL);
-	set_zero(!*A);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -427,7 +427,7 @@ void or_hl()
 void xor_n()
 {
 	*A ^= memory_get8(*PC + 1);
-	set_zero(!*A);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -437,7 +437,7 @@ void xor_n()
 void xor_reg8(reg8 reg)
 {
 	*A ^= *reg;
-	set_zero(*A);
+	if(*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -447,7 +447,7 @@ void xor_reg8(reg8 reg)
 void xor_hl()
 {
 	*A ^= memory_get8(*HL);
-	set_zero(!*A);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -459,7 +459,7 @@ void inc_reg8(reg8 reg)
 	byte result = *reg + 1;
 	calc_halfcarry_8(*reg, result, false);
 	set_subtract(false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	*reg = result;
 	*PC += 1;
 	cycles += 4;
@@ -469,7 +469,7 @@ void inc_hl()
 	byte result = memory_get8(*HL) + 1;
 	calc_halfcarry_8(memory_get8(*HL), result, false);
 	set_subtract(false);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	memory_set8_logical(*HL, result);
 	*PC += 1;
 	cycles += 12;
@@ -479,7 +479,7 @@ void dec_reg8(reg8 reg)
 	byte result = *reg - 1;
 	calc_halfcarry_8(*reg, result, true);
 	set_subtract(true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	*reg = result;
 	*PC += 1;
 	cycles += 4;
@@ -489,7 +489,7 @@ void dec_hl()
 	byte result = memory_get8(*HL) - 1;
 	calc_halfcarry_8(memory_get8(*HL), result, true);
 	set_subtract(true);
-	set_zero(!result);
+	if(!result) set_zero(true);
 	memory_set8_logical(*HL, result);
 	*PC += 1;
 	cycles += 12;
@@ -539,7 +539,7 @@ void swap_reg8(reg8 reg)
 	byte temp = *reg & 0xF;
 	*reg = (*reg >> 4);
 	*reg |= (temp << 4);
-	set_zero(!*reg);
+	if(!*reg) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -553,7 +553,7 @@ void swap_hl()
 	value = (value >> 4);
 	value |= (temp << 4);
 	memory_set8_logical(*HL, value);
-	set_zero(!value);
+	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -642,7 +642,7 @@ void rlc_reg8(reg8 reg)
 	//8-bit rotation, bit 7 goes to both CF and bit 0
 	byte temp = *reg << 1;
 	temp |= (*reg >> 7);
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry( (*reg & 0x8) );
 	set_subtract(false);
 	set_halfcarry(false);
@@ -655,7 +655,7 @@ void rlc_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value << 1;
 	temp |= (value >> 7);
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry( (value & 0x8) );
 	set_subtract(false);
 	set_halfcarry(false);
@@ -668,7 +668,7 @@ void rl_reg8(reg8 reg)
 	//9-bit rotation, CF to bit 0, bit 7 to CF
 	byte temp = *reg << 1;
 	temp |= get_carry();
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry(*reg >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -681,7 +681,7 @@ void rl_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value << 1;
 	temp |= get_carry();
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry(value >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -694,7 +694,7 @@ void rrc_reg8(reg8 reg)
 	//8-bit rotation, bit 0 goes to bit 7 and CF
 	byte temp = *reg >> 1;
 	temp |= (*reg << 7);
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -707,7 +707,7 @@ void rrc_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value >> 1;
 	temp |= (value << 7);
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry(value & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -720,7 +720,7 @@ void rr_reg8(reg8 reg)
 	//9-bit rotation, CF goes to bit 7, bit 0 to CF
 	byte temp = *reg >> 1;
 	temp |= get_carry() << 7;
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -733,7 +733,7 @@ void rr_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value >> 1;
 	temp |= get_carry() << 7;
-	set_zero(!temp);
+	if(!temp) set_zero(true);
 	set_carry(value & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -745,7 +745,7 @@ void sla_reg8(reg8 reg)
 {
 	set_carry(*reg & 0x80);
 	*reg <<= 1;
-	set_zero(!*reg);
+	if(!*reg) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -756,7 +756,7 @@ void sla_hl()
 	byte value = memory_get8(*HL);
 	set_carry(value & 0x80);
 	value <<= 1;
-	set_zero(!value);
+	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
@@ -769,7 +769,7 @@ void sra_reg8(reg8 reg)
 	byte temp = *reg >> 1;
 	set_carry(*reg & 0x1);
 	*reg = (*reg & 0x80) | temp;
-	set_zero(!*reg);
+	if(!*reg) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -781,7 +781,7 @@ void sra_hl()
 	byte temp = value >> 1;
 	set_carry(value & 0x1);
 	value = (value & 0x80) | temp;
-	set_zero(!value);
+	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
@@ -793,7 +793,7 @@ void srl_reg8(reg8 reg)
 	//bit 7 reset to 0
 	set_carry(*reg & 0x1);
 	*reg >>= 1;
-	set_zero(!*reg);
+	if(!*reg) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -804,7 +804,7 @@ void srl_hl()
 	byte value = memory_get8(*HL);
 	set_carry(value & 0x1);
 	value >>= 1;
-	set_zero(!value);
+	if(!value) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);

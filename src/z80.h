@@ -234,11 +234,11 @@ static inline void calc_carry_8(byte result, byte registervalue, bool isSubtract
 {
 	if(!isSubtract)
 	{
-		set_carry(result < registervalue);
+		if(result < registervalue) set_carry(true);
 	}
 	else
 	{
-		set_carry(result > registervalue);
+		if(result > registervalue) set_carry(true);
 	}
 }
 static inline void calc_carry_16(word result, word registervalue, bool isSubtract)
@@ -250,11 +250,11 @@ static inline void calc_halfcarry_8(byte result, byte registervalue, bool isSubt
 {
 	if(!isSubtract)
 	{
-		set_halfcarry((result & 0xF) < (registervalue & 0xF));
+		if((result & 0xF) < (registervalue & 0xF)) set_halfcarry(true);
 	}
 	else
 	{
-		set_halfcarry((result & 0xF) > (registervalue & 0xF));
+		if((result & 0xF) > (registervalue & 0xF)) set_halfcarry(true);
 	}
 }
 static inline void calc_halfcarry_16(word result, word registervalue, bool isSubtract)
