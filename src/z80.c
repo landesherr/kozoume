@@ -169,8 +169,8 @@ void ldhl_sp_n()
 	word result;
 	tempvalue = memory_get8s(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempvalue);
-	calc_halfcarry_16(result, *SP, false);
-	calc_carry_16(result, *SP, false);
+	if(!calc_halfcarry_16(result, *SP, false)) set_halfcarry(false);
+	if(!calc_carry_16(result, *SP, false)) set_carry(false);
 	set_zero(false);
 	set_subtract(false);
 	*HL = result;
@@ -511,8 +511,8 @@ void add_sp_n()
 	word result;
 	byte tempval = memory_get8s(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempval);
-	calc_halfcarry_16(result, *SP, false);
-	calc_carry_16(result, *SP, false);
+	if(!calc_halfcarry_16(result, *SP, false)) set_halfcarry(false);
+	if(!calc_carry_16(result, *SP, false)) set_carry(false);
 	set_zero(false);
 	set_subtract(false);
 	*SP = result;
@@ -574,7 +574,7 @@ void daa()
 		if(get_halfcarry() || ( (*A & 0xF) > 9)) *A += 6;
 		if(get_carry() || *A > 0x9F) *A += 0x60;
 	}
-	calc_carry_8(*A, prev, false);
+	if(!calc_carry_8(*A, prev, false)) set_carry(false);
 	set_halfcarry(false);
 	set_zero(*A == 0);
 

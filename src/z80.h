@@ -169,10 +169,10 @@ void prefix_cb(void);
 
 
 //flag operations and other inline funcs
-static inline void calc_carry_8(byte, byte, bool);
-static inline void calc_halfcarry_16(word, word, bool);
-static inline void calc_carry_8(byte, byte, bool);
-static inline void calc_halfcarry_16(word, word, bool);
+static inline bool calc_carry_8(byte, byte, bool);
+static inline bool calc_halfcarry_16(word, word, bool);
+static inline bool calc_carry_8(byte, byte, bool);
+static inline bool calc_halfcarry_16(word, word, bool);
 static inline void set_flag(byte, bool);
 static inline void set_zero(bool);
 static inline void set_subtract(bool);
@@ -230,36 +230,54 @@ static inline bool get_zero()
 	return get_flag(7);
 }
 
-static inline void calc_carry_8(byte result, byte registervalue, bool isSubtract)
+static inline bool calc_carry_8(byte result, byte registervalue, bool isSubtract)
 {
 	if(!isSubtract)
 	{
-		if(result < registervalue) set_carry(true);
+		if(result < registervalue)
+		{
+			set_carry(true);
+			return true;
+		}
 	}
 	else
 	{
-		if(result > registervalue) set_carry(true);
+		if(result > registervalue)
+		{
+			set_carry(true);
+			return true;
+		}
 	}
+	return false;
 }
-static inline void calc_carry_16(word result, word registervalue, bool isSubtract)
+static inline bool calc_carry_16(word result, word registervalue, bool isSubtract)
 {
-	calc_carry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
+	return calc_carry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
 }
 
-static inline void calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
+static inline bool calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
 {
 	if(!isSubtract)
 	{
-		if((result & 0xF) < (registervalue & 0xF)) set_halfcarry(true);
+		if((result & 0xF) < (registervalue & 0xF))
+		{
+			set_halfcarry(true);
+			return true;
+		}
 	}
 	else
 	{
-		if((result & 0xF) > (registervalue & 0xF)) set_halfcarry(true);
+		if((result & 0xF) > (registervalue & 0xF))
+		{
+			set_halfcarry(true);
+			return true;
+		}
 	}
+	return false;
 }
-static inline void calc_halfcarry_16(word result, word registervalue, bool isSubtract)
+static inline bool calc_halfcarry_16(word result, word registervalue, bool isSubtract)
 {
-	calc_halfcarry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
+	return calc_halfcarry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
 }
 
 static inline word do_signed_add_reg16_byte(reg16 dest, byte value)
