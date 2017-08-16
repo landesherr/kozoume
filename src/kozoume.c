@@ -24,6 +24,7 @@
 #include "globaldefs.h"
 #include "opcodes.h"
 #include "interpreter.h"
+#include "interrupts.h"
 
 #define INIT_PC() (*PC = 0x100)
 
