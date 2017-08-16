@@ -32,7 +32,7 @@ void do_interrupts()
 {
 	if(interruptsEnabled)
 	{
-		interrupt current;
+		interrupt in;
 		for(unsigned i=0;i<NUM_INTERRUPTS;i++)
 		{
 			in = all_interrupts[i];

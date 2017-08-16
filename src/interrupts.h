@@ -20,6 +20,7 @@
 
 #include "globaldefs.h"
 #include "z80.h"
+#include "memory.h"
 #include <stdbool.h>
 
 #define INTERRUPT_FLAG 0xFF0F
@@ -30,7 +31,7 @@
 #define VECTOR_STAT 0x48
 #define VECTOR_TIMER 0x50
 #define VECTOR_SERIAL 0x58
-#define VECTOR_JOPYPAD 0x60
+#define VECTOR_JOYPAD 0x60
 
 typedef enum interrupt
 {
@@ -46,7 +47,7 @@ void set_interrupt(interrupt, bool);
 void enable_interrupt(interrupt, bool);
 
 static inline void do_interrupt(interrupt);
-static inline void get_interrupt_vector(interrupt);
+static inline word get_interrupt_vector(interrupt);
 
 static inline word get_interrupt_vector(interrupt i)
 {
@@ -71,7 +72,7 @@ static inline void do_interrupt(interrupt i)
 	set_interrupt(i, false);
 	interruptsEnabled = false;
 	*SP -= 2;
-	memory_set16(*SP,*PC);
+	memory_set16(*SP, *PC);
 	*PC = get_interrupt_vector(i);
 	cycles += 12;
 }
