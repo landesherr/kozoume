@@ -61,6 +61,13 @@ cartridge* load_cart(char *path)
 	loaded_cart->is_gbc = (memory_get8(0x143) == 0xC0);
 	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
 	loaded_cart->ram_bytes = calc_ram_size(memory_get8(0x149));
+	//load additional bank if multiple exist
+	if(loaded_cart->rom_banks > 0)
+	{
+		fseek(cart, BANK_SIZE, SEEK_SET);
+		fread(&memory_map[BANK_SIZE], BANK_SIZE, 1, cart);
+		//TODO refactor, handle bank switching
+	}
 	dbgwrite("Current ROM is type %X\n", loaded_cart->type);
 	dbgwrite("Current ROM %s a GBC ROM\n", loaded_cart->is_gbc ? "IS" : "IS NOT");
 	dbgwrite("%d banks ROM, %d bytes RAM\n", loaded_cart->rom_banks, loaded_cart->ram_bytes);
