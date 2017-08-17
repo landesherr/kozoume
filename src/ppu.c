@@ -19,10 +19,12 @@
 #include "ppu.h"
 #include "z80.h"
 #include "memory.h"
+#include "io.h"
 #include "interpreter.h"
+#include "interrupts.h"
 #include "globaldefs.h"
 #include <stdbool.h>
-#include <stdio.h> //remove for debug
+#include <stdio.h> //remove when done debugging
 
 ppu_mode gfxmode = SEARCH;
 static unsigned hblank_count, mode_cycles;
@@ -42,50 +44,49 @@ void ppu_tick()
 			{
 				mode_cycles -= MODE_0_CYCLES;
 				hblank_count++;
+				UPDATE_LCDC();
 				if(hblank_count == SCREEN_RES_Y)
 				{
 					gfxmode = VBLANK;
-					hblank_count = 0;
-					VBLANK_INTERRUPT(true);
 				}
 				else
 				{
 					gfxmode = SEARCH;
-					OAM_INTERRUPT(true);
 				}
 				set_mode_flag(gfxmode);
 			}
 			//TODO actual HBLANK logic
 			break;
 		case VBLANK:
-			HBLANK_INTERRUPT(false);
 			if(mode_cycles >= MODE_1_CYCLES)
 			{
 				mode_cycles -= MODE_1_CYCLES;
 				gfxmode = SEARCH;
-				OAM_INTERRUPT(true);
 				set_mode_flag(gfxmode);
+			}
+			else if(mode_cycles % MODE_0_CYCLES == 0)
+			{
+				hblank_count++;
+				UPDATE_LCDC();
 			}
 			//TODO actual VBLANK logic
 			break;
 		case SEARCH:
-			VBLANK_INTERRUPT(false);
-			HBLANK_INTERRUPT(false);
 			if(mode_cycles >= MODE_2_CYCLES)
 			{
 				mode_cycles -= MODE_1_CYCLES;
 				gfxmode = TRANSFER;
 				set_mode_flag(gfxmode);
+				hblank_count = 0;
+				UPDATE_LCDC();
 			}
 			//TODO actual SEARCH logic
 			break;
 		case TRANSFER:
-			OAM_INTERRUPT(false);
 			if(mode_cycles >= MODE_3_CYCLES)
 			{
 				mode_cycles -= MODE_3_CYCLES;
 				gfxmode = HBLANK;
-				HBLANK_INTERRUPT(true);
 				set_mode_flag(gfxmode);
 			}
 			//TODO actual TRANSFER logic
@@ -93,4 +94,10 @@ void ppu_tick()
 		default:
 			dbgwrite("Invalid PPU mode! How did this even happen?\n");
 	}
+	set_stat(STAT_COINCIDENCE_FLAG, LY_COMPARE);
+	//TODO is there any additional interrupt-specific logic needed below?
+	if(gfxmode == HBLANK && HBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
+	else if(gfxmode == VBLANK && VBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
+	else if(gfxmode == SEARCH && OAM_INTERRUPT) set_interrupt(INT_STAT, true);
+	else if(LY_COMPARE && COINCIDENCE_INTERRUPT) set_interrupt(INT_STAT, true);
 }

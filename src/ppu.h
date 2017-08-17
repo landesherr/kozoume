@@ -31,10 +31,13 @@
 #define MODE_2_CYCLES 80
 #define MODE_3_CYCLES 172
 
-#define COINCIDENCE_INTERRUPT(TF) set_stat(6, tf)
-#define OAM_INTERRUPT(TF) set_stat(5, TF)
-#define VBLANK_INTERRUPT(TF) set_stat(4, TF)
-#define HBLANK_INTERRUPT(TF) set_stat(3, TF)
+#define UPDATE_LCDC() memory_set8(LCDC, hblank_count)
+#define LY_COMPARE ( memory_get8(LCDC) == memory_get8(LYC) )
+
+#define COINCIDENCE_INTERRUPT get_stat(STAT_COINCIDENCE)
+#define OAM_INTERRUPT get_stat(STAT_OAM)
+#define VBLANK_INTERRUPT get_stat(STAT_VBLANK)
+#define HBLANK_INTERRUPT get_stat(STAT_HBLANK)
 
 typedef enum ppu_mode
 {
@@ -44,12 +47,24 @@ typedef enum ppu_mode
 	TRANSFER = 3
 } ppu_mode;
 
+typedef enum stat_bit
+{
+	STAT_MODE_LOW = 0,
+	STAT_MODE_HIGH = 1,
+	STAT_COINCIDENCE_FLAG = 2,
+	STAT_HBLANK = 3,
+	STAT_VBLANK = 4,
+	STAT_OAM = 5,
+	STAT_COINCIDENCE = 6
+} stat_bit;
+
 extern ppu_mode gfxmode;
 
 void ppu_tick(void);
 
 static inline void set_stat(byte, bool);
 static inline void set_mode_flag(ppu_mode);
+static inline bool get_stat(stat_bit);
 
 static inline void set_stat(byte bit, bool set)
 {
@@ -62,4 +77,8 @@ static inline void set_mode_flag(ppu_mode m)
 {
 	set_stat(0, m & 1);
 	set_stat(1, (m >> 1) & 1);
+}
+static inline bool get_stat(stat_bit bit)
+{
+	return ((memory_get8(STAT) >> bit) & 1);
 }
