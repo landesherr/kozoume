@@ -16,10 +16,12 @@
 	limitations under the License.
 */
 
+#include "globaldefs.h"
 #include "interrupts.h"
 #include "memory.h"
 #include "z80.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 #define INTERRUPT_ENABLE_ALL() memory_set8(INTERRUPT_ENABLE, 0x0F)
 #define INTERRUPT_DISABLE_ALL() memory_set8(INTERRUPT_ENABLE, 0x00)
@@ -38,6 +40,7 @@ void do_interrupts()
 			in = all_interrupts[i];
 			if(INTERRUPT_ENABLED(in) && INTERRUPT_SET(in))
 			{
+				dbgwrite("===Interrupt %u called!===\n", in);
 				do_interrupt(in);
 				return;
 			}

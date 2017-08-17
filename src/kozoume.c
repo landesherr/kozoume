@@ -25,6 +25,7 @@
 #include "opcodes.h"
 #include "interpreter.h"
 #include "interrupts.h"
+#include "ppu.h" //can be removed when debugging is finished
 
 #define INIT_PC() (*PC = 0x100)
 
@@ -53,6 +54,8 @@ int main(int argc, char *argv[])
 		dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
 		dbgwrite("Stack Pointer is %X \n", *SP);
 		dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
+		dbgwrite("PPU mode is %u\n", gfxmode);
+		dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
 		dbgwrite("Quit? ");
 		in = getchar();
 		if(in == 'y') go = 0;
