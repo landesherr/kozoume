@@ -64,6 +64,8 @@ void ppu_tick()
 				mode_cycles -= MODE_1_CYCLES;
 				gfxmode = SEARCH;
 				set_mode_flag(gfxmode);
+				hblank_count = 0;
+				UPDATE_LCDC();
 			}
 			else if(mode_cycles % MODE_0_CYCLES == 0)
 			{
@@ -75,11 +77,10 @@ void ppu_tick()
 		case SEARCH:
 			if(mode_cycles >= MODE_2_CYCLES)
 			{
-				mode_cycles -= MODE_1_CYCLES;
+				mode_cycles -= MODE_2_CYCLES;
 				gfxmode = TRANSFER;
 				set_mode_flag(gfxmode);
-				hblank_count = 0;
-				UPDATE_LCDC();
+				mode_cycles = 0;
 			}
 			//TODO actual SEARCH logic
 			break;

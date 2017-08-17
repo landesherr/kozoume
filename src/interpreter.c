@@ -38,5 +38,5 @@ void interpreter_step()
 	}
 	io_tick();
 	ppu_tick();
-	//if(interruptsEnabled) do_interrupts();
+	if(interruptsEnabled) do_interrupts();
 }
