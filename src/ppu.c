@@ -48,6 +48,7 @@ void ppu_tick()
 				if(hblank_count == SCREEN_RES_Y)
 				{
 					gfxmode = VBLANK;
+					set_interrupt(VBLANK, true);
 				}
 				else
 				{
