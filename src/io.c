@@ -19,6 +19,7 @@
 #include "io.h"
 #include "interpreter.h"
 #include "z80.h"
+#include "interrupts.h"
 
 void io_tick()
 {
@@ -65,8 +66,8 @@ void tima_tick()
 			value = memory_get8(TIMA) + 1;
 			if(!value)
 			{
-				//TODO: Interrupt on overflow
 				memory_set8(TIMA, memory_get8(TMA));
+				set_interrupt(INT_TIMER, true);
 			}
 			else memory_set8(TIMA, value);
 		}
