@@ -57,8 +57,9 @@ int main(int argc, char *argv[])
 		dbgwrite("PPU mode is %u\n", gfxmode);
 		dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
 		dbgwrite("Quit? ");
-		in = getchar();
-		if(in == 'y') go = 0;
+		//in = getchar();
+		if(*PC >= 0x8000) go = 0;
+		if(*PC < 100 && memory_get8(*PC) > 0xf0) go = 0;
 	}
 	free_bytecode_tables();
 	memory_free();
