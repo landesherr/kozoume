@@ -457,7 +457,7 @@ void xor_hl()
 void inc_reg8(reg8 reg)
 {
 	byte result = *reg + 1;
-	calc_halfcarry_8(*reg, result, false);
+	calc_halfcarry_8(result, *reg, false);
 	set_subtract(false);
 	if(!result) set_zero(true);
 	*reg = result;
@@ -467,7 +467,7 @@ void inc_reg8(reg8 reg)
 void inc_hl()
 {
 	byte result = memory_get8(*HL) + 1;
-	calc_halfcarry_8(memory_get8(*HL), result, false);
+	calc_halfcarry_8(result, memory_get8(*HL), false);
 	set_subtract(false);
 	if(!result) set_zero(true);
 	memory_set8_logical(*HL, result);
@@ -477,7 +477,7 @@ void inc_hl()
 void dec_reg8(reg8 reg)
 {
 	byte result = *reg - 1;
-	calc_halfcarry_8(*reg, result, true);
+	calc_halfcarry_8(result, *reg, true);
 	set_subtract(true);
 	set_zero(!result);
 	*reg = result;
@@ -487,7 +487,7 @@ void dec_reg8(reg8 reg)
 void dec_hl()
 {
 	byte result = memory_get8(*HL) - 1;
-	calc_halfcarry_8(memory_get8(*HL), result, true);
+	calc_halfcarry_8(result, memory_get8(*HL), true);
 	set_subtract(true);
 	set_zero(!result);
 	memory_set8_logical(*HL, result);
