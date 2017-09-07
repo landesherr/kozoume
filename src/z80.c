@@ -377,7 +377,7 @@ void and_n()
 void and_reg8(reg8 reg)
 {
 	*A &= *reg;
-	if(*A) set_zero(true);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -407,7 +407,7 @@ void or_n()
 void or_reg8(reg8 reg)
 {
 	*A |= *reg;
-	if(*A) set_zero(true);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -437,7 +437,7 @@ void xor_n()
 void xor_reg8(reg8 reg)
 {
 	*A ^= *reg;
-	if(*A) set_zero(true);
+	if(!*A) set_zero(true);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
