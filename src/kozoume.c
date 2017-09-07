@@ -30,7 +30,7 @@
 
 #define INIT_PC() (*PC = 0x100)
 
-void basic_sanity_check(void);
+//void basic_sanity_check(void);
 void powerup(void);
 
 int main(int argc, char *argv[])
@@ -97,6 +97,7 @@ cmdagain:
 	return 0;
 }
 
+/*
 void basic_sanity_check()
 {
 	bool doOnce = true;
@@ -137,6 +138,7 @@ void basic_sanity_check()
 	dbgwrite("Too many iterations. Something's wrong.\n");
 	exit(1);
 }
+*/
 
 //set memory/register values to defaults
 void powerup()
