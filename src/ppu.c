@@ -44,7 +44,7 @@ void ppu_tick()
 			{
 				mode_cycles -= MODE_0_CYCLES;
 				hblank_count++;
-				UPDATE_LCDC();
+				UPDATE_LY();
 				if(hblank_count == SCREEN_RES_Y)
 				{
 					gfxmode = VBLANK;
@@ -65,12 +65,12 @@ void ppu_tick()
 				gfxmode = SEARCH;
 				set_mode_flag(gfxmode);
 				hblank_count = 0;
-				UPDATE_LCDC();
+				UPDATE_LY();
 			}
 			else if(mode_cycles % MODE_0_CYCLES == 0)
 			{
 				hblank_count++;
-				UPDATE_LCDC();
+				UPDATE_LY();
 			}
 			//TODO actual VBLANK logic
 			break;

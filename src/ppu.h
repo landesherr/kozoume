@@ -31,8 +31,8 @@
 #define MODE_2_CYCLES 80
 #define MODE_3_CYCLES 172
 
-#define UPDATE_LCDC() memory_set8(LCDC, hblank_count)
-#define LY_COMPARE ( memory_get8(LCDC) == memory_get8(LYC) )
+#define UPDATE_LY() memory_set8(LY, hblank_count)
+#define LY_COMPARE ( memory_get8(LY) == memory_get8(LYC) )
 
 #define COINCIDENCE_INTERRUPT get_stat(STAT_COINCIDENCE)
 #define OAM_INTERRUPT get_stat(STAT_OAM)
