@@ -6,6 +6,7 @@ typedef enum console_action
 	STEP,
 	SETBRK,
 	CLRBRK,
+	PEEK,
 	RUN,
 	QUIT,
 	BADCMD

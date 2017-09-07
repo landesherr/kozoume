@@ -42,6 +42,14 @@ console_command* console_get_command()
 		cmd->action = RUNTO;
 		cmd->param.numeric = address & 0xFFFF;
 	}
+	else if(!strcmp(words[0], "peek"))
+	{
+		if(words == 0) goto badcmd;
+		unsigned address = strtol(words[1], NULL, 16);
+		if(address == 0) goto badcmd;
+		cmd->action = PEEK;
+		cmd->param.numeric = address & 0xFFFF;
+	}
 	else if(!strcmp(words[0], "setbrk"))
 	{
 		if(words == 0) goto badcmd;

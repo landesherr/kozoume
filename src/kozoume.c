@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 		dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
 		if(!run)
 		{
+cmdagain:
 			do {cmd = console_get_command();} while(cmd->action == BADCMD);
 			if(cmd->action == QUIT)
 			{
@@ -71,6 +72,12 @@ int main(int argc, char *argv[])
 			{
 				run = 1;
 				runto = cmd->param.numeric;
+			}
+			else if(cmd->action == PEEK)
+			{
+				printf("\nMemory value: %X\n", memory_get8(cmd->param.numeric));
+				free(cmd);
+				goto cmdagain;
 			}
 			free(cmd);
 		}
