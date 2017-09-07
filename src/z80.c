@@ -367,7 +367,7 @@ void cp_hl()
 void and_n()
 {
 	*A &= memory_get8(*PC + 1);
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -377,7 +377,7 @@ void and_n()
 void and_reg8(reg8 reg)
 {
 	*A &= *reg;
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -387,7 +387,7 @@ void and_reg8(reg8 reg)
 void and_hl()
 {
 	*A &= memory_get8(*HL);
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(true);
 	set_carry(false);
@@ -397,7 +397,7 @@ void and_hl()
 void or_n()
 {
 	*A |= memory_get8(*PC + 1);
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -407,7 +407,7 @@ void or_n()
 void or_reg8(reg8 reg)
 {
 	*A |= *reg;
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -417,7 +417,7 @@ void or_reg8(reg8 reg)
 void or_hl()
 {
 	*A |= memory_get8(*HL);
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -427,7 +427,7 @@ void or_hl()
 void xor_n()
 {
 	*A ^= memory_get8(*PC + 1);
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -437,7 +437,7 @@ void xor_n()
 void xor_reg8(reg8 reg)
 {
 	*A ^= *reg;
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -447,7 +447,7 @@ void xor_reg8(reg8 reg)
 void xor_hl()
 {
 	*A ^= memory_get8(*HL);
-	if(!*A) set_zero(true);
+	set_zero(!*A);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
