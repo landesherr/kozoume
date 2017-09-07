@@ -18,6 +18,7 @@
 
 
 #include "interpreter.h"
+#include "interrupts.h"
 #include "z80.h"
 #include "opcodes.h"
 #include "memory.h"

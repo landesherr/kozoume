@@ -25,6 +25,7 @@
 #include "opcodes.h"
 #include "interpreter.h"
 #include "interrupts.h"
+#include "console.h"
 #include "ppu.h" //can be removed when debugging is finished
 
 #define INIT_PC() (*PC = 0x100)
@@ -34,8 +35,8 @@ void powerup(void);
 
 int main(int argc, char *argv[])
 {
-	unsigned go = 1;
-	unsigned in;
+	unsigned go = 1, run = 0, runto = 0;
+	console_command *cmd;
 	memory_init();
 	powerup();
 	if(argc < 2)
@@ -53,13 +54,36 @@ int main(int argc, char *argv[])
 		interpreter_step();
 		dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
 		dbgwrite("Stack Pointer is %X \n", *SP);
+		dbgwrite("(HL) is %X \n", memory_get16(*HL));
 		dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
 		dbgwrite("PPU mode is %u\n", gfxmode);
 		dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
-		dbgwrite("Quit? ");
-		//in = getchar();
-		if(*PC >= 0x8000) go = 0;
-		if(*PC < 100 && memory_get8(*PC) > 0xf0) go = 0;
+		if(!run)
+		{
+			do {cmd = console_get_command();} while(cmd->action == BADCMD);
+			if(cmd->action == QUIT)
+			{
+				dbgwrite("Quitting...\n");
+				go = 0;
+			}
+			else if(cmd->action == RUN) run = 1;
+			else if(cmd->action == RUNTO)
+			{
+				run = 1;
+				runto = cmd->param.numeric;
+			}
+			free(cmd);
+		}
+		else if(runto)
+		{
+			if(*PC == runto)
+			{
+				run = 0;
+				runto = 0;
+			}
+		}
+		//if(*PC >= 0x8000) go = 0;
+		//if(*PC < 100 && memory_get8(*PC) > 0xf0) go = 0;
 	}
 	free_bytecode_tables();
 	memory_free();
@@ -138,3 +162,4 @@ void powerup()
 	memory_set8(0xFF48, 0xFF);
 	memory_set8(0xFF49, 0xFF);
 }
+
