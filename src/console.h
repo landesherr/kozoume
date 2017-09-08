@@ -21,6 +21,7 @@
 typedef enum console_action
 {
 	RUNTO,
+	RUNTIL,
 	STEP,
 	SETBRK,
 	CLRBRK,
@@ -43,5 +44,13 @@ typedef struct console_command
 	console_param param;
 	//console_param *params;
 } console_command;
+
+typedef enum runtil_condition
+{
+	UNTIL_VBLANK,
+	UNTIL_JUMP,
+	UNTIL_INTERRUPT,
+	NO_RUNTIL
+} runtil_condition;
 
 console_command* console_get_command(void);

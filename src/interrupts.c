@@ -38,6 +38,7 @@ void do_interrupts()
 		for(unsigned i=0;i<NUM_INTERRUPTS;i++)
 		{
 			in = all_interrupts[i];
+			if(INTERRUPT_SET(in)) dbgwrite("Interrupt %u is set\n", in);
 			if(INTERRUPT_ENABLED(in) && INTERRUPT_SET(in))
 			{
 				dbgwrite("===Interrupt %u called!===\n", in);

@@ -60,6 +60,12 @@ console_command* console_get_command()
 		cmd->action = RUNTO;
 		cmd->param.numeric = address & 0xFFFF;
 	}
+	else if(!strcmp(words[0], "runtil"))
+	{
+		if(words == 0) goto badcmd;
+		cmd->action = RUNTIL;
+		cmd->param.str = words[1];
+	}
 	else if(!strcmp(words[0], "peek"))
 	{
 		if(words == 0) goto badcmd;

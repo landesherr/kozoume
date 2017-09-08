@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "memory.h"
 #include "z80.h"
 #include "cartridge.h"
@@ -36,6 +37,7 @@ void powerup(void);
 int main(int argc, char *argv[])
 {
 	unsigned go = 1, run = 0, runto = 0;
+	runtil_condition rc = NO_RUNTIL;
 	console_command *cmd;
 	memory_init();
 	powerup();
@@ -77,6 +79,19 @@ cmdagain:
 				run = 1;
 				runto = cmd->param.numeric;
 			}
+			else if(cmd->action == RUNTIL)
+			{
+				run = 1;
+				if(!strcmp(cmd->param.str, "vblank")) rc = UNTIL_VBLANK;
+				else if(!strcmp(cmd->param.str, "jump")) rc = UNTIL_JUMP;
+				else if(!strcmp(cmd->param.str, "interrupt")) rc = UNTIL_INTERRUPT;
+				else
+				{
+					free(cmd);
+					printf("\nInvalid parameter!\n");
+					goto cmdagain;
+				}
+			}
 			else if(cmd->action == PEEK)
 			{
 				printf("\nMemory value: %X\n", memory_get8(cmd->param.numeric));
@@ -91,6 +106,17 @@ cmdagain:
 			{
 				run = 0;
 				runto = 0;
+			}
+		}
+		else if(rc != NO_RUNTIL)
+		{
+			if((rc == UNTIL_VBLANK && gfxmode == 1) ||
+				(rc == UNTIL_JUMP && false) || //lazy, finish later
+				(rc == UNTIL_INTERRUPT && false) //ditto
+			)
+			{
+				run = 0;
+				rc = NO_RUNTIL;
 			}
 		}
 		//if(*PC >= 0x8000) go = 0;
