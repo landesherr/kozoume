@@ -26,11 +26,12 @@
 #include <stdbool.h>
 #include <stdio.h> //remove when done debugging
 
-ppu_mode gfxmode = SEARCH;
-static unsigned hblank_count, mode_cycles;
+ppu_mode gfxmode = VBLANK;
+static unsigned hblank_count = 153, mode_cycles = 4500;
 
 void ppu_tick()
 {
+	if(!LCD_ON) return;
 	//144 search->transfer->hblank cycles followed by vblank
 	//hblank = 456 cycles
 	//(80 mode 2, 172 mode 3, 204 mode 0)
@@ -67,7 +68,7 @@ void ppu_tick()
 				hblank_count = 0;
 				UPDATE_LY();
 			}
-			else if(mode_cycles % MODE_0_CYCLES == 0)
+			else if(mode_cycles % (MODE_0_CYCLES + MODE_2_CYCLES + MODE_3_CYCLES) == 0)
 			{
 				hblank_count++;
 				UPDATE_LY();

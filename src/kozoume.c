@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 		dbgwrite("(HL) is %X \n", memory_get16(*HL));
 		dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
 		dbgwrite("PPU mode is %u\n", gfxmode);
+		dbgwrite("LCD is %s\n", LCD_ON ? "ON" : "OFF");
 		dbgwrite("IME: %s\n", interruptsEnabled ? "enabled" : "disabled");
 		dbgwrite("FFFF: %X\n", memory_get8(0xFFFF));
 		dbgwrite("FF0F: %X\n", memory_get8(0xFF0F));

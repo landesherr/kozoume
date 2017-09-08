@@ -78,8 +78,7 @@ void memory_set8_logical(word address, byte value)
 		//this is inefficient, but it's nice to have a flat memory model
 		memory_map[address - 0x2000] = value;
 	}
-	else if(MEMORY_IN_RANGE(address, internal_ram_bank_0) \
-		|| MEMORY_IN_RANGE(address, internal_ram_bank_switch))
+	else if(MEMORY_IN_RANGE(address, internal_ram_bank_0))
 	{
 		memory_map[address + 0x2000] = value;
 	}
@@ -112,8 +111,7 @@ void memory_set16_logical(word address, word value)
 		//this is inefficient, but it's nice to have a flat memory model
 		*((word*)&memory_map[address - 0x2000]) = value;
 	}
-	else if(MEMORY_IN_RANGE(address, internal_ram_bank_0) \
-		|| MEMORY_IN_RANGE(address, internal_ram_bank_switch))
+	else if(MEMORY_IN_RANGE(address, internal_ram_bank_0))
 	{
 		*((word*)&memory_map[address + 0x2000]) = value;
 	}

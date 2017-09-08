@@ -33,6 +33,7 @@
 
 #define UPDATE_LY() memory_set8(LY, hblank_count)
 #define LY_COMPARE ( memory_get8(LY) == memory_get8(LYC) )
+#define LCD_ON ( (memory_get8(LCDC) >> 7) & 1 )
 
 #define COINCIDENCE_INTERRUPT get_stat(STAT_COINCIDENCE)
 #define OAM_INTERRUPT get_stat(STAT_OAM)
