@@ -24,13 +24,24 @@
 #include "memory.h"
 #include "io.h"
 #include "ppu.h"
+#include <stdbool.h>
 
 unsigned cycles_prev;
 
 void interpreter_step()
 {
-	cycles_prev = cycles;
+	if(pendingEI)
+	{
+		interruptsEnabled = true;
+		pendingEI = false;
+	}
+	if(pendingDI)
+	{
+		interruptsEnabled = false;
+		pendingDI = false;
+	}
 
+	cycles_prev = cycles;
 	if(!prefixCB) standard_opcodes[FETCH()]();
 	else
 	{
@@ -39,5 +50,6 @@ void interpreter_step()
 	}
 	io_tick();
 	ppu_tick();
+
 	if(interruptsEnabled) do_interrupts();
 }

@@ -34,7 +34,7 @@ extern reg16 AF, BC, DE, HL, SP, PC;
 extern unsigned cycles;
 extern bool isHalting, isStopped;
 extern bool prefixCB;
-extern bool interruptsEnabled;
+extern bool interruptsEnabled, pendingDI, pendingEI;
 
 typedef enum conditional
 {

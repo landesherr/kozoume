@@ -40,7 +40,7 @@ reg16 PC = (word*) &registers[10];
 
 unsigned cycles = 0;
 bool isHalting = false, isStopped = false;
-bool interruptsEnabled = true;
+bool interruptsEnabled = true, pendingDI = false, pendingEI = false;
 bool prefixCB = false;
 
 //8-BIT LOADS
@@ -620,18 +620,15 @@ void stop()
 	*PC += 1;
 	cycles += 4;
 }
-//Technically, enabling or disabling interrupts shouldn't happen immediately
-//It should be delayed by one instruction on actual GB hardware
-//However, the GBC doesn't behave like this, and compatibility is fine
 void di()
 {
-	interruptsEnabled = false;
+	pendingDI = true;
 	*PC += 1;
 	cycles += 4;
 }
 void ei()
 {
-	interruptsEnabled = true;
+	pendingEI = true;
 	*PC += 1;
 	cycles += 4;
 }
