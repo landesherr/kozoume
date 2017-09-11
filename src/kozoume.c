@@ -200,5 +200,6 @@ void powerup()
 	memory_set8(0xFF47, 0xFC);
 	memory_set8(0xFF48, 0xFF);
 	memory_set8(0xFF49, 0xFF);
+	memory_set8(0xFF0F, 0x01); //Set VBLANK to true for post-BIOS accuracy
 }
 
