@@ -19,6 +19,7 @@
 #pragma once
 
 #include "memory.h"
+#include <stdbool.h>
 
 void io_tick(void);
 void div_tick(void);

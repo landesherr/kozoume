@@ -20,6 +20,8 @@
 #include "interpreter.h"
 #include "z80.h"
 #include "interrupts.h"
+#include <stdio.h>
+#include "globaldefs.h"
 
 #define CLOCKS_TO_DMA 0x2A0
 #define CLOCKS_PER_BYTE 4
@@ -28,7 +30,7 @@ void io_tick()
 {
 	div_tick();
 	tima_tick();
-	//TODO more IO regs
+	dma_transfer();
 }
 
 void div_tick()
@@ -112,9 +114,12 @@ void dma_transfer()
 	//If DMA register is 0, don't do anything
 	if(dma_address)
 	{
-		dbgwrite("### DMA requested at %X ###\n", dma_address);
-		//40 * 28 bit transfer from 0000-f19f to OAM
-		dma_cycles = CLOCKS_TO_DMA;
+		if(dma_address <= 0xF100 && dma_address % 0x100 == 0)
+		{
+			dbgwrite("### DMA requested at %X ###\n", dma_address);
+			//40 * 28 bit transfer from 0000-f19f to OAM
+			dma_cycles = CLOCKS_TO_DMA;
+		}
 		memory_set16(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
 	}
 }
