@@ -23,3 +23,5 @@
 void io_tick(void);
 void div_tick(void);
 void tima_tick(void);
+
+void dma_transfer(void);

@@ -21,6 +21,9 @@
 #include "z80.h"
 #include "interrupts.h"
 
+#define CLOCKS_TO_DMA 0x2A0
+#define CLOCKS_PER_BYTE 4
+
 void io_tick()
 {
 	div_tick();
@@ -71,5 +74,47 @@ void tima_tick()
 			}
 			else memory_set8(TIMA, value);
 		}
+	}
+}
+
+void dma_transfer()
+{
+	static int dma_cycles = 0, completed = 0;
+	static word dma_address = 0;
+	unsigned bytes_to_copy;
+	if(dma_cycles)
+	{
+		dbgwrite("### Processing DMA ###\n");
+		dma_cycles -= (cycles - cycles_prev);
+		if(dma_cycles <= 0)
+		{
+			dma_cycles = 0;
+			completed = 0;
+			return;
+		}
+		//The math doesn't quite add up. Theres these extra 32 clocks I can't account for
+		//So let's just assume some kind of weird memory thing is happening at the start
+		//Sounds good to me.
+		if(dma_cycles > CLOCKS_TO_DMA - 32) return;
+		else
+		{
+			bytes_to_copy = ((CLOCKS_TO_DMA - 32) - dma_cycles) / CLOCKS_PER_BYTE;
+			for(int i=completed;i<bytes_to_copy;i++)
+			{
+				//OAM = FE00-FE9F
+				memory_set8(dma_address + i, memory_get8(0xFE00 + i));
+			}
+			completed = bytes_to_copy;
+		}
+		return;
+	}
+	dma_address = memory_get16(DMA);
+	//If DMA register is 0, don't do anything
+	if(dma_address)
+	{
+		dbgwrite("### DMA requested at %X ###\n", dma_address);
+		//40 * 28 bit transfer from 0000-f19f to OAM
+		dma_cycles = CLOCKS_TO_DMA;
+		memory_set16(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
 	}
 }
