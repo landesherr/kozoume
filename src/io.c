@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "globaldefs.h"
 
-#define CLOCKS_TO_DMA 0x2A0
+#define CLOCKS_TO_DMA 0x280
 #define CLOCKS_PER_BYTE 4
 
 void io_tick()
@@ -94,13 +94,9 @@ void dma_transfer()
 			completed = 0;
 			return;
 		}
-		//The math doesn't quite add up. Theres these extra 32 clocks I can't account for
-		//So let's just assume some kind of weird memory thing is happening at the start
-		//Sounds good to me.
-		if(dma_cycles > CLOCKS_TO_DMA - 32) return;
 		else
 		{
-			bytes_to_copy = ((CLOCKS_TO_DMA - 32) - dma_cycles) / CLOCKS_PER_BYTE;
+			bytes_to_copy = (CLOCKS_TO_DMA - dma_cycles) / CLOCKS_PER_BYTE;
 			for(int i=completed;i<bytes_to_copy;i++)
 			{
 				//OAM = FE00-FE9F
