@@ -324,7 +324,7 @@ void opcode_3c()
 
 void opcode_3d()
 {
-	dec_reg8(D);
+	dec_reg8(A);
 }
 
 void opcode_3e()
