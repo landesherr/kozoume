@@ -110,16 +110,13 @@ void dma_transfer()
 		}
 		return;
 	}
-	dma_address = memory_get16(DMA);
+	dma_address = ((word) memory_get8(DMA)) << 8;
 	//If DMA register is 0, don't do anything
 	if(dma_address)
 	{
-		if(dma_address <= 0xF100 && dma_address % 0x100 == 0)
-		{
-			dbgwrite("### DMA requested at %X ###\n", dma_address);
-			//40 * 28 bit transfer from 0000-f19f to OAM
-			dma_cycles = CLOCKS_TO_DMA;
-		}
-		memory_set16(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
+		dbgwrite("### DMA requested at %X ###\n", dma_address);
+		//40 * 28 bit transfer from 0000-f19f to OAM
+		dma_cycles = CLOCKS_TO_DMA;
+		memory_set8(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
 	}
 }
