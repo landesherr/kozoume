@@ -238,9 +238,9 @@ void adc_a_n()
 {
 	byte result;
 	result = *A + memory_get8(*PC + 1) + get_carry();
-	calc_halfcarry_8(result, *A, false);
-	calc_carry_8(result, *A, false);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, false));
+	set_carry(calc_carry_8(result, *A, false));
+	set_zero(!result);
 	set_subtract(false);
 	*A = result;
 	*PC += 2;
@@ -249,9 +249,9 @@ void adc_a_n()
 void adc_a_reg8(reg8 reg)
 {
 	byte result = *A + *reg + get_carry();
-	calc_halfcarry_8(result, *A, false);
-	calc_carry_8(result, *A, false);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, false));
+	set_carry(calc_carry_8(result, *A, false));
+	set_zero(!result);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -260,9 +260,9 @@ void adc_a_reg8(reg8 reg)
 void adc_a_hl()
 {
 	byte result = *A + memory_get8(*HL) + get_carry();
-	calc_halfcarry_8(result, *A, false);
-	calc_carry_8(result, *A, false);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, false));
+	set_carry(calc_carry_8(result, *A, false));
+	set_zero(!result);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -271,9 +271,9 @@ void adc_a_hl()
 void sub_a_n()
 {
 	byte result = *A - memory_get8(*PC + 1);
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
+	set_zero(!result);
 	set_subtract(true);
 	*A = result;
 	*PC += 2;
@@ -282,9 +282,9 @@ void sub_a_n()
 void sub_a_reg8(reg8 reg)
 {
 	byte result = *A - *reg;
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
+	set_zero(!result);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -293,9 +293,9 @@ void sub_a_reg8(reg8 reg)
 void sub_a_hl()
 {
 	byte result = *A - memory_get8(*HL);
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
+	set_zero(!result);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -304,9 +304,9 @@ void sub_a_hl()
 void sbc_a_n()
 {
 	byte result = *A - (memory_get8(*PC + 1) + get_carry());
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
+	set_zero(!result);
 	set_subtract(true);
 	*A = result;
 	*PC += 2;
@@ -315,9 +315,9 @@ void sbc_a_n()
 void sbc_a_reg8(reg8 reg)
 {
 	byte result = *A - (*reg + get_carry());
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
+	set_zero(!result);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -326,9 +326,9 @@ void sbc_a_reg8(reg8 reg)
 void sbc_a_hl()
 {
 	byte result = *A - (memory_get8(*HL) + get_carry());
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
+	set_zero(!result);
 	set_subtract(true);
 	*A = result;
 	*PC += 1;
@@ -337,8 +337,8 @@ void sbc_a_hl()
 void cp_n()
 {
 	byte result = *A - memory_get8(*PC + 1);
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
 	set_zero(!result);
 	set_subtract(true);
 	*PC += 2;
@@ -347,8 +347,8 @@ void cp_n()
 void cp_reg8(reg8 reg)
 {
 	byte result = *A - *reg;
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
 	set_zero(!result);
 	set_subtract(true);
 	*PC += 1;
@@ -357,8 +357,8 @@ void cp_reg8(reg8 reg)
 void cp_hl()
 {
 	byte result = *A - *HL;
-	calc_halfcarry_8(result, *A, true);
-	calc_carry_8(result, *A, true);
+	set_halfcarry(calc_halfcarry_8(result, *A, true));
+	set_carry(calc_carry_8(result, *A, true));
 	set_zero(!result);
 	set_subtract(true);
 	*PC += 1;
