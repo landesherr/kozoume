@@ -339,7 +339,7 @@ void cp_n()
 	byte result = *A - memory_get8(*PC + 1);
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	set_subtract(true);
 	*PC += 2;
 	cycles += 8;
@@ -349,7 +349,7 @@ void cp_reg8(reg8 reg)
 	byte result = *A - *reg;
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	set_subtract(true);
 	*PC += 1;
 	cycles += 4;
@@ -359,7 +359,7 @@ void cp_hl()
 	byte result = *A - *HL;
 	calc_halfcarry_8(result, *A, true);
 	calc_carry_8(result, *A, true);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	set_subtract(true);
 	*PC += 1;
 	cycles += 8;
