@@ -459,7 +459,7 @@ void inc_reg8(reg8 reg)
 	byte result = *reg + 1;
 	if(!calc_halfcarry_8(result, *reg, false)) set_halfcarry(false);
 	set_subtract(false);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	*reg = result;
 	*PC += 1;
 	cycles += 4;
@@ -469,7 +469,7 @@ void inc_hl()
 	byte result = memory_get8(*HL) + 1;
 	if(!calc_halfcarry_8(result, memory_get8(*HL), false)) set_halfcarry(false);
 	set_subtract(false);
-	if(!result) set_zero(true);
+	set_zero(!result);
 	memory_set8_logical(*HL, result);
 	*PC += 1;
 	cycles += 12;
