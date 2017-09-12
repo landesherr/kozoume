@@ -31,6 +31,7 @@ void io_tick()
 	div_tick();
 	tima_tick();
 	dma_transfer();
+	check_joypad();
 }
 
 void div_tick()
@@ -114,5 +115,19 @@ void dma_transfer()
 		//40 * 28 bit transfer from 0000-f19f to OAM
 		dma_cycles = CLOCKS_TO_DMA;
 		memory_set8(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
+	}
+}
+
+void check_joypad()
+{
+	byte temp = memory_get8(P1);
+	//TODO insert actual joypad values here, instead of none
+	if(temp & 0x20)
+	{
+		memory_set8(P1, 0x0F);
+	}
+	else if(temp & 0x10)
+	{
+		memory_set8(P1, 0x0F);
 	}
 }

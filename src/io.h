@@ -26,3 +26,4 @@ void div_tick(void);
 void tima_tick(void);
 
 void dma_transfer(void);
+void check_joypad(void);
