@@ -31,7 +31,14 @@ static unsigned hblank_count = 153, mode_cycles = 4500;
 
 void ppu_tick()
 {
-	if(!LCD_ON) return;
+	if(!LCD_ON)
+	{
+		gfxmode = 0;
+		hblank_count = 0;
+		mode_cycles = 0;
+		UPDATE_LY();
+		return;
+	}
 	//144 search->transfer->hblank cycles followed by vblank
 	//hblank = 456 cycles
 	//(80 mode 2, 172 mode 3, 204 mode 0)
