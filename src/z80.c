@@ -1011,7 +1011,7 @@ void call_cc(conditional c)
 void rst(byte address)
 {
 	*SP -= 2;
-	memory_set16_logical(*SP, *PC + 3);
+	memory_set16_logical(*SP, *PC + 1);
 	*PC = address;
 	cycles += 32;
 }
