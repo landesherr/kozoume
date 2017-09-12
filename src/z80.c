@@ -204,9 +204,9 @@ void add_a_n()
 {
 	byte result;
 	result = *A + memory_get8(*PC + 1);
-	calc_halfcarry_8(result, *A, false);
-	calc_carry_8(result, *A, false);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, false));
+	set_carry(calc_carry_8(result, *A, false));
+	set_zero(!result);
 	set_subtract(false);
 	*A = result;
 	*PC += 2;
@@ -215,9 +215,9 @@ void add_a_n()
 void add_a_reg8(reg8 reg)
 {
 	byte result = *A + *reg;
-	calc_halfcarry_8(result, *A, false);
-	calc_carry_8(result, *A, false);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, false));
+	set_carry(calc_carry_8(result, *A, false));
+	set_zero(!result);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
@@ -226,9 +226,9 @@ void add_a_reg8(reg8 reg)
 void add_a_hl()
 {
 	byte result = *A + memory_get8(*HL);
-	calc_halfcarry_8(result, *A, false);
-	calc_carry_8(result, *A, false);
-	if(!result) set_zero(true);
+	set_halfcarry(calc_halfcarry_8(result, *A, false));
+	set_carry(calc_carry_8(result, *A, false));
+	set_zero(!result);
 	set_subtract(false);
 	*A = result;
 	*PC += 1;
