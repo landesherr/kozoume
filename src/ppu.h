@@ -21,6 +21,7 @@
 #include "memory.h"
 #include "globaldefs.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define SCREEN_RES_X 160
 #define SCREEN_RES_Y 144
@@ -31,14 +32,25 @@
 #define MODE_2_CYCLES 80
 #define MODE_3_CYCLES 172
 
+#define TILE_MAP_1_BEGIN 0x9800
+#define TILE_MAP_2_BEGIN 0x9C00
+#define TILE_MAP_SIZE 0x400
+
+#define TILE_DATA_1_BEGIN 0x8000
+#define TILE_DATA_2_BEGIN 0x8800
+#define TILE_DATA_SIZE 0x1000
+
 #define UPDATE_LY() memory_set8(LY, hblank_count)
 #define LY_COMPARE ( memory_get8(LY) == memory_get8(LYC) )
-#define LCD_ON ( (memory_get8(LCDC) >> 7) & 1 )
+
+#define LCD_ON get_lcdc(7)
 
 #define COINCIDENCE_INTERRUPT get_stat(STAT_COINCIDENCE)
 #define OAM_INTERRUPT get_stat(STAT_OAM)
 #define VBLANK_INTERRUPT get_stat(STAT_VBLANK)
 #define HBLANK_INTERRUPT get_stat(STAT_HBLANK)
+
+#define PIXEL(Y, X) screen_bitmap[(Y * SCREEN_RES_X) + X]
 
 typedef enum ppu_mode
 {
@@ -59,13 +71,42 @@ typedef enum stat_bit
 	STAT_COINCIDENCE = 6
 } stat_bit;
 
+typedef enum lcdc_bit
+{
+	LCDC_LCD_ON = 7,
+	LCDC_WIN_TILEMAP = 6,
+	LCDC_WIN_DISPLAY_ON = 5,
+	LCDC_BG_WIN_TILE = 4,
+	LCDC_BG_TILEMAP = 3,
+	LCDC_OBJ_SIZE = 2,
+	LCDC_OBJ_ENABLE = 1,
+	LCDC_BG_DISPLAY = 0
+} lcdc_bit;
+
+typedef enum pixel_value
+{
+	PIXEL_OFF = 0,
+	PIXEL_LIGHT = 1,
+	PIXEL_DARK = 2,
+	PIXEL_FULL = 3
+} pixel_value;
+
 extern ppu_mode gfxmode;
+extern byte *screen_bitmap;
 
 void ppu_tick(void);
+void clear_tiles(void);
+void update_tiles(void);
+void scanline(void);
 
 static inline void set_stat(byte, bool);
 static inline void set_mode_flag(ppu_mode);
 static inline bool get_stat(stat_bit);
+static inline bool get_lcdc(lcdc_bit);
+static inline word get_tile_address(byte, byte, word);
+static inline pixel_value** get_tile(byte, word);
+static inline void free_tile(pixel_value**);
+static inline byte get_color(pixel_value);
 
 static inline void set_stat(byte bit, bool set)
 {
@@ -82,4 +123,41 @@ static inline void set_mode_flag(ppu_mode m)
 static inline bool get_stat(stat_bit bit)
 {
 	return ((memory_get8(STAT) >> bit) & 1);
+}
+static inline bool get_lcdc(lcdc_bit bit)
+{
+	return ((memory_get8(LCDC) >> bit) & 1);
+}
+static inline word get_tile_address(byte y, byte x, word base)
+{
+	y >>= 3;
+	x >>= 3;
+	return (base + (y * 32) + x);
+}
+static inline pixel_value** get_tile(byte tileno, word base)
+{
+	if(base == TILE_MAP_2_BEGIN) tileno ^= (1 << 7);
+	pixel_value **pixels = malloc(8 * sizeof(pixel_value*));
+	for(unsigned a=0;a<8;a++) pixels[a] = malloc(8 * sizeof(pixel_value));
+	word address = base + (tileno * 16);
+	word temp;
+	for(unsigned i=0;i<16;i+=2)
+	{
+		temp = memory_get16(address + i);
+		for(unsigned j=0;j<8;j++)
+		{
+			pixels[i>>1][j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
+		}
+	}
+	return pixels;
+}
+static inline void free_tile(pixel_value **tile)
+{
+	for(unsigned i=0;i<8;i++) free(tile[i]);
+	free(tile);
+}
+static inline byte get_color(pixel_value p)
+{
+	//TODO remap colors and convert to bitmap color
+	return (byte) p;
 }

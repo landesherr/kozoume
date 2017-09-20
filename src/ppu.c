@@ -26,8 +26,11 @@
 #include <stdbool.h>
 #include <stdio.h> //remove when done debugging
 
+#define LINE_TO_TILE(LINE) ((LINE) >> 3)
+
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
+byte *screen_bitmap;
 
 void ppu_tick()
 {
@@ -110,4 +113,58 @@ void ppu_tick()
 	else if(gfxmode == VBLANK && VBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
 	else if(gfxmode == SEARCH && OAM_INTERRUPT) set_interrupt(INT_STAT, true);
 	else if(LY_COMPARE && COINCIDENCE_INTERRUPT) set_interrupt(INT_STAT, true);
+}
+
+void scanline()
+{
+	if(!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
+	word map_bg, map_win;
+	map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
+	map_win = get_lcdc(LCDC_WIN_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
+
+	word tile_data;
+	tile_data = get_lcdc(LCDC_BG_WIN_TILE) ? TILE_DATA_2_BEGIN : TILE_DATA_1_BEGIN;
+
+	byte ly = memory_get8(LY);
+	byte scroll_x = memory_get8(SCX);
+	byte scroll_y = memory_get8(SCY);
+	byte window_y = memory_get8(WY);
+	byte window_x = memory_get8(WX);
+
+	word tilemap_offset_y = map_bg + LINE_TO_TILE(ly + scroll_y);
+	word tilemap_offset_x = LINE_TO_TILE(scroll_x);
+
+	//byte tile = memory_get8(tilemap_offset_x + tilemap_offset_y);
+	//if(map_bg == TILE_MAP_2_BEGIN) tile ^= 1 << 7;
+
+	word pixel;
+	byte y = ly + scroll_y;
+	byte x;
+
+	byte tile_y = y & 7;
+	byte tile_x;
+	static byte current_background_tile, current_sprite_tile;
+	static pixel_value **bgtile, **oamtile;
+	for(unsigned i=0;i<SCREEN_RES_X;i++)
+	{
+		x = i + scroll_x;
+		tile_x = x & 7;
+		if(get_lcdc(LCDC_BG_DISPLAY)) //if drawing to background is enabled
+		{
+			//TODO check for window and act accordingly
+			byte temptile = memory_get8(get_tile_address(y, x, map_bg));
+			if(temptile != current_sprite_tile || i == 0)
+			{
+				free_tile(bgtile);
+				current_sprite_tile = temptile;
+				bgtile = get_tile(current_sprite_tile, tile_data);
+			}
+			PIXEL(ly, i) = bgtile[tile_y][tile_x];
+
+		}
+		if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
+		{
+			//TODO
+		}
+	}
 }
