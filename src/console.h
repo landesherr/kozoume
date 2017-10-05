@@ -50,6 +50,7 @@ typedef enum runtil_condition
 	UNTIL_VBLANK,
 	UNTIL_JUMP,
 	UNTIL_INTERRUPT,
+	UNTIL_HBLANK,
 	NO_RUNTIL
 } runtil_condition;
 

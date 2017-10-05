@@ -101,6 +101,7 @@ void ppu_tick()
 				mode_cycles -= MODE_3_CYCLES;
 				gfxmode = HBLANK;
 				set_mode_flag(gfxmode);
+				scanline();
 			}
 			//TODO actual TRANSFER logic
 			break;
@@ -117,6 +118,7 @@ void ppu_tick()
 
 void scanline()
 {
+	printf("SCANLINE:\n");
 	if(!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
 	word map_bg, map_win;
 	map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
@@ -155,11 +157,12 @@ void scanline()
 			byte temptile = memory_get8(get_tile_address(y, x, map_bg));
 			if(temptile != current_sprite_tile || i == 0)
 			{
-				free_tile(bgtile);
+				if(bgtile) free_tile(bgtile);
 				current_sprite_tile = temptile;
 				bgtile = get_tile(current_sprite_tile, tile_data);
 			}
 			PIXEL(ly, i) = bgtile[tile_y][tile_x];
+			printf("%d", bgtile[tile_y][tile_x]);
 
 		}
 		if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
@@ -167,4 +170,5 @@ void scanline()
 			//TODO
 		}
 	}
+	printf("\n");
 }

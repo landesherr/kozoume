@@ -85,6 +85,7 @@ cmdagain:
 				if(!strcmp(cmd->param.str, "vblank")) rc = UNTIL_VBLANK;
 				else if(!strcmp(cmd->param.str, "jump")) rc = UNTIL_JUMP;
 				else if(!strcmp(cmd->param.str, "interrupt")) rc = UNTIL_INTERRUPT;
+				else if(!strcmp(cmd->param.str, "hblank")) rc = UNTIL_HBLANK;
 				else
 				{
 					free(cmd);
@@ -111,6 +112,7 @@ cmdagain:
 		else if(rc != NO_RUNTIL)
 		{
 			if((rc == UNTIL_VBLANK && gfxmode == 1) ||
+				(rc == UNTIL_HBLANK && gfxmode == 0 && LCD_ON) ||
 				(rc == UNTIL_JUMP && false) || //lazy, finish later
 				(rc == UNTIL_INTERRUPT && false) //ditto
 			)
