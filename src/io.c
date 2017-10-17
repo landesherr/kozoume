@@ -101,7 +101,7 @@ void dma_transfer()
 			for(int i=completed;i<bytes_to_copy;i++)
 			{
 				//OAM = FE00-FE9F
-				memory_set8(dma_address + i, memory_get8(0xFE00 + i));
+				memory_set8(0xFE00 + i, memory_get8(dma_address + i));
 			}
 			completed = bytes_to_copy;
 		}
