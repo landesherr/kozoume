@@ -27,6 +27,8 @@
 #include <stdio.h> //remove when done debugging
 
 #define LINE_TO_TILE(LINE) ((LINE) >> 3)
+#define NUM_OAM_ENTRIES 40
+#define SPRITE_SIZE 8
 
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
@@ -145,30 +147,69 @@ void scanline()
 
 	byte tile_y = y & 7;
 	byte tile_x;
-	static byte current_background_tile, current_sprite_tile;
-	static pixel_value **bgtile, **oamtile;
+	byte temptile;
+	static byte current_sprite_tile;
+	static pixel_value **bgtile = NULL, **oamtile = NULL;
+	oam_entry current_entry;
+	byte yc, xc, tile_no, oam_options;
 	for(unsigned i=0;i<SCREEN_RES_X;i++)
 	{
 		x = i + scroll_x;
 		tile_x = x & 7;
 		if(get_lcdc(LCDC_BG_DISPLAY)) //if drawing to background is enabled
 		{
+			printf("BACKGROUND\n");
 			//TODO check for window and act accordingly
-			byte temptile = memory_get8(get_tile_address(y, x, map_bg));
+			temptile = memory_get8(get_tile_address(y, x, map_bg));
 			if(temptile != current_sprite_tile || i == 0)
 			{
 				if(bgtile) free_tile(bgtile);
 				current_sprite_tile = temptile;
+				printf("GET BG TILE\n");
 				bgtile = get_tile(current_sprite_tile, tile_data);
 			}
 			PIXEL(ly, i) = bgtile[tile_y][tile_x];
-			printf("%d", bgtile[tile_y][tile_x]);
 
 		}
 		if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
 		{
-			//TODO
+			printf("SPRITE\n");
+			for(unsigned j=0;j<NUM_OAM_ENTRIES;j++)
+			{
+				current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
+				if(!current_entry) continue;
+				else printf("OAM DATA: %X\n", current_entry);
+				yc = OAM_Y_COORD(current_entry);
+				xc = OAM_X_COORD(current_entry);
+				tile_no = OAM_TILE_NO(current_entry);
+				printf("SPRITE TILE\n");
+				oamtile = get_tile(tile_no, tile_data);
+				if(yc <= y && (yc + SPRITE_SIZE) > y)
+				{
+					//TODO handle palette
+					//TODO handle attributes (e.g. flip)
+					for(unsigned k=0;k<SPRITE_SIZE;k++)
+					{
+						if((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
+						{
+							oam_options = OAM_OPTIONS(current_entry);
+							//only draw if high priority or no other pixel exists here
+							//TODO: handle remapped PIXEL_OFF palette value
+							if(oam_options >> 7 == 0 || PIXEL(ly, i) == PIXEL_OFF)
+							{
+								printf("SET SPRITE\n");
+								PIXEL(ly, i) = oamtile[tile_y][tile_x];
+							}
+						}
+					}
+					printf("CONDITIONAL FREE\n");
+					if(oamtile) free_tile(oamtile);
+				}
+			}
+
 		}
+		printf("%d", PIXEL(ly, i));
 	}
+	if(oamtile) free_tile(oamtile);
 	printf("\n");
 }

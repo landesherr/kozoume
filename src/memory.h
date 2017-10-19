@@ -94,6 +94,7 @@ typedef enum ioreg
 byte memory_get8(word);
 signed char memory_get8s(word);
 word memory_get16(word);
+unsigned memory_get32(word);
 
 //set memory values exactly as specified (faster, for use in emulator logic)
 void memory_set8(word, byte);

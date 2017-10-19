@@ -87,7 +87,7 @@ void dma_transfer()
 	unsigned bytes_to_copy;
 	if(dma_cycles)
 	{
-		dbgwrite("### Processing DMA ###\n");
+		dbgwrite("                                                                ### Processing DMA ###\n");
 		dma_cycles -= (cycles - cycles_prev);
 		if(dma_cycles <= 0)
 		{

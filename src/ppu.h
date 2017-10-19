@@ -52,6 +52,11 @@
 
 #define PIXEL(Y, X) screen_bitmap[(Y * SCREEN_RES_X) + X]
 
+#define OAM_Y_COORD(OAM_ENTRY) (OAM_ENTRY >> 24)
+#define OAM_X_COORD(OAM_ENTRY) ((OAM_ENTRY >> 16) & 0xFF)
+#define OAM_TILE_NO(OAM_ENTRY) ((OAM_ENTRY >> 8) & 0xFF)
+#define OAM_OPTIONS(OAM_ENTRY) (OAM_ENTRY & 0xFF)
+
 typedef enum ppu_mode
 {
 	HBLANK = 0,
@@ -90,6 +95,8 @@ typedef enum pixel_value
 	PIXEL_DARK = 2,
 	PIXEL_FULL = 3
 } pixel_value;
+
+typedef unsigned oam_entry;
 
 extern ppu_mode gfxmode;
 extern byte *screen_bitmap;

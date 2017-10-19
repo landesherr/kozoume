@@ -60,6 +60,10 @@ word memory_get16(word address)
 {
 	return *((word*)&memory_map[address]);
 }
+unsigned memory_get32(word address)
+{
+	return *((unsigned*)&memory_map[address]);
+}
 
 void memory_set8(word address, byte value)
 {
