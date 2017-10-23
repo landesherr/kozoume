@@ -57,6 +57,8 @@
 #define OAM_TILE_NO(OAM_ENTRY) ((OAM_ENTRY >> 8) & 0xFF)
 #define OAM_OPTIONS(OAM_ENTRY) (OAM_ENTRY & 0xFF)
 
+#include <stdio.h>
+
 typedef enum ppu_mode
 {
 	HBLANK = 0,
@@ -143,16 +145,19 @@ static inline word get_tile_address(byte y, byte x, word base)
 }
 static inline pixel_value** get_tile(byte tileno, word base)
 {
-	if(base == TILE_MAP_2_BEGIN) tileno ^= (1 << 7);
+	word address;
+	//16 bytes per tile
+	if(base == TILE_MAP_2_BEGIN && (tileno >> 7)) address = base - (((~tileno)*16) + 1);
+	else address = base + (tileno * 16);
 	pixel_value **pixels = malloc(8 * sizeof(pixel_value*));
 	for(unsigned a=0;a<8;a++) pixels[a] = malloc(8 * sizeof(pixel_value));
-	word address = base + (tileno * 16);
 	word temp;
 	for(unsigned i=0;i<16;i+=2)
 	{
 		temp = memory_get16(address + i);
 		for(unsigned j=0;j<8;j++)
 		{
+			printf("Line value %d\n", temp);
 			pixels[i>>1][j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
 		}
 	}
