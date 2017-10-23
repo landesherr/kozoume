@@ -88,7 +88,7 @@ void ld_a_nnmem()
 }
 void ld_mem_a(reg16 address)
 {
-	memory_set8_logical(memory_get16(*address), *A);
+	memory_set8_logical(*address, *A);
 	*PC += 1;
 	cycles += 8;
 }
