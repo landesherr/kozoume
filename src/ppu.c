@@ -32,6 +32,7 @@
 
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
+const byte text_pixels[4] = {178, 177, 176, 32};
 byte *screen_bitmap;
 
 void ppu_tick()
@@ -60,6 +61,7 @@ void ppu_tick()
 				UPDATE_LY();
 				if(hblank_count == SCREEN_RES_Y)
 				{
+					debug_printscreen();
 					gfxmode = VBLANK;
 					set_interrupt(INT_VBLANK, true);
 				}
@@ -127,7 +129,7 @@ void scanline()
 	map_win = get_lcdc(LCDC_WIN_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
 
 	word tile_data;
-	tile_data = get_lcdc(LCDC_BG_WIN_TILE) ? TILE_DATA_2_BEGIN : TILE_DATA_1_BEGIN;
+	tile_data = get_lcdc(LCDC_BG_WIN_TILE) ? TILE_DATA_1_BEGIN : TILE_DATA_2_BEGIN;
 
 	byte ly = memory_get8(LY);
 	byte scroll_x = memory_get8(SCX);
@@ -139,9 +141,7 @@ void scanline()
 	word tilemap_offset_x = LINE_TO_TILE(scroll_x);
 
 	//byte tile = memory_get8(tilemap_offset_x + tilemap_offset_y);
-	//if(map_bg == TILE_MAP_2_BEGIN) tile ^= 1 << 7;
 
-	word pixel;
 	byte y = ly + scroll_y;
 	byte x;
 
@@ -158,32 +158,26 @@ void scanline()
 		{
 			x = i + scroll_x;
 			tile_x = x & 7;
-			printf("BACKGROUND\n");
 			//TODO check for window and act accordingly
 			temptile = memory_get8(get_tile_address(y, x, map_bg));
 			if(temptile != current_sprite_tile || i == 0)
 			{
 				if(bgtile) free_tile(bgtile);
 				current_sprite_tile = temptile;
-				printf("GET BG TILE\n");
 				bgtile = get_tile(current_sprite_tile, tile_data);
 			}
 			PIXEL(ly, i) = bgtile[tile_y][tile_x];
-			printf("%d", PIXEL(ly, i));
 		}
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
 	{
-		printf("SPRITE\n");
 		for(unsigned j=0;j<NUM_OAM_ENTRIES;j++)
 		{
 			current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
 			if(!current_entry) continue;
-			else printf("OAM DATA: %X\n", current_entry);
 			yc = OAM_Y_COORD(current_entry);
 			xc = OAM_X_COORD(current_entry);
 			tile_no = OAM_TILE_NO(current_entry);
-			printf("SPRITE TILE\n");
 			oamtile = get_tile(tile_no, tile_data);
 			if(yc <= y && (yc + SPRITE_SIZE) > y)
 			{
@@ -198,16 +192,25 @@ void scanline()
 						//TODO: handle remapped PIXEL_OFF palette value
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
 						{
-							printf("SET SPRITE\n");
 							PIXEL(ly, xc+k) = oamtile[tile_y][tile_x];
 						}
 					}
 				}
-				printf("CONDITIONAL FREE\n");
 				if(oamtile) free_tile(oamtile);
 			}
 		}
 
 	}
-	printf("\n");
+}
+
+void debug_printscreen()
+{
+	for(unsigned i=0;i<SCREEN_RES_Y;i++)
+	{
+		for(unsigned j=0;j<SCREEN_RES_X;j++)
+		{
+			printf("%c", text_pixels[PIXEL(i,j)]);
+		}
+		printf("\n");
+	}
 }
