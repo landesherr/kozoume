@@ -32,7 +32,7 @@
 
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
-const byte text_pixels[4] = {178, 177, 176, 32};
+const byte text_pixels[4] = {'#', '=', '-', ' '};
 byte *screen_bitmap;
 
 void ppu_tick()
