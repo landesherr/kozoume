@@ -112,8 +112,9 @@ static inline void set_mode_flag(ppu_mode);
 static inline bool get_stat(stat_bit);
 static inline bool get_lcdc(lcdc_bit);
 static inline word get_tile_address(byte, byte, word);
-static inline pixel_value** get_tile(byte, word);
+static inline pixel_value** get_tile(byte, word, bool, bool);
 static inline void free_tile(pixel_value**);
+static inline void set_palette(byte, pixel_value*);
 static inline byte get_color(pixel_value);
 
 static inline void set_stat(byte bit, bool set)
@@ -142,7 +143,7 @@ static inline word get_tile_address(byte y, byte x, word base)
 	x >>= 3;
 	return (base + (y * 32) + x);
 }
-static inline pixel_value** get_tile(byte tileno, word base)
+static inline pixel_value** get_tile(byte tileno, word base, bool flip_x, bool flip_y)
 {
 	word address;
 	//16 bytes per tile
@@ -156,7 +157,7 @@ static inline pixel_value** get_tile(byte tileno, word base)
 		temp = memory_get16(address + i);
 		for(unsigned j=0;j<8;j++)
 		{
-			pixels[i>>1][j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
+			pixels[flip_y ? 8-(i>>1): i>>1][flip_x ? 8-j : j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
 		}
 	}
 	return pixels;
@@ -165,6 +166,10 @@ static inline void free_tile(pixel_value **tile)
 {
 	for(unsigned i=0;i<8;i++) free(tile[i]);
 	free(tile);
+}
+static inline void set_palette(byte palette, pixel_value *data)
+{
+	for(unsigned i=0;i<4;i++) data[i] = (palette >> i*2) & 3;
 }
 static inline byte get_color(pixel_value p)
 {

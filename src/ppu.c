@@ -25,6 +25,7 @@
 #include "globaldefs.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define LINE_TO_TILE(LINE) ((LINE) >> 3)
 #define NUM_OAM_ENTRIES 40
@@ -151,8 +152,12 @@ void scanline()
 	static pixel_value **bgtile = NULL, **oamtile = NULL;
 	oam_entry current_entry;
 	byte yc, xc, tile_no, oam_options;
+
+	byte oam_palette;
+	pixel_value bg_palette_data[4], oam_palette_data[4];
 	if(get_lcdc(LCDC_BG_DISPLAY))
 	{
+		set_palette(memory_get8(BGP), bg_palette_data);
 		for(unsigned i=0;i<SCREEN_RES_X;i++)
 		{
 			x = i + scroll_x;
@@ -163,9 +168,9 @@ void scanline()
 			{
 				if(bgtile) free_tile(bgtile);
 				current_sprite_tile = temptile;
-				bgtile = get_tile(current_sprite_tile, tile_data);
+				bgtile = get_tile(current_sprite_tile, tile_data, false, false);
 			}
-			PIXEL(ly, i) = bgtile[tile_y][tile_x];
+			PIXEL(ly, i) = bg_palette_data[bgtile[tile_y][tile_x]];
 		}
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
@@ -180,24 +185,24 @@ void scanline()
 			if(yc == 0 || xc == 0) continue;
 			yc -= 16;
 			xc -= 8;
+			oam_options = OAM_OPTIONS(current_entry);
 			tile_no = OAM_TILE_NO(current_entry);
-			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN);
+			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
 			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
 			if(yc <= y && (yc + SPRITE_SIZE) > y)
 			{
-				//TODO handle palette
-				//TODO handle attributes (e.g. flip)
+				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
+				set_palette(oam_palette, oam_palette_data);
 				for(unsigned k=0;k<SPRITE_SIZE;k++)
 				{
 					if((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
 					{
-						oam_options = OAM_OPTIONS(current_entry);
 						tile_x = (xc + k) & 7;
+
 						//only draw if high priority or no other pixel exists here
-						//TODO: handle remapped PIXEL_OFF palette value
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
 						{
-							PIXEL(ly, xc+k) = oamtile[tile_y][tile_x];
+							PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x]];
 						}
 					}
 				}
@@ -210,7 +215,8 @@ void scanline()
 
 void debug_printscreen()
 {
-
+	printf("\033[2J\033[1;1H"); //clear terminal
+	/*
 	for(unsigned i=0;i<SCREEN_RES_Y;i++)
 	{
 		for(unsigned j=0;j<SCREEN_RES_X;j++)
@@ -219,7 +225,7 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
-/*
+	*/
 	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
 	{
 		char out = '#';
@@ -300,5 +306,5 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
-*/
+	usleep(100000);
 }
