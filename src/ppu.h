@@ -52,10 +52,10 @@
 
 #define PIXEL(Y, X) screen_bitmap[(Y * SCREEN_RES_X) + X]
 
-#define OAM_Y_COORD(OAM_ENTRY) (OAM_ENTRY >> 24)
-#define OAM_X_COORD(OAM_ENTRY) ((OAM_ENTRY >> 16) & 0xFF)
-#define OAM_TILE_NO(OAM_ENTRY) ((OAM_ENTRY >> 8) & 0xFF)
-#define OAM_OPTIONS(OAM_ENTRY) (OAM_ENTRY & 0xFF)
+#define OAM_OPTIONS(OAM_ENTRY) (OAM_ENTRY >> 24)
+#define OAM_TILE_NO(OAM_ENTRY) ((OAM_ENTRY >> 16) & 0xFF)
+#define OAM_X_COORD(OAM_ENTRY) ((OAM_ENTRY >> 8) & 0xFF)
+#define OAM_Y_COORD(OAM_ENTRY) (OAM_ENTRY & 0xFF)
 
 typedef enum ppu_mode
 {

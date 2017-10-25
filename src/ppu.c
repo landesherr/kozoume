@@ -174,10 +174,15 @@ void scanline()
 		{
 			current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
 			if(!current_entry) continue;
+			//printf("Found current entry %X\n", current_entry);
 			yc = OAM_Y_COORD(current_entry);
 			xc = OAM_X_COORD(current_entry);
+			if(yc == 0 || xc == 0) continue;
+			yc -= 16;
+			xc -= 8;
 			tile_no = OAM_TILE_NO(current_entry);
-			oamtile = get_tile(tile_no, tile_data);
+			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN);
+			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
 			if(yc <= y && (yc + SPRITE_SIZE) > y)
 			{
 				//TODO handle palette
@@ -187,6 +192,7 @@ void scanline()
 					if((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
 					{
 						oam_options = OAM_OPTIONS(current_entry);
+						tile_x = (xc + k) & 7;
 						//only draw if high priority or no other pixel exists here
 						//TODO: handle remapped PIXEL_OFF palette value
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
@@ -195,8 +201,8 @@ void scanline()
 						}
 					}
 				}
-				if(oamtile) free_tile(oamtile);
 			}
+			if(oamtile) free_tile(oamtile);
 		}
 
 	}
