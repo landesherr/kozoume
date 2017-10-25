@@ -577,7 +577,8 @@ void daa()
 	if(!calc_carry_8(*A, prev, false)) set_carry(false);
 	set_halfcarry(false);
 	set_zero(*A == 0);
-
+	*PC += 1;
+	cycles += 4;
 }
 void cpl()
 {
