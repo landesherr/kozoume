@@ -24,7 +24,7 @@
 #include "interrupts.h"
 #include "globaldefs.h"
 #include <stdbool.h>
-#include <stdio.h> //remove when done debugging
+#include <stdlib.h>
 
 #define LINE_TO_TILE(LINE) ((LINE) >> 3)
 #define NUM_OAM_ENTRIES 40
@@ -122,7 +122,6 @@ void ppu_tick()
 
 void scanline()
 {
-	printf("SCANLINE:\n");
 	if(!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
 	word map_bg, map_win;
 	map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
@@ -205,6 +204,7 @@ void scanline()
 
 void debug_printscreen()
 {
+
 	for(unsigned i=0;i<SCREEN_RES_Y;i++)
 	{
 		for(unsigned j=0;j<SCREEN_RES_X;j++)
@@ -213,4 +213,86 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
+/*
+	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
+	{
+		char out = '#';
+		for(unsigned j=0;j<SCREEN_RES_X;j++)
+		{
+			switch(PIXEL(i,j))
+			{
+				case 0:
+					switch(PIXEL(i+1,j))
+					{
+						case 0:
+							out = '#';
+							break;
+						case 1:
+							out = '9';
+							break;
+						case 2:
+							out = 'T';
+							break;
+						case 3:
+							out = '\"';
+							break;
+					}
+					break;
+				case 1:
+					switch(PIXEL(i+1,j))
+					{
+						case 0:
+							out = '&';
+							break;
+						case 1:
+							out = 'X';
+							break;
+						case 2:
+							out = 'F';
+							break;
+						case 3:
+							out = '`';
+							break;
+					}
+					break;
+				case 2:
+					switch(PIXEL(i+1,j))
+					{
+						case 0:
+							out = 'L';
+							break;
+						case 1:
+							out = 'i';
+							break;
+						case 2:
+							out = '=';
+							break;
+						case 3:
+							out = '\'';
+							break;
+					}
+					break;
+				case 3:
+					switch(PIXEL(i+1,j))
+					{
+						case 0:
+							out = '_';
+							break;
+						case 1:
+							out = ',';
+							break;
+						case 2:
+							out = '.';
+							break;
+						case 3:
+							out = ' ';
+							break;
+					}
+					break;
+			}
+			printf("%c", out);
+		}
+		printf("\n");
+	}
+*/
 }

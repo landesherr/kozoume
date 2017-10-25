@@ -87,7 +87,7 @@ void dma_transfer()
 	unsigned bytes_to_copy;
 	if(dma_cycles)
 	{
-		dbgwrite("                                                                ### Processing DMA ###\n");
+		//dbgwrite("                                                                ### Processing DMA ###\n");
 		dma_cycles -= (cycles - cycles_prev);
 		if(dma_cycles <= 0)
 		{
@@ -111,7 +111,7 @@ void dma_transfer()
 	//If DMA register is 0, don't do anything
 	if(dma_address)
 	{
-		dbgwrite("### DMA requested at %X ###\n", dma_address);
+		//dbgwrite("### DMA requested at %X ###\n", dma_address);
 		//40 * 28 bit transfer from 0000-f19f to OAM
 		dma_cycles = CLOCKS_TO_DMA;
 		memory_set8(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
