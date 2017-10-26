@@ -22,6 +22,7 @@
 #include "globaldefs.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define SCREEN_RES_X 160
 #define SCREEN_RES_Y 144
@@ -37,7 +38,7 @@
 #define TILE_MAP_SIZE 0x400
 
 #define TILE_DATA_1_BEGIN 0x8000
-#define TILE_DATA_2_BEGIN 0x8800
+#define TILE_DATA_2_BEGIN 0x9000
 #define TILE_DATA_SIZE 0x1000
 
 #define UPDATE_LY() memory_set8(LY, hblank_count)
@@ -147,7 +148,7 @@ static inline pixel_value** get_tile(byte tileno, word base, bool flip_x, bool f
 {
 	word address;
 	//16 bytes per tile
-	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - (((~tileno)*16) + 1);
+	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - ((((~tileno & 0xFF) + 1)*16));
 	else address = base + (tileno * 16);
 	pixel_value **pixels = malloc(8 * sizeof(pixel_value*));
 	for(unsigned a=0;a<8;a++) pixels[a] = malloc(8 * sizeof(pixel_value));

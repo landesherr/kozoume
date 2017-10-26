@@ -202,7 +202,7 @@ void scanline()
 						//only draw if high priority or no other pixel exists here
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
 						{
-							PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x]];
+							PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x] & 3];
 						}
 					}
 				}
@@ -215,8 +215,7 @@ void scanline()
 
 void debug_printscreen()
 {
-	printf("\033[2J\033[1;1H"); //clear terminal
-	/*
+	//printf("\033[2J\033[1;1H"); //clear terminal
 	for(unsigned i=0;i<SCREEN_RES_Y;i++)
 	{
 		for(unsigned j=0;j<SCREEN_RES_X;j++)
@@ -225,7 +224,7 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
-	*/
+	/*
 	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
 	{
 		char out = '#';
@@ -306,5 +305,5 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
-	usleep(100000);
+	*/
 }
