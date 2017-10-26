@@ -19,6 +19,7 @@
 #include "globaldefs.h"
 #include "memory.h"
 #include "ppu.h"
+#include "cartridge.h"
 #include <stdlib.h>
 
 byte *memory_map;
@@ -102,6 +103,29 @@ void memory_set8_logical(word address, byte value)
 		|| MEMORY_IN_RANGE(address, cart_header))
 	{
 		//can't write to ROM
+		if(address >= 0x2000 && address <= 0x3FFF)
+		{
+			switch(mycart->type)
+			{
+				case ROM_MBC1_RAM:
+				case ROM_MBC1_RAM_BATT:
+					bank_switch(mycart, value & 0x1F);
+					break;
+				case ROM_MBC2:
+				case ROM_MBC2_BATT:
+					bank_switch(mycart, value & 0xF);
+					break;
+				case ROM_MBC3_TIMER_BATT:
+				case ROM_MBC3_TIMER_RAM_BATT:
+				case ROM_MBC3:
+				case ROM_MBC3_RAM:
+				case ROM_MBC3_RAM_BATT:
+					bank_switch(mycart, value);
+					break;
+				default:
+					break;
+			}
+		}
 		return;
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available

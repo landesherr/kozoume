@@ -61,6 +61,8 @@ typedef struct cartridge
 	unsigned ram_bytes;
 } cartridge;
 
+extern cartridge *mycart;
+
 cartridge* load_cart(char*);
 void free_cart(cartridge*);
-void bank_switch(cartridge*);
+void bank_switch(cartridge*, byte);

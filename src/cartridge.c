@@ -24,6 +24,8 @@
 
 #define BANK_SIZE 0x4000
 
+cartridge *mycart;
+
 static inline unsigned get_cart_size(FILE*);
 static inline byte calc_rom_banks(byte);
 static inline unsigned calc_ram_size(byte);
@@ -74,7 +76,24 @@ cartridge* load_cart(char *path)
 	dbgwrite("Name - %s\n", name);
 	calculate_checksum(cart);
 	fclose(cart);
+	mycart = loaded_cart;
 	return loaded_cart;
+}
+
+void bank_switch(cartridge *c, byte bankno)
+{
+	FILE *cart;
+	cart = fopen(c->filename,"rb");
+	if(!cart)
+	{
+		dbgwrite("Unable to load ROM for bank switch!!!\n");
+		exit(1);
+	}
+	if(!bankno) bankno = 1;
+	fseek(cart, BANK_SIZE*bankno, SEEK_SET);
+	fread(&memory_map[BANK_SIZE], BANK_SIZE, 1, cart);
+	fclose(cart);
+	c->bank = bankno;
 }
 
 static inline unsigned get_cart_size(FILE *cart)
