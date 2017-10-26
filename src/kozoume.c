@@ -52,18 +52,18 @@ int main(int argc, char *argv[])
 	//basic_sanity_check();
 	while(go)
 	{
-		dbgwrite("Current PC: %X - Opcode: %X \n", *PC, memory_get8(*PC));
+		//dbgwrite("Current PC: %X - Opcode: %X \n", *PC, memory_get8(*PC));
 		interpreter_step();
-		dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
-		dbgwrite("Stack Pointer is %X \n", *SP);
-		dbgwrite("(HL) is %X \n", memory_get16(*HL));
-		dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
-		dbgwrite("PPU mode is %u\n", gfxmode);
-		dbgwrite("LCD is %s\n", LCD_ON ? "ON" : "OFF");
-		dbgwrite("IME: %s\n", interruptsEnabled ? "enabled" : "disabled");
-		dbgwrite("FFFF: %X\n", memory_get8(0xFFFF));
-		dbgwrite("FF0F: %X\n", memory_get8(0xFF0F));
-		dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
+		//dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
+		//dbgwrite("Stack Pointer is %X \n", *SP);
+		//dbgwrite("(HL) is %X \n", memory_get16(*HL));
+		//dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
+		//dbgwrite("PPU mode is %u\n", gfxmode);
+		//dbgwrite("LCD is %s\n", LCD_ON ? "ON" : "OFF");
+		//dbgwrite("IME: %s\n", interruptsEnabled ? "enabled" : "disabled");
+		//dbgwrite("FFFF: %X\n", memory_get8(0xFFFF));
+		//dbgwrite("FF0F: %X\n", memory_get8(0xFF0F));
+		//dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
 		if(!run)
 		{
 cmdagain:
