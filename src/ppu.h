@@ -158,7 +158,7 @@ static inline pixel_value** get_tile(byte tileno, word base, bool flip_x, bool f
 		temp = memory_get16(address + i);
 		for(unsigned j=0;j<8;j++)
 		{
-			pixels[flip_y ? 8-(i>>1): i>>1][flip_x ? 8-j : j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
+			pixels[flip_y ? 7-(i>>1): i>>1][flip_x ? 7-j : j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
 		}
 	}
 	return pixels;

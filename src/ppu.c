@@ -202,7 +202,8 @@ void scanline()
 						//only draw if high priority or no other pixel exists here
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
 						{
-							if(oamtile[tile_y][tile_x] <= 3 && oamtile[tile_y][tile_x] != 0) PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x]];
+							if(oamtile[tile_y][tile_x] <= 3 && oamtile[tile_y][tile_x] != 0)
+								PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x]];
 						}
 					}
 				}
