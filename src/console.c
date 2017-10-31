@@ -74,6 +74,10 @@ console_command* console_get_command()
 		cmd->action = PEEK;
 		cmd->param.numeric = address & 0xFFFF;
 	}
+	else if(!strcmp(words[0], "dumpoam"))
+	{
+		cmd->action = DUMP_OAM;
+	}
 	else if(!strcmp(words[0], "setbrk"))
 	{
 		if(words == 0) goto badcmd;

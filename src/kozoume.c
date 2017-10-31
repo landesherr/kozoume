@@ -99,6 +99,12 @@ cmdagain:
 				free(cmd);
 				goto cmdagain;
 			}
+			else if(cmd->action == DUMP_OAM)
+			{
+				dump_oam();
+				free(cmd);
+				goto cmdagain;
+			}
 			free(cmd);
 		}
 		else if(runto)

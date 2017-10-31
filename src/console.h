@@ -26,6 +26,7 @@ typedef enum console_action
 	SETBRK,
 	CLRBRK,
 	PEEK,
+	DUMP_OAM,
 	RUN,
 	QUIT,
 	BADCMD

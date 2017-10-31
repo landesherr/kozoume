@@ -214,6 +214,24 @@ void scanline()
 	}
 }
 
+void dump_oam()
+{
+	for(unsigned i=0;i<NUM_OAM_ENTRIES;i++)
+	{
+		byte current_entry = (oam_entry) memory_get32(oam.lower + (i * sizeof(oam_entry)));
+		pixel_value **oamtile = get_tile(OAM_TILE_NO(current_entry), TILE_DATA_1_BEGIN, false, false);
+		for(unsigned j=0;j<8;j++)
+		{
+			for(unsigned k=0;k<8;k++)
+			{
+				printf("%c", text_pixels[oamtile[j][k] & 3]);
+			}
+			printf("\n");
+		}
+		printf("\n");
+	}
+}
+
 void debug_printscreen()
 {
 	//printf("\033[2J\033[1;1H"); //clear terminal
