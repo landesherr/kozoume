@@ -48,6 +48,7 @@ void interpreter_step()
 		prefix_opcodes[FETCH()]();
 		prefixCB = false;
 	}
+	*F &= 0xF0; //Only use top 4 bits of F
 	io_tick();
 	ppu_tick();
 
