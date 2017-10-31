@@ -174,7 +174,7 @@ void opcode_1e()
 
 void opcode_1f()
 {
-	rrc_reg8(A);
+	rr_reg8(A);
 }
 
 void opcode_20()
