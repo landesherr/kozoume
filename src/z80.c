@@ -563,18 +563,21 @@ void swap_hl()
 void daa()
 {
 	byte prev = *A;
+	bool sub;
 
 	if(get_subtract())
 	{
 		if(get_halfcarry()) *A -= 6;
 		if(get_carry()) *A -= 0x60;
+		sub = true;
 	}
 	else
 	{
 		if(get_halfcarry() || ( (*A & 0xF) > 9)) *A += 6;
 		if(get_carry() || *A > 0x9F) *A += 0x60;
+		sub = false;
 	}
-	if(!calc_carry_8(*A, prev, false)) set_carry(false);
+	if(!calc_carry_8(*A, prev, sub)) set_carry(false);
 	set_halfcarry(false);
 	set_zero(*A == 0);
 	*PC += 1;
