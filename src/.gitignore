@@ -1,4 +1,9 @@
+*.obj
+*.dll
+*.a
 *.o
 *.swp
 kozoume
 kozoume.exe
+Debug
+.vs

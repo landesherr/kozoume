@@ -23,9 +23,9 @@
 #include "interpreter.h"
 #include "interrupts.h"
 #include "globaldefs.h"
+#include "render.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #define LINE_TO_TILE(LINE) ((LINE) >> 3)
 #define NUM_OAM_ENTRIES 40
@@ -123,7 +123,7 @@ void ppu_tick()
 
 void scanline()
 {
-	if(!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
+	if (!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
 	word map_bg, map_win;
 	map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
 	map_win = get_lcdc(LCDC_WIN_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
@@ -155,63 +155,64 @@ void scanline()
 
 	byte oam_palette;
 	pixel_value bg_palette_data[4], oam_palette_data[4];
-	if(get_lcdc(LCDC_BG_DISPLAY))
+	if (get_lcdc(LCDC_BG_DISPLAY))
 	{
 		set_palette(memory_get8(BGP), bg_palette_data);
-		for(unsigned i=0;i<SCREEN_RES_X;i++)
+		for (unsigned i = 0; i < SCREEN_RES_X; i++)
 		{
 			x = i + scroll_x;
 			tile_x = x & 7;
 			//TODO check for window and act accordingly
 			temptile = memory_get8(get_tile_address(y, x, map_bg));
-			if(temptile != current_sprite_tile || i == 0)
+			if (temptile != current_sprite_tile || i == 0)
 			{
-				if(bgtile) free_tile(bgtile);
+				if (bgtile) free_tile(bgtile);
 				current_sprite_tile = temptile;
 				bgtile = get_tile(current_sprite_tile, tile_data, false, false);
 			}
 			PIXEL(ly, i) = bg_palette_data[bgtile[tile_y][tile_x]];
 		}
 	}
-	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
+	if (get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
 	{
-		for(unsigned j=0;j<NUM_OAM_ENTRIES;j++)
+		for (unsigned j = 0; j < NUM_OAM_ENTRIES; j++)
 		{
-			current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
-			if(!current_entry) continue;
+			current_entry = (oam_entry)memory_get32(oam.lower + (j * sizeof(oam_entry)));
+			if (!current_entry) continue;
 			//printf("Found current entry %X\n", current_entry);
 			yc = OAM_Y_COORD(current_entry);
 			xc = OAM_X_COORD(current_entry);
-			if(yc == 0 || xc == 0) continue;
+			if (yc == 0 || xc == 0) continue;
 			yc -= 16;
 			xc -= 8;
 			oam_options = OAM_OPTIONS(current_entry);
 			tile_no = OAM_TILE_NO(current_entry);
 			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
 			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
-			if(yc <= y && (yc + SPRITE_SIZE) > y)
+			if (yc <= y && (yc + SPRITE_SIZE) > y)
 			{
 				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
 				set_palette(oam_palette, oam_palette_data);
-				for(unsigned k=0;k<SPRITE_SIZE;k++)
+				for (unsigned k = 0; k < SPRITE_SIZE; k++)
 				{
-					if((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
+					if ((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
 					{
 						tile_x = (xc + k) & 7;
 
 						//only draw if high priority or no other pixel exists here
-						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
+						if (oam_options >> 7 == 0 || PIXEL(ly, xc + k) == PIXEL_OFF)
 						{
-							if(oamtile[tile_y][tile_x] <= 3 && oamtile[tile_y][tile_x] != 0)
-								PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x]];
+							if (oamtile[tile_y][tile_x] <= 3 && oamtile[tile_y][tile_x] != 0)
+								PIXEL(ly, xc + k) = oam_palette_data[oamtile[tile_y][tile_x]];
 						}
 					}
 				}
 			}
-			if(oamtile) free_tile(oamtile);
+			if (oamtile) free_tile(oamtile);
 		}
 
 	}
+	render_scanline(ly);
 }
 
 void dump_oam()
@@ -234,7 +235,8 @@ void dump_oam()
 
 void debug_printscreen()
 {
-	//printf("\033[2J\033[1;1H"); //clear terminal
+	/*
+	printf("\033[2J\033[1;1H"); //clear terminal
 	for(unsigned i=0;i<SCREEN_RES_Y;i++)
 	{
 		for(unsigned j=0;j<SCREEN_RES_X;j++)
@@ -243,7 +245,6 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
-	/*
 	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
 	{
 		char out = '#';

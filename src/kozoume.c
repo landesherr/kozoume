@@ -27,6 +27,7 @@
 #include "interpreter.h"
 #include "interrupts.h"
 #include "console.h"
+#include "render.h"
 #include "ppu.h" //can be removed when debugging is finished
 
 #define INIT_PC() (*PC = 0x100)
@@ -36,6 +37,7 @@ void powerup(void);
 
 int main(int argc, char *argv[])
 {
+	render_init();
 	unsigned go = 1, run = 0, runto = 0;
 	runtil_condition rc = NO_RUNTIL;
 	console_command *cmd;
