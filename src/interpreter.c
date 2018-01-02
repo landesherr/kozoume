@@ -27,9 +27,32 @@
 #include <stdbool.h>
 
 unsigned cycles_prev;
+bool haltingBugTriggered = false;
 
 void interpreter_step()
 {
+	if(isHalting)
+	{
+		cycles++;
+		cycles_prev++;
+		io_tick();
+		ppu_tick();
+		if(check_interrupts())
+		{
+			if(interruptsEnabled)
+			{
+				isHalting = false;
+				do_interrupts();
+			}
+			else
+			{
+				haltingBugTriggered = true;
+				isHalting = false;
+			}
+		}
+		return;
+	}
+
 	if(pendingEI)
 	{
 		interruptsEnabled = true;
@@ -40,7 +63,11 @@ void interpreter_step()
 		interruptsEnabled = false;
 		pendingDI = false;
 	}
-
+	if(haltingBugTriggered)
+	{
+		haltingBugTriggered = false;
+		cycles = cycles_prev;
+	}
 	cycles_prev = cycles;
 	if(!prefixCB) standard_opcodes[FETCH()]();
 	else

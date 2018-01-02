@@ -45,6 +45,7 @@ typedef enum interrupt
 void do_interrupts(void);
 void set_interrupt(interrupt, bool);
 void enable_interrupt(interrupt, bool);
+bool check_interrupts();
 
 static inline void do_interrupt(interrupt);
 static inline word get_interrupt_vector(interrupt);

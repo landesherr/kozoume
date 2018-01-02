@@ -29,6 +29,17 @@
 
 static const interrupt all_interrupts[NUM_INTERRUPTS] = { INT_VBLANK, INT_STAT, INT_TIMER, INT_SERIAL, INT_JOYPAD };
 
+bool check_interrupts()
+{
+	interrupt in;
+	for(unsigned i=0;i<NUM_INTERRUPTS;i++)
+	{
+		in = all_interrupts[i];
+		if(INTERRUPT_ENABLED(in) && INTERRUPT_SET(in)) return true;
+	}
+	return false;
+}
+
 void do_interrupts()
 {
 	if(interruptsEnabled)
