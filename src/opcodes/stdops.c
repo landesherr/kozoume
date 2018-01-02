@@ -249,7 +249,7 @@ void opcode_2d()
 
 void opcode_2e()
 {
-	ld_nn_n(E);
+	ld_nn_n(L);
 }
 
 void opcode_2f()
