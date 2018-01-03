@@ -54,7 +54,7 @@ void opcode_06()
 
 void opcode_07()
 {
-	rlc_reg8(A);
+	rlca();
 }
 
 void opcode_08()
@@ -94,7 +94,7 @@ void opcode_0e()
 
 void opcode_0f()
 {
-	rrc_reg8(A);
+	rrca();
 }
 
 void opcode_10()
@@ -134,7 +134,7 @@ void opcode_16()
 
 void opcode_17()
 {
-	rl_reg8(A);
+	rla();
 }
 
 void opcode_18()
@@ -174,7 +174,7 @@ void opcode_1e()
 
 void opcode_1f()
 {
-	rr_reg8(A);
+	rra();
 }
 
 void opcode_20()

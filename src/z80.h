@@ -125,12 +125,16 @@ void ei(void);
 //Rotates + shifts
 void rlc_reg8(reg8);
 void rlc_hl(void);
+void rlca(void);
 void rl_reg8(reg8);
 void rl_hl(void);
+void rla(void);
 void rrc_reg8(reg8);
 void rrc_hl(void);
+void rrca(void);
 void rr_reg8(reg8);
 void rr_hl(void);
+void rra(void);
 void sla_reg8(reg8);
 void sla_hl(void);
 void sra_reg8(reg8);

@@ -666,6 +666,18 @@ void rlc_hl()
 	*PC += 1;
 	cycles += 16;
 }
+void rlca()
+{
+	byte temp = *A << 1;
+	temp |= (*A >> 7);
+	set_carry((*A & 0x80));
+	set_subtract(false);
+	set_halfcarry(false);
+	set_zero(false);
+	*A = temp;
+	*PC += 1;
+	cycles += 4;
+}
 void rl_reg8(reg8 reg)
 {
 	//9-bit rotation, CF to bit 0, bit 7 to CF
@@ -691,6 +703,18 @@ void rl_hl()
 	memory_set8_logical(*HL, temp);
 	*PC += 1;
 	cycles += 16;
+}
+void rla()
+{
+	byte temp = *A << 1;
+	temp |= get_carry();
+	set_carry(*A >> 7);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_zero(false);
+	*A = temp;
+	*PC += 1;
+	cycles += 4;
 }
 void rrc_reg8(reg8 reg)
 {
@@ -718,6 +742,18 @@ void rrc_hl()
 	*PC += 1;
 	cycles += 16;
 }
+void rrca()
+{
+	byte temp = *A >> 1;
+	temp |= (*A << 7);
+	set_carry(*A & 0x1);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_zero(false);
+	*A = temp;
+	*PC += 1;
+	cycles += 4;
+}
 void rr_reg8(reg8 reg)
 {
 	//9-bit rotation, CF goes to bit 7, bit 0 to CF
@@ -743,6 +779,18 @@ void rr_hl()
 	memory_set8_logical(*HL, temp);
 	*PC += 1;
 	cycles += 16;
+}
+void rra()
+{
+	byte temp = *A >> 1;
+	temp |= get_carry() << 7;
+	set_carry(*A & 0x1);
+	set_subtract(false);
+	set_halfcarry(false);
+	set_zero(false);
+	*A = temp;
+	*PC += 1;
+	cycles += 4;
 }
 void sla_reg8(reg8 reg)
 {
