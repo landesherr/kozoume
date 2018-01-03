@@ -241,9 +241,16 @@ void add_a_hl()
 void adc_a_n()
 {
 	byte result;
-	result = *A + memory_get8(*PC + 1) + get_carry();
+	bool carry = get_carry();
+	result = *A + memory_get8(*PC + 1);
 	set_halfcarry(calc_halfcarry_8(result, *A, false));
 	set_carry(calc_carry_8(result, *A, false));
+	if(carry)
+	{
+		if(calc_halfcarry_8(result+1, result, false)) set_halfcarry(true);
+		if(calc_carry_8(result+1, result, false)) set_carry(true);
+		result++;
+	}
 	set_zero(!result);
 	set_subtract(false);
 	*A = result;
@@ -252,9 +259,16 @@ void adc_a_n()
 }
 void adc_a_reg8(reg8 reg)
 {
-	byte result = *A + *reg + get_carry();
+	byte result = *A + *reg;
+	bool carry = get_carry();
 	set_halfcarry(calc_halfcarry_8(result, *A, false));
 	set_carry(calc_carry_8(result, *A, false));
+	if(carry)
+	{
+		if(calc_halfcarry_8(result+1, result, false)) set_halfcarry(true);
+		if(calc_carry_8(result+1, result, false)) set_carry(true);
+		result++;
+	}
 	set_zero(!result);
 	set_subtract(false);
 	*A = result;
@@ -307,9 +321,16 @@ void sub_a_hl()
 }
 void sbc_a_n()
 {
-	byte result = *A - (memory_get8(*PC + 1) + get_carry());
+	byte result = *A - (memory_get8(*PC + 1));
+	bool carry = get_carry();
 	set_halfcarry(calc_halfcarry_8(result, *A, true));
 	set_carry(calc_carry_8(result, *A, true));
+	if(carry)
+	{
+		if(calc_halfcarry_8(result-1, result, true)) set_halfcarry(true);
+		if(calc_carry_8(result-1, result, true)) set_carry(true);
+		result--;
+	}
 	set_zero(!result);
 	set_subtract(true);
 	*A = result;
@@ -318,9 +339,16 @@ void sbc_a_n()
 }
 void sbc_a_reg8(reg8 reg)
 {
-	byte result = *A - (*reg + get_carry());
+	byte result = *A - *reg;
+	bool carry = get_carry();
 	set_halfcarry(calc_halfcarry_8(result, *A, true));
 	set_carry(calc_carry_8(result, *A, true));
+	if(carry)
+	{
+		if(calc_halfcarry_8(result-1, result, true)) set_halfcarry(true);
+		if(calc_carry_8(result-1, result, true)) set_carry(true);
+		result--;
+	}
 	set_zero(!result);
 	set_subtract(true);
 	*A = result;
