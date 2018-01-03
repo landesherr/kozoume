@@ -20,6 +20,7 @@
 #include "memory.h"
 #include <stdbool.h>
 
+//TODO: refactor flag checks into macros like this
 #define NASZ(VARNAME) if(true) set_zero(!VARNAME)
 
 byte registers[12];
@@ -171,8 +172,9 @@ void ldhl_sp_n()
 	word result;
 	tempvalue = memory_get8(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempvalue);
-	set_halfcarry(calc_halfcarry_16(tempvalue, *SP, false));
-	set_carry(calc_carry_16(result, *SP, false));
+	//Lower 8 bits for carry checks
+	set_halfcarry(calc_halfcarry_8(result & 0xFF, *SP & 0xFF, false));
+	set_carry(calc_carry_8(result & 0xFF, *SP & 0xFF, false));
 	set_zero(false);
 	set_subtract(false);
 	*HL = result;
@@ -513,8 +515,9 @@ void add_sp_n()
 	word result;
 	byte tempval = memory_get8(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempval);
-	set_halfcarry(calc_halfcarry_16(tempval, *SP, false));
-	set_carry(calc_carry_16(result, *SP, false));
+	//Handle carry flags different for this opcode: use lower 8 bits
+	set_halfcarry(calc_halfcarry_8(result & 0xFF, *SP & 0xFF, false));
+	set_carry(calc_carry_8(result & 0xFF, *SP & 0xFF, false));
 	set_zero(false);
 	set_subtract(false);
 	*SP = result;
