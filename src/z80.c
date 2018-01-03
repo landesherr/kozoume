@@ -469,7 +469,7 @@ void inc_reg8(reg8 reg)
 void inc_hl()
 {
 	byte result = memory_get8(*HL) + 1;
-	if(!calc_halfcarry_8(result, memory_get8(*HL), false)) set_halfcarry(false);
+	//if(!calc_halfcarry_8(result, memory_get8(*HL), false)) set_halfcarry(false);
 	set_subtract(false);
 	set_zero(!result);
 	memory_set8_logical(*HL, result);
@@ -489,7 +489,7 @@ void dec_reg8(reg8 reg)
 void dec_hl()
 {
 	byte result = memory_get8(*HL) - 1;
-	if(!calc_halfcarry_8(result, memory_get8(*HL), true)) set_halfcarry(false);
+	//if(!calc_halfcarry_8(result, memory_get8(*HL), true)) set_halfcarry(false);
 	set_subtract(true);
 	set_zero(!result);
 	memory_set8_logical(*HL, result);
@@ -501,8 +501,8 @@ void dec_hl()
 void add_hl_reg16(reg16 reg)
 {
 	word result = *HL + *reg;
-	calc_halfcarry_16(result, *HL, false);
-	calc_carry_16(result, *HL, false);
+	set_halfcarry(calc_halfcarry_16(result, *HL, false));
+	set_carry(calc_carry_16(result, *HL, false));
 	set_subtract(false);
 	*HL = result;
 	*PC += 1;
@@ -513,8 +513,8 @@ void add_sp_n()
 	word result;
 	byte tempval = memory_get8(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempval);
-	if(!calc_halfcarry_16(result, *SP, false)) set_halfcarry(false);
-	if(!calc_carry_16(result, *SP, false)) set_carry(false);
+	set_halfcarry(calc_halfcarry_16(result, *SP, false));
+	set_carry(calc_carry_16(result, *SP, false));
 	set_zero(false);
 	set_subtract(false);
 	*SP = result;
