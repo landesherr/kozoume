@@ -37,6 +37,7 @@ void powerup(void);
 int main(int argc, char *argv[])
 {
 	unsigned go = 1, run = 0, runto = 0;
+	byte triggerop;
 	runtil_condition rc = NO_RUNTIL;
 	console_command *cmd;
 	memory_init();
@@ -79,6 +80,12 @@ cmdagain:
 				run = 1;
 				runto = cmd->param.numeric;
 			}
+			else if(cmd->action == RUNOP)
+			{
+				run = 1;
+				rc = UNTIL_OP;
+				triggerop = cmd->param.numeric;
+			}
 			else if(cmd->action == RUNTIL)
 			{
 				run = 1;
@@ -120,7 +127,8 @@ cmdagain:
 			if((rc == UNTIL_VBLANK && gfxmode == 1) ||
 				(rc == UNTIL_HBLANK && gfxmode == 0 && LCD_ON) ||
 				(rc == UNTIL_JUMP && false) || //lazy, finish later
-				(rc == UNTIL_INTERRUPT && false) //ditto
+				(rc == UNTIL_INTERRUPT && false) ||//ditto
+				(rc == UNTIL_OP && memory_get8(*PC) == triggerop)
 			)
 			{
 				run = 0;

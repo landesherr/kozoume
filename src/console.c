@@ -17,6 +17,7 @@
 */
 
 #include "console.h"
+#include "globaldefs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,6 +60,13 @@ console_command* console_get_command()
 		if(address == 0) goto badcmd;
 		cmd->action = RUNTO;
 		cmd->param.numeric = address & 0xFFFF;
+	}
+	else if(!strcmp(words[0], "runop"))
+	{
+		if(words == 0) goto badcmd;
+		byte op = strtol(words[1], NULL, 16);
+		cmd->action = RUNOP;
+		cmd->param.numeric = op;
 	}
 	else if(!strcmp(words[0], "runtil"))
 	{

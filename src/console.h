@@ -21,6 +21,7 @@
 typedef enum console_action
 {
 	RUNTO,
+	RUNOP,
 	RUNTIL,
 	STEP,
 	SETBRK,
@@ -48,6 +49,7 @@ typedef struct console_command
 
 typedef enum runtil_condition
 {
+	UNTIL_OP,
 	UNTIL_VBLANK,
 	UNTIL_JUMP,
 	UNTIL_INTERRUPT,
