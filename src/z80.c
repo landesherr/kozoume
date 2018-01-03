@@ -659,7 +659,7 @@ void rlc_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value << 1;
 	temp |= (value >> 7);
-	if(!temp) set_zero(true);
+	set_zero(!temp);
 	set_carry( (value & 0x8) );
 	set_subtract(false);
 	set_halfcarry(false);
@@ -685,7 +685,7 @@ void rl_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value << 1;
 	temp |= get_carry();
-	if(!temp) set_zero(true);
+	set_zero(!temp);
 	set_carry(value >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -711,7 +711,7 @@ void rrc_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value >> 1;
 	temp |= (value << 7);
-	if(!temp) set_zero(true);
+	set_zero(!temp);
 	set_carry(value & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -737,7 +737,7 @@ void rr_hl()
 	byte value = memory_get8(*HL);
 	byte temp = value >> 1;
 	temp |= get_carry() << 7;
-	if(!temp) set_zero(true);
+	set_zero(!temp);
 	set_carry(value & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -761,7 +761,7 @@ void sla_hl()
 	byte value = memory_get8(*HL);
 	set_carry(value & 0x80);
 	value <<= 1;
-	if(!value) set_zero(true);
+	set_zero(!value);
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
@@ -787,7 +787,7 @@ void sra_hl()
 	byte temp = value >> 1;
 	set_carry(value & 0x1);
 	value = (value & 0x80) | temp;
-	if(!value) set_zero(true);
+	set_zero(!value);
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
@@ -811,7 +811,7 @@ void srl_hl()
 	byte value = memory_get8(*HL);
 	set_carry(value & 0x1);
 	value >>= 1;
-	if(!value) set_zero(true);
+	set_zero(!value);
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
