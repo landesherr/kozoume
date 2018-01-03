@@ -20,8 +20,7 @@
 #include "memory.h"
 #include <stdbool.h>
 
-//Not A? Set Zero!
-#define NASZ(VARNAME) if(reg != A) set_zero(!VARNAME)
+#define NASZ(VARNAME) if(true) set_zero(!VARNAME)
 
 byte registers[12];
 
@@ -542,7 +541,7 @@ void swap_reg8(reg8 reg)
 	byte temp = *reg & 0xF;
 	*reg = (*reg >> 4);
 	*reg |= (temp << 4);
-	if(!*reg) set_zero(true);
+	NASZ(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -556,7 +555,7 @@ void swap_hl()
 	value = (value >> 4);
 	value |= (temp << 4);
 	memory_set8_logical(*HL, value);
-	if(!value) set_zero(true);
+	set_zero(!value);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -647,12 +646,12 @@ void rlc_reg8(reg8 reg)
 	byte temp = *reg << 1;
 	temp |= (*reg >> 7);
 	NASZ(temp);
-	set_carry( (*reg & 0x8) );
+	set_carry((*reg & 0x80));
 	set_subtract(false);
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 4;
+	cycles += 8;
 }
 void rlc_hl()
 {
@@ -660,7 +659,7 @@ void rlc_hl()
 	byte temp = value << 1;
 	temp |= (value >> 7);
 	set_zero(!temp);
-	set_carry( (value & 0x8) );
+	set_carry((value & 0x80));
 	set_subtract(false);
 	set_halfcarry(false);
 	memory_set8_logical(*HL, temp);
@@ -678,7 +677,7 @@ void rl_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 4;
+	cycles += 8;
 }
 void rl_hl()
 {
@@ -704,7 +703,7 @@ void rrc_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 4;
+	cycles += 8;
 }
 void rrc_hl()
 {
@@ -730,7 +729,7 @@ void rr_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 4;
+	cycles += 8;
 }
 void rr_hl()
 {
