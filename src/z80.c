@@ -20,6 +20,9 @@
 #include "memory.h"
 #include <stdbool.h>
 
+//Not A? Set Zero!
+#define NASZ(VARNAME) if(reg != A) set_zero(!VARNAME)
+
 byte registers[12];
 
 reg8 A = &registers[1];
@@ -643,7 +646,7 @@ void rlc_reg8(reg8 reg)
 	//8-bit rotation, bit 7 goes to both CF and bit 0
 	byte temp = *reg << 1;
 	temp |= (*reg >> 7);
-	if(!temp) set_zero(true);
+	NASZ(temp);
 	set_carry( (*reg & 0x8) );
 	set_subtract(false);
 	set_halfcarry(false);
@@ -669,7 +672,7 @@ void rl_reg8(reg8 reg)
 	//9-bit rotation, CF to bit 0, bit 7 to CF
 	byte temp = *reg << 1;
 	temp |= get_carry();
-	if(!temp) set_zero(true);
+	NASZ(temp);
 	set_carry(*reg >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -695,7 +698,7 @@ void rrc_reg8(reg8 reg)
 	//8-bit rotation, bit 0 goes to bit 7 and CF
 	byte temp = *reg >> 1;
 	temp |= (*reg << 7);
-	if(!temp) set_zero(true);
+	NASZ(temp);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -721,7 +724,7 @@ void rr_reg8(reg8 reg)
 	//9-bit rotation, CF goes to bit 7, bit 0 to CF
 	byte temp = *reg >> 1;
 	temp |= get_carry() << 7;
-	if(!temp) set_zero(true);
+	NASZ(temp);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -746,7 +749,8 @@ void sla_reg8(reg8 reg)
 {
 	set_carry(*reg & 0x80);
 	*reg <<= 1;
-	if(!*reg) set_zero(true);
+	//if(!*reg) set_zero(true);
+	NASZ(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -770,7 +774,8 @@ void sra_reg8(reg8 reg)
 	byte temp = *reg >> 1;
 	set_carry(*reg & 0x1);
 	*reg = (*reg & 0x80) | temp;
-	if(!*reg) set_zero(true);
+	//if(!*reg) set_zero(true);
+	NASZ(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -794,7 +799,8 @@ void srl_reg8(reg8 reg)
 	//bit 7 reset to 0
 	set_carry(*reg & 0x1);
 	*reg >>= 1;
-	if(!*reg) set_zero(true);
+	//if(!*reg) set_zero(true);
+	NASZ(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
