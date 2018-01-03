@@ -257,7 +257,8 @@ static inline bool calc_carry_8(byte result, byte registervalue, bool isSubtract
 }
 static inline bool calc_carry_16(word result, word registervalue, bool isSubtract)
 {
-	return calc_carry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
+	if(!isSubtract) return result < registervalue;
+	else return result > registervalue;
 }
 
 static inline bool calc_halfcarry_8(byte result, byte registervalue, bool isSubtract)
@@ -266,7 +267,6 @@ static inline bool calc_halfcarry_8(byte result, byte registervalue, bool isSubt
 	{
 		if((result & 0xF) < (registervalue & 0xF))
 		{
-			set_halfcarry(true);
 			return true;
 		}
 	}
@@ -274,15 +274,15 @@ static inline bool calc_halfcarry_8(byte result, byte registervalue, bool isSubt
 	{
 		if((result & 0xF) > (registervalue & 0xF))
 		{
-			set_halfcarry(true);
 			return true;
 		}
 	}
 	return false;
 }
-static inline bool calc_halfcarry_16(word result, word registervalue, bool isSubtract)
+static inline bool calc_halfcarry_16(word a, word b, bool isSubtract)
 {
-	return calc_halfcarry_8((byte)(result >> 8), (byte)(registervalue >> 8), isSubtract);
+	word res = a + b;
+	return (res ^ a ^ b) & 0x1000;
 }
 
 static inline word do_signed_add_reg16_byte(reg16 dest, byte value)

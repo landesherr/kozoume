@@ -171,7 +171,7 @@ void ldhl_sp_n()
 	word result;
 	tempvalue = memory_get8(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempvalue);
-	set_halfcarry(calc_halfcarry_16(result, *SP, false));
+	set_halfcarry(calc_halfcarry_16(tempvalue, *SP, false));
 	set_carry(calc_carry_16(result, *SP, false));
 	set_zero(false);
 	set_subtract(false);
@@ -501,7 +501,7 @@ void dec_hl()
 void add_hl_reg16(reg16 reg)
 {
 	word result = *HL + *reg;
-	set_halfcarry(calc_halfcarry_16(result, *HL, false));
+	set_halfcarry(calc_halfcarry_16(*reg, *HL, false));
 	set_carry(calc_carry_16(result, *HL, false));
 	set_subtract(false);
 	*HL = result;
@@ -513,7 +513,7 @@ void add_sp_n()
 	word result;
 	byte tempval = memory_get8(*PC + 1);
 	result = do_signed_add_reg16_byte(SP, tempval);
-	set_halfcarry(calc_halfcarry_16(result, *SP, false));
+	set_halfcarry(calc_halfcarry_16(tempval, *SP, false));
 	set_carry(calc_carry_16(result, *SP, false));
 	set_zero(false);
 	set_subtract(false);
