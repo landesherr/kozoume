@@ -19,6 +19,7 @@
 #pragma once
 
 #define FETCH() memory_get8(*PC)
+#define BUGFETCH() memory_get8((*PC)--)
 
 extern unsigned cycles_prev;
 

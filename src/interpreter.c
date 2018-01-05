@@ -44,11 +44,6 @@ void interpreter_step()
 				isHalting = false;
 				do_interrupts();
 			}
-			else
-			{
-				haltingBugTriggered = true;
-				isHalting = false;
-			}
 		}
 		return;
 	}
@@ -63,21 +58,28 @@ void interpreter_step()
 		interruptsEnabled = false;
 		pendingDI = false;
 	}
+	cycles_prev = cycles;
 	if(haltingBugTriggered)
 	{
+		standard_opcodes[BUGFETCH()]();
 		haltingBugTriggered = false;
-		cycles = cycles_prev;
 	}
-	cycles_prev = cycles;
-	if(!prefixCB) standard_opcodes[FETCH()]();
 	else
 	{
-		prefix_opcodes[FETCH()]();
-		prefixCB = false;
+		if(!prefixCB) standard_opcodes[FETCH()]();
+		else
+		{
+			prefix_opcodes[FETCH()]();
+			prefixCB = false;
+		}
 	}
 	*F &= 0xF0; //Only use top 4 bits of F
 	io_tick();
 	ppu_tick();
-
-	if(interruptsEnabled && !prefixCB) do_interrupts();
+	if(isHalting && !interruptsEnabled)
+	{
+		isHalting = false;
+		if(check_interrupts()) haltingBugTriggered = true;
+	}
+	if(interruptsEnabled && !prefixCB && !isHalting) do_interrupts();
 }
