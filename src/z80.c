@@ -673,7 +673,8 @@ void stop()
 }
 void di()
 {
-	pendingDI = true;
+	//pendingDI = true;
+	interruptsEnabled = false;
 	*PC += 1;
 	cycles += 4;
 }
