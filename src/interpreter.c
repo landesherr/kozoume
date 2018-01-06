@@ -39,9 +39,9 @@ void interpreter_step()
 		ppu_tick();
 		if(check_interrupts())
 		{
+			isHalting = false;
 			if(interruptsEnabled)
 			{
-				isHalting = false;
 				do_interrupts();
 			}
 		}
@@ -78,8 +78,11 @@ void interpreter_step()
 	ppu_tick();
 	if(isHalting && !interruptsEnabled)
 	{
-		isHalting = false;
-		if(check_interrupts()) haltingBugTriggered = true;
+		if(check_interrupts())
+		{
+			isHalting = false;
+			haltingBugTriggered = true;
+		}
 	}
 	if(interruptsEnabled && !prefixCB && !isHalting) do_interrupts();
 }
