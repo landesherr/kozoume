@@ -591,7 +591,7 @@ void swap_reg8(reg8 reg)
 	set_halfcarry(false);
 	set_carry(false);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void swap_hl()
 {
@@ -605,7 +605,7 @@ void swap_hl()
 	set_halfcarry(false);
 	set_carry(false);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void daa()
 {
@@ -697,7 +697,7 @@ void rlc_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void rlc_hl()
 {
@@ -710,7 +710,7 @@ void rlc_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, temp);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void rlca()
 {
@@ -735,7 +735,7 @@ void rl_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void rl_hl()
 {
@@ -748,7 +748,7 @@ void rl_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, temp);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void rla()
 {
@@ -773,7 +773,7 @@ void rrc_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void rrc_hl()
 {
@@ -786,7 +786,7 @@ void rrc_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, temp);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void rrca()
 {
@@ -811,7 +811,7 @@ void rr_reg8(reg8 reg)
 	set_halfcarry(false);
 	*reg = temp;
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void rr_hl()
 {
@@ -824,7 +824,7 @@ void rr_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, temp);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void rra()
 {
@@ -847,7 +847,7 @@ void sla_reg8(reg8 reg)
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void sla_hl()
 {
@@ -859,7 +859,7 @@ void sla_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void sra_reg8(reg8 reg)
 {
@@ -872,7 +872,7 @@ void sra_reg8(reg8 reg)
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void sra_hl()
 {
@@ -885,7 +885,7 @@ void sra_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void srl_reg8(reg8 reg)
 {
@@ -897,7 +897,7 @@ void srl_reg8(reg8 reg)
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void srl_hl()
 {
@@ -909,7 +909,7 @@ void srl_hl()
 	set_halfcarry(false);
 	memory_set8_logical(*HL, value);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 
 //Bit opcodes
@@ -919,7 +919,7 @@ void bit_reg8(byte bit, reg8 reg)
 	set_subtract(false);
 	set_halfcarry(true);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void bit_hl(byte bit)
 {
@@ -928,13 +928,13 @@ void bit_hl(byte bit)
 	set_subtract(false);
 	set_halfcarry(true);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void set_reg8(byte bit, reg8 reg)
 {
 	*reg |= (1 << bit);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void set_hl(byte bit)
 {
@@ -942,13 +942,13 @@ void set_hl(byte bit)
 	value |= (1 << bit);
 	memory_set8_logical(*HL, value);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 void res_reg8(byte bit, reg8 reg)
 {
 	*reg &= ~(1 << bit);
 	*PC += 1;
-	cycles += 8;
+	cycles += 4;
 }
 void res_hl(byte bit)
 {
@@ -956,7 +956,7 @@ void res_hl(byte bit)
 	value &= ~(1 << bit);
 	memory_set8_logical(*HL, value);
 	*PC += 1;
-	cycles += 16;
+	cycles += 12;
 }
 
 //Jumps
