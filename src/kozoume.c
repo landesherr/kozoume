@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
 		//dbgwrite("FFFF: %X\n", memory_get8(0xFFFF));
 		//dbgwrite("FF0F: %X\n", memory_get8(0xFF0F));
 		//dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
+		//dbgwrite("DIV: %x | TIMA: %x, TMA: %x, TAC: %x\n", memory_get8(DIV), memory_get8(TIMA), memory_get8(TMA), memory_get8(TAC));
 		if(!run)
 		{
 cmdagain:

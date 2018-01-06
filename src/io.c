@@ -37,8 +37,8 @@ void io_tick()
 void div_tick()
 {
 	byte value;
-	//increment DIV every 64 clock cycles
-	if(cycles % 64 < cycles_prev % 64)
+	//increment DIV every 64 M cycles = 256 T cycles
+	if(cycles % 256 < cycles_prev % 256)
 	{
 		value = memory_get8(DIV) + 1;
 		memory_set8(DIV, value);
@@ -48,6 +48,7 @@ void tima_tick()
 {
 	byte value;
 	byte timer_control = memory_get8(TAC);
+	bool fastclock = false;
 	unsigned input_clock, cycles_per_tick;
 	if(timer_control & 0x4) //Start Timer bit (bit 2)
 	{
@@ -58,6 +59,7 @@ void tima_tick()
 				break;
 			case 1:
 				input_clock = 262144;
+				fastclock = true;
 				break;
 			case 2:
 				input_clock = 65536;
@@ -67,7 +69,7 @@ void tima_tick()
 				break;
 		}
 		cycles_per_tick = Z80_CYCLES / input_clock;
-		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick)
+		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick || (fastclock && cycles - cycles_prev >= 16))
 		{
 			value = memory_get8(TIMA) + 1;
 			if(!value)
