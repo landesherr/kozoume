@@ -24,6 +24,7 @@
 #include "globaldefs.h"
 
 #define CLOCKS_TO_DMA 0x280
+#define FASTCLOCK 262144
 #define CLOCKS_PER_BYTE 4
 
 void io_tick()
@@ -48,7 +49,6 @@ void tima_tick()
 {
 	byte value;
 	byte timer_control = memory_get8(TAC);
-	bool fastclock = false;
 	unsigned input_clock, cycles_per_tick;
 	if(timer_control & 0x4) //Start Timer bit (bit 2)
 	{
@@ -59,7 +59,6 @@ void tima_tick()
 				break;
 			case 1:
 				input_clock = 262144;
-				fastclock = true;
 				break;
 			case 2:
 				input_clock = 65536;
@@ -69,7 +68,7 @@ void tima_tick()
 				break;
 		}
 		cycles_per_tick = Z80_CYCLES / input_clock;
-		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick || (fastclock && cycles - cycles_prev >= 16))
+		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick || (input_clock == FASTCLOCK && cycles - cycles_prev >= 16))
 		{
 			value = memory_get8(TIMA) + 1;
 			if(!value)
