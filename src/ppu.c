@@ -197,7 +197,7 @@ void scanline()
 				{
 					if((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
 					{
-						tile_x = (xc + k) & 7;
+						tile_x = k;
 
 						//only draw if high priority or no other pixel exists here
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
