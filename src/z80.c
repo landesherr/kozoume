@@ -43,7 +43,7 @@ reg16 PC = (word*) &registers[10];
 
 unsigned cycles = 0;
 bool isHalting = false, isStopped = false;
-bool interruptsEnabled = true, pendingDI = false, pendingEI = false;
+bool interruptsEnabled = false, pendingDI = false, pendingEI = false;
 bool prefixCB = false;
 
 //8-BIT LOADS
