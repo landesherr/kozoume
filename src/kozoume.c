@@ -37,6 +37,7 @@ void powerup(void);
 int main(int argc, char *argv[])
 {
 	unsigned go = 1, run = 0, runto = 0;
+	bool debug_print = false;
 	byte triggerop;
 	runtil_condition rc = NO_RUNTIL;
 	console_command *cmd;
@@ -47,25 +48,33 @@ int main(int argc, char *argv[])
 		dbgwrite("No ROM specified\n");
 		exit(0);
 	}
-	load_cart(argv[1]);
+	else if(argc > 2)
+	{
+		if(!strcmp(argv[2], "debug")) debug_print = true;
+	}
+	cartridge *this_cart = load_cart(argv[1]);
 	INIT_PC();
 	allocate_bytecode_tables();
 	//basic_sanity_check();
 	while(go)
 	{
-		//dbgwrite("Current PC: %X - Opcode: %X \n", *PC, memory_get8(*PC));
+		if(debug_print) dbgwrite("Current PC: %X - Opcode: %X \n", *PC, memory_get8(*PC));
 		interpreter_step();
-		//dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
-		//dbgwrite("Stack Pointer is %X \n", *SP);
-		//dbgwrite("(HL) is %X \n", memory_get16(*HL));
-		//dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
-		//dbgwrite("PPU mode is %u\n", gfxmode);
-		//dbgwrite("LCD is %s\n", LCD_ON ? "ON" : "OFF");
-		//dbgwrite("IME: %s\n", interruptsEnabled ? "enabled" : "disabled");
-		//dbgwrite("FFFF: %X\n", memory_get8(0xFFFF));
-		//dbgwrite("FF0F: %X\n", memory_get8(0xFF0F));
-		//dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
-		//dbgwrite("DIV: %x | TIMA: %x, TMA: %x, TAC: %x\n", memory_get8(DIV), memory_get8(TIMA), memory_get8(TMA), memory_get8(TAC));
+		if(debug_print)
+		{
+			dbgwrite("A=%X F=%X \nB=%X C=%X \nD=%X E=%X \nH=%X L=%X \n", *A, *F, *B, *C, *D, *E, *H, *L);
+			dbgwrite("Stack Pointer is %X \n", *SP);
+			dbgwrite("(HL) is %X \n", memory_get16(*HL));
+			dbgwrite("Last Stack Value is %X \n", memory_get16(*SP));
+			dbgwrite("PPU mode is %u\n", gfxmode);
+			dbgwrite("LCD is %s\n", LCD_ON ? "ON" : "OFF");
+			dbgwrite("IME: %s\n", interruptsEnabled ? "enabled" : "disabled");
+			dbgwrite("FFFF: %X\n", memory_get8(0xFFFF));
+			dbgwrite("FF0F: %X\n", memory_get8(0xFF0F));
+			dbgwrite("Cycles = %u, Prev = %u\n", cycles, cycles_prev);
+			dbgwrite("DIV: %x | TIMA: %x, TMA: %x, TAC: %x\n", memory_get8(DIV), memory_get8(TIMA), memory_get8(TMA), memory_get8(TAC));
+			dbgwrite("Cartridge Bank: %d\n", this_cart->bank);
+		}
 		if(!run)
 		{
 cmdagain:
