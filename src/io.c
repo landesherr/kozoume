@@ -83,6 +83,17 @@ void tima_tick()
 
 void dma_transfer()
 {
+	word dma_address = ((word) memory_get8(DMA)) << 8;
+	if(!dma_address) return;
+	else memory_set8(DMA,0);
+	for(int i=0;i<0xA0;i++)
+	{
+		//OAM = FE00-FE9F
+		memory_set8(0xFE00 + i, memory_get8(dma_address + i));
+	}
+	return;
+	//SKIPPING ROBUST LOGIC
+	/*
 	static int dma_cycles = 0, completed = 0;
 	static word dma_address = 0;
 	unsigned bytes_to_copy;
@@ -117,6 +128,7 @@ void dma_transfer()
 		dma_cycles = CLOCKS_TO_DMA;
 		memory_set8(DMA, 0); //Does this get reset as soon as DMA is acknowledged?
 	}
+	*/
 }
 
 void check_joypad()

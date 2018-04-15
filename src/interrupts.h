@@ -75,5 +75,5 @@ static inline void do_interrupt(interrupt i)
 	*SP -= 2;
 	memory_set16(*SP, *PC);
 	*PC = get_interrupt_vector(i);
-	cycles += 12;
+	cycles += 20;
 }

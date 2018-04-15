@@ -90,13 +90,13 @@ void memory_set8_logical(word address, byte value)
 	else if(MEMORY_IN_RANGE(address, unusable_mem)) return;
 	else if(MEMORY_IN_RANGE(address, oam))
 	{
-		if(gfxmode == SEARCH || gfxmode == TRANSFER) return;
+		//if(gfxmode == SEARCH || gfxmode == TRANSFER) return;
 	}
 	else if(MEMORY_IN_RANGE(address, char_ram) \
 		|| MEMORY_IN_RANGE(address, bg_map_1) \
 		|| MEMORY_IN_RANGE(address, bg_map_2))
 	{
-		if(gfxmode == TRANSFER) return;
+		//if(gfxmode == TRANSFER) return;
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
@@ -147,13 +147,13 @@ void memory_set16_logical(word address, word value)
 	else if(MEMORY_IN_RANGE(address, unusable_mem)) return;
 	else if(MEMORY_IN_RANGE(address, oam))
 	{
-		if(gfxmode == SEARCH || gfxmode == TRANSFER) return;
+		//if(gfxmode == SEARCH || gfxmode == TRANSFER) return;
 	}
 	else if(MEMORY_IN_RANGE(address, char_ram) \
 		|| MEMORY_IN_RANGE(address, bg_map_1) \
 		|| MEMORY_IN_RANGE(address, bg_map_2))
 	{
-		if(gfxmode == TRANSFER) return;
+		//if(gfxmode == TRANSFER) return;
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \

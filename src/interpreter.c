@@ -27,7 +27,7 @@
 #include <stdbool.h>
 
 unsigned cycles_prev;
-bool haltingBugTriggered = false;
+byte haltingBugTriggered = 0; //0 = Not checked, Not enabled 1 = Enabled, 2 = Checked, Not enabled
 
 void interpreter_step()
 {
@@ -40,9 +40,15 @@ void interpreter_step()
 		if(check_interrupts())
 		{
 			isHalting = false;
+			cycles += 4;
+			cycles_prev += 4;
 			if(interruptsEnabled)
 			{
 				do_interrupts();
+			}
+			else
+			{
+				haltingBugTriggered = 0;
 			}
 		}
 		return;
@@ -59,10 +65,10 @@ void interpreter_step()
 		pendingDI = false;
 	}
 	cycles_prev = cycles;
-	if(haltingBugTriggered)
+	if(haltingBugTriggered == 1)
 	{
 		standard_opcodes[BUGFETCH()]();
-		haltingBugTriggered = false;
+		haltingBugTriggered = 0;
 	}
 	else
 	{
@@ -76,13 +82,14 @@ void interpreter_step()
 	*F &= 0xF0; //Only use top 4 bits of F
 	io_tick();
 	ppu_tick();
-	if(isHalting && !interruptsEnabled)
+	if(isHalting && !interruptsEnabled && haltingBugTriggered != 2)
 	{
 		if(check_interrupts())
 		{
 			isHalting = false;
-			haltingBugTriggered = true;
+			haltingBugTriggered = 1;
 		}
+		else haltingBugTriggered = 2;
 	}
 	if(interruptsEnabled && !prefixCB && !isHalting) do_interrupts();
 }
