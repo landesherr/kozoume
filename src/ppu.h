@@ -115,7 +115,8 @@ static inline bool get_stat(stat_bit);
 static inline bool get_lcdc(lcdc_bit);
 static inline word get_tile_address(byte, byte, word);
 static inline pixel_value** get_tile(byte, word, bool, bool);
-static inline void free_tile(pixel_value**);
+static inline pixel_value** get_tile_large(byte, word, bool, bool);
+static inline void free_tile(pixel_value**, bool);
 static inline void set_palette(byte, pixel_value*);
 static inline byte get_color(pixel_value);
 
@@ -164,9 +165,29 @@ static inline pixel_value** get_tile(byte tileno, word base, bool flip_x, bool f
 	}
 	return pixels;
 }
-static inline void free_tile(pixel_value **tile)
+static inline pixel_value** get_tile_large(byte tileno, word base, bool flip_x, bool flip_y)
 {
-	for(unsigned i=0;i<8;i++) free(tile[i]);
+	word address;
+	//16 bytes per tile
+	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - ((((~tileno & 0xFF) + 1)*16));
+	else address = base + (tileno * 16);
+	pixel_value **pixels = malloc(16 * sizeof(pixel_value*));
+	for(unsigned a=0;a<16;a++) pixels[a] = malloc(8 * sizeof(pixel_value));
+	word temp;
+	for(unsigned i=0;i<32;i+=2)
+	{
+		temp = memory_get16(address + i);
+		for(unsigned j=0;j<8;j++)
+		{
+			pixels[flip_y ? 15-(i>>1): i>>1][flip_x ? 7-j : j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
+		}
+	}
+	return pixels;
+}
+static inline void free_tile(pixel_value **tile, bool big_sprites)
+{
+	byte sprite_y = big_sprites ? 16 : 8;
+	for(unsigned i=0;i<sprite_y;i++) free(tile[i]);
 	free(tile);
 }
 static inline void set_palette(byte palette, pixel_value *data)

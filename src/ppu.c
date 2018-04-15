@@ -30,6 +30,7 @@
 #define LINE_TO_TILE(LINE) ((LINE) >> 3)
 #define NUM_OAM_ENTRIES 40
 #define SPRITE_SIZE 8
+#define SPRITE_SIZE_LARGE 16
 
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
@@ -166,7 +167,7 @@ void scanline()
 			temptile = memory_get8(get_tile_address(y, x, map_bg));
 			if(temptile != current_sprite_tile || i == 0)
 			{
-				if(bgtile) free_tile(bgtile);
+				if(bgtile) free_tile(bgtile, false);
 				current_sprite_tile = temptile;
 				bgtile = get_tile(current_sprite_tile, tile_data, false, false);
 			}
@@ -175,6 +176,8 @@ void scanline()
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
 	{
+		bool big_sprites = get_lcdc(LCDC_OBJ_SIZE);
+		byte sprite_size_y = big_sprites ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
 		for(unsigned j=0;j<NUM_OAM_ENTRIES;j++)
 		{
 			current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
@@ -187,10 +190,12 @@ void scanline()
 			xc -= 8;
 			oam_options = OAM_OPTIONS(current_entry);
 			tile_no = OAM_TILE_NO(current_entry);
-			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
+			if(!big_sprites) oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
+			else oamtile = get_tile_large(tile_no & 0xFE, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
 			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
-			if(yc <= y && (yc + SPRITE_SIZE) > y)
+			if(yc <= y && (yc + sprite_size_y) > y)
 			{
+				if(big_sprites) tile_y = (y - yc) & 0xF;
 				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
 				set_palette(oam_palette, oam_palette_data);
 				for(unsigned k=0;k<SPRITE_SIZE;k++)
@@ -208,7 +213,7 @@ void scanline()
 					}
 				}
 			}
-			if(oamtile) free_tile(oamtile);
+			if(oamtile) free_tile(oamtile, big_sprites);
 		}
 
 	}
@@ -235,6 +240,7 @@ void dump_oam()
 void debug_printscreen()
 {
 	//printf("\033[2J\033[1;1H"); //clear terminal
+
 	for(unsigned i=0;i<SCREEN_RES_Y;i++)
 	{
 		for(unsigned j=0;j<SCREEN_RES_X;j++)
@@ -243,6 +249,7 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
+
 	/*
 	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
 	{
