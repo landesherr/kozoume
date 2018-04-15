@@ -169,7 +169,7 @@ void scanline()
 			{
 				if(bgtile) free_tile(bgtile, false);
 				current_sprite_tile = temptile;
-				bgtile = get_tile(current_sprite_tile, tile_data, false, false);
+				bgtile = get_tile(current_sprite_tile, tile_data, false, false, false);
 			}
 			PIXEL(ly, i) = bg_palette_data[bgtile[tile_y][tile_x]];
 		}
@@ -190,12 +190,12 @@ void scanline()
 			xc -= 8;
 			oam_options = OAM_OPTIONS(current_entry);
 			tile_no = OAM_TILE_NO(current_entry);
-			if(!big_sprites) oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
-			else oamtile = get_tile_large(tile_no & 0xFE, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1);
+			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
 			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
 			if(yc <= y && (yc + sprite_size_y) > y)
 			{
 				if(big_sprites) tile_y = (y - yc) & 0xF;
+				else tile_y = (y - yc) & 0x7;
 				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
 				set_palette(oam_palette, oam_palette_data);
 				for(unsigned k=0;k<SPRITE_SIZE;k++)
@@ -224,7 +224,7 @@ void dump_oam()
 	for(unsigned i=0;i<NUM_OAM_ENTRIES;i++)
 	{
 		byte current_entry = (oam_entry) memory_get32(oam.lower + (i * sizeof(oam_entry)));
-		pixel_value **oamtile = get_tile(OAM_TILE_NO(current_entry), TILE_DATA_1_BEGIN, false, false);
+		pixel_value **oamtile = get_tile(OAM_TILE_NO(current_entry), TILE_DATA_1_BEGIN, false, false, false);
 		for(unsigned j=0;j<8;j++)
 		{
 			for(unsigned k=0;k<8;k++)
