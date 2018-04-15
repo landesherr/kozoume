@@ -68,7 +68,7 @@ cartridge* load_cart(char *path)
 	{
 		fseek(cart, BANK_SIZE, SEEK_SET);
 		fread(&memory_map[BANK_SIZE], BANK_SIZE, 1, cart);
-		//TODO refactor, handle bank switching
+		loaded_cart->bank = 1;
 	}
 	dbgwrite("Current ROM is type %X\n", loaded_cart->type);
 	dbgwrite("Current ROM %s a GBC ROM\n", loaded_cart->is_gbc ? "IS" : "IS NOT");
@@ -82,6 +82,7 @@ cartridge* load_cart(char *path)
 
 void bank_switch(cartridge *c, byte bankno)
 {
+	//TODO: Don't use file I/O for this, ffs
 	FILE *cart;
 	cart = fopen(c->filename,"rb");
 	if(!cart)

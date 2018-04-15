@@ -107,6 +107,7 @@ void memory_set8_logical(word address, byte value)
 		{
 			switch(mycart->type)
 			{
+				case ROM_MBC1:
 				case ROM_MBC1_RAM:
 				case ROM_MBC1_RAM_BATT:
 					bank_switch(mycart, value & 0x1F);
