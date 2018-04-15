@@ -609,23 +609,21 @@ void swap_hl()
 }
 void daa()
 {
-	byte prev = *A;
-	bool sub;
+	word value = *A;
 
 	if(get_subtract())
 	{
-		if(get_halfcarry()) *A -= 6;
-		if(get_carry()) *A -= 0x60;
-		sub = true;
+		if(get_halfcarry()) value = (value - 6) & 0xFF;
+		if(get_carry()) value -= 0x60;
 	}
 	else
 	{
-		if(get_halfcarry() || ( (*A & 0xF) > 9)) *A += 6;
-		if(get_carry() || *A > 0x9F) *A += 0x60;
-		sub = false;
+		if(get_halfcarry() || ( (value & 0xF) > 9)) value += 6;
+		if(get_carry() || value > 0x9F) value += 0x60;
 	}
-	set_carry(calc_carry_8(*A, prev, sub));
+	if(value & 0x100) set_carry(true);
 	set_halfcarry(false);
+	*A = value;
 	set_zero(*A == 0);
 	*PC += 1;
 	cycles += 4;
