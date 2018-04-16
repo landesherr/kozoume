@@ -192,10 +192,10 @@ void scanline()
 			tile_no = OAM_TILE_NO(current_entry);
 			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
 			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
-			if(yc <= y && (yc + sprite_size_y) > y)
+			if(yc <= ly && (yc + sprite_size_y) > ly)
 			{
-				if(big_sprites) tile_y = (y - yc) & 0xF;
-				else tile_y = (y - yc) & 0x7;
+				if(big_sprites) tile_y = (ly - yc) & 0xF;
+				else tile_y = (ly - yc) & 0x7;
 				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
 				set_palette(oam_palette, oam_palette_data);
 				for(unsigned k=0;k<SPRITE_SIZE;k++)
@@ -240,7 +240,7 @@ void dump_oam()
 void debug_printscreen()
 {
 	//printf("\033[2J\033[1;1H"); //clear terminal
-
+	printf("\033c");
 	for(unsigned i=0;i<SCREEN_RES_Y;i++)
 	{
 		for(unsigned j=0;j<SCREEN_RES_X;j++)
@@ -249,7 +249,8 @@ void debug_printscreen()
 		}
 		printf("\n");
 	}
-
+	fflush(stdout);
+	usleep(50000);
 	/*
 	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
 	{
