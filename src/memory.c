@@ -100,7 +100,8 @@ void memory_set8_logical(word address, byte value)
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
-		|| MEMORY_IN_RANGE(address, cart_header))
+		|| MEMORY_IN_RANGE(address, cart_header) \
+		|| MEMORY_IN_RANGE(address, restart_interrupt_vectors))
 	{
 		//can't write to ROM
 		if(address >= 0x2000 && address <= 0x3FFF)
@@ -157,9 +158,12 @@ void memory_set16_logical(word address, word value)
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
-		|| MEMORY_IN_RANGE(address, cart_header))
+		|| MEMORY_IN_RANGE(address, cart_header) \
+		|| MEMORY_IN_RANGE(address, restart_interrupt_vectors))
 	{
 		//can't write to ROM
+		memory_set8_logical(address, value & 0xFF);
+		memory_set8_logical(address+1, value >> 8);
 		return;
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available
