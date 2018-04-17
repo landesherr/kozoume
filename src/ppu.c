@@ -136,7 +136,8 @@ void scanline()
 	byte scroll_x = memory_get8(SCX);
 	byte scroll_y = memory_get8(SCY);
 	byte window_y = memory_get8(WY);
-	byte window_x = memory_get8(WX);
+	byte window_x = memory_get8(WX) - 7;
+	bool use_window;
 
 	word tilemap_offset_y = map_bg + LINE_TO_TILE(ly + scroll_y);
 	word tilemap_offset_x = LINE_TO_TILE(scroll_x);
@@ -149,8 +150,8 @@ void scanline()
 	byte tile_y = y & 7;
 	byte tile_x;
 	byte temptile;
-	static byte current_sprite_tile;
-	static pixel_value **bgtile = NULL, **oamtile = NULL;
+	static byte current_bg_tile, current_win_tile;
+	static pixel_value **bgtile = NULL, **oamtile = NULL, **wintile = NULL;
 	oam_entry current_entry;
 	byte yc, xc, tile_no, oam_options;
 
@@ -163,15 +164,27 @@ void scanline()
 		{
 			x = i + scroll_x;
 			tile_x = x & 7;
-			//TODO check for window and act accordingly
 			temptile = memory_get8(get_tile_address(y, x, map_bg));
-			if(temptile != current_sprite_tile || i == 0)
+			if(temptile != current_bg_tile || i == 0)
 			{
 				if(bgtile) free_tile(bgtile, false);
-				current_sprite_tile = temptile;
-				bgtile = get_tile(current_sprite_tile, tile_data, false, false, false);
+				current_bg_tile = temptile;
+				bgtile = get_tile(current_bg_tile, tile_data, false, false, false);
 			}
-			PIXEL(ly, i) = bg_palette_data[bgtile[tile_y][tile_x]];
+			//Window stuff
+			if(get_lcdc(LCDC_WIN_DISPLAY_ON) && window_x <= 166 && window_x <= i && window_y <= ly)
+			{
+				use_window = true;
+				temptile = memory_get8(get_tile_address(ly - window_y, i - window_x, map_win));
+				if(temptile != current_win_tile || wintile == NULL)
+				{
+					if(wintile) free_tile(wintile, false);
+					current_win_tile = temptile;
+					wintile = get_tile(current_win_tile, tile_data, false, false, false);
+				}
+			}
+			else use_window = false;
+			PIXEL(ly, i) = use_window ? wintile[ly & 7][i & 7] : bg_palette_data[bgtile[tile_y][tile_x]];
 		}
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
@@ -219,21 +232,27 @@ void scanline()
 	}
 }
 
+void dump_tile(pixel_value **tile)
+{
+	for(unsigned j=0;j<8;j++)
+	{
+		for(unsigned k=0;k<8;k++)
+		{
+			printf("%c", text_pixels[tile[j][k] & 3]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
 void dump_oam()
 {
 	for(unsigned i=0;i<NUM_OAM_ENTRIES;i++)
 	{
 		byte current_entry = (oam_entry) memory_get32(oam.lower + (i * sizeof(oam_entry)));
 		pixel_value **oamtile = get_tile(OAM_TILE_NO(current_entry), TILE_DATA_1_BEGIN, false, false, false);
-		for(unsigned j=0;j<8;j++)
-		{
-			for(unsigned k=0;k<8;k++)
-			{
-				printf("%c", text_pixels[oamtile[j][k] & 3]);
-			}
-			printf("\n");
-		}
-		printf("\n");
+		dump_tile(oamtile);
+		free(oamtile);
 	}
 }
 

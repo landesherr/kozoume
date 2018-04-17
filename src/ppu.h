@@ -107,6 +107,7 @@ void clear_tiles(void);
 void update_tiles(void);
 void scanline(void);
 void debug_printscreen(void);
+void dump_tile(pixel_value**);
 void dump_oam(void);
 
 static inline void set_stat(byte, bool);

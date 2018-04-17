@@ -112,7 +112,7 @@ cmdagain:
 			}
 			else if(cmd->action == PEEK)
 			{
-				printf("\nMemory value: %X\n", memory_get8(cmd->param.numeric));
+				printf("\nMemory value of %X: %X\n", cmd->param.numeric, memory_get8(cmd->param.numeric));
 				free(cmd);
 				goto cmdagain;
 			}

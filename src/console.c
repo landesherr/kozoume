@@ -57,7 +57,7 @@ console_command* console_get_command()
 	{
 		if(words == 0) goto badcmd;
 		unsigned address = strtol(words[1], NULL, 16);
-		if(address == 0) goto badcmd;
+		//if(address > 0xFFFF) goto badcmd;
 		cmd->action = RUNTO;
 		cmd->param.numeric = address & 0xFFFF;
 	}

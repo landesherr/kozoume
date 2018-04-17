@@ -21,6 +21,7 @@
 #include "memory.h"
 #include "z80.h"
 #include <stdbool.h>
+#include <unistd.h>
 
 #define INTERRUPT_ENABLE_ALL() memory_set8(INTERRUPT_ENABLE, 0x0F)
 #define INTERRUPT_DISABLE_ALL() memory_set8(INTERRUPT_ENABLE, 0x00)
