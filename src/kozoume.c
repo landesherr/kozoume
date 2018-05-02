@@ -28,6 +28,7 @@
 #include "interrupts.h"
 #include "console.h"
 #include "ppu.h" //can be removed when debugging is finished
+#include "render.h"
 
 void powerup(void);
 
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
 	console_command *cmd;
 	memory_init();
 	powerup();
+	render_init();
 	if(argc < 2)
 	{
 		dbgwrite("No ROM specified\n");
@@ -144,6 +146,7 @@ cmdagain:
 		//if(*PC < 100 && memory_get8(*PC) > 0xf0) go = 0;
 	}
 	memory_free();
+	render_teardown();
 	return 0;
 }
 

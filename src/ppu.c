@@ -23,6 +23,7 @@
 #include "interpreter.h"
 #include "interrupts.h"
 #include "globaldefs.h"
+#include "render.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -61,7 +62,7 @@ void ppu_tick()
 				UPDATE_LY();
 				if(hblank_count == SCREEN_RES_Y)
 				{
-					debug_printscreen();
+					render_screen();
 					gfxmode = VBLANK;
 					set_interrupt(INT_VBLANK, true);
 				}
