@@ -3,17 +3,22 @@
 #include <stdbool.h>
 #include <time.h>
 #include "ppu.h"
+#include "render.h"
 
 #define WINDOW_TITLE "Kozoume"
 #define FRAME_TIME (1.0 / 60.0)
 
+#define DC cool //Default Colorset
+color vapor[4] = { 0xCCFFFF, 0xF1DAFF, 0xE3E8FF, 0xFFCCFF };
+color cool[4] = { 0xFF6AD5, 0xC774E8, 0xAD8CFF, 0x879E58 };
+color original[4] = { 0x9BBC0F, 0x8BAC0F, 0x306230, 0x0F380F };
+
 SDL_Window *window;
 SDL_Renderer *renderer;
 clock_t timer = 0;
-
-unsigned modulo = 0;
-
 bool initialized = false;
+
+static inline void set_color(byte, color[]);
 
 void render_init()
 {
@@ -57,26 +62,16 @@ void render_screen()
 		for(int x=0;x<SCREEN_RES_X;x++)
 		{
 			//TODO Clean this up w/ a macro and avoid numeric literals
-			switch(PIXEL(y,x))
-			{
-				case 0:
-					SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-					break;
-				case 1:
-					SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-					break;
-				case 2:
-					SDL_SetRenderDrawColor(renderer, 64, 64, 64, 255);
-					break;
-				case 3:
-					SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-					break;
-				default:
-					SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-					break;
-			}
+			set_color(PIXEL(y,x), DC);
 			SDL_RenderDrawPoint(renderer, x, y);
 		}
 	}
 	SDL_RenderPresent(renderer);
+}
+
+static inline void set_color(byte colorno, color colorset[])
+{
+	colorno &= 3;
+	color c = colorset[colorno];
+	SDL_SetRenderDrawColor(renderer, GET_R(c), GET_G(c), GET_B(c), ALPHA);
 }
