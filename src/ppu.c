@@ -29,8 +29,6 @@
 
 #define LINE_TO_TILE(LINE) ((LINE) >> 3)
 #define NUM_OAM_ENTRIES 40
-#define SPRITE_SIZE 8
-#define SPRITE_SIZE_LARGE 16
 
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
@@ -125,12 +123,10 @@ void ppu_tick()
 void scanline()
 {
 	if(!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
-	word map_bg, map_win;
-	map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
-	map_win = get_lcdc(LCDC_WIN_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
+	word map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
+	word map_win = get_lcdc(LCDC_WIN_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
 
-	word tile_data;
-	tile_data = get_lcdc(LCDC_BG_WIN_TILE) ? TILE_DATA_1_BEGIN : TILE_DATA_2_BEGIN;
+	word tile_data= get_lcdc(LCDC_BG_WIN_TILE) ? TILE_DATA_1_BEGIN : TILE_DATA_2_BEGIN;
 
 	byte ly = memory_get8(LY);
 	byte scroll_x = memory_get8(SCX);
@@ -139,11 +135,6 @@ void scanline()
 	byte window_x = memory_get8(WX) - 7;
 	bool use_window;
 
-	word tilemap_offset_y = map_bg + LINE_TO_TILE(ly + scroll_y);
-	word tilemap_offset_x = LINE_TO_TILE(scroll_x);
-
-	//byte tile = memory_get8(tilemap_offset_x + tilemap_offset_y);
-
 	byte y = ly + scroll_y;
 	byte x;
 
@@ -151,7 +142,7 @@ void scanline()
 	byte tile_x;
 	byte temptile;
 	static byte current_bg_tile, current_win_tile;
-	static pixel_value **bgtile = NULL, **oamtile = NULL, **wintile = NULL;
+	static pixel_value bgtile[SPRITE_SIZE][SPRITE_SIZE] = {0}, oamtile[SPRITE_SIZE_LARGE][SPRITE_SIZE] = {0}, wintile[SPRITE_SIZE][SPRITE_SIZE] = {0};
 	oam_entry current_entry;
 	byte yc, xc, tile_no, oam_options;
 
@@ -167,9 +158,8 @@ void scanline()
 			temptile = memory_get8(get_tile_address(y, x, map_bg));
 			if(temptile != current_bg_tile || i == 0)
 			{
-				if(bgtile) free_tile(bgtile, false);
 				current_bg_tile = temptile;
-				bgtile = get_tile(current_bg_tile, tile_data, false, false, false);
+				get_tile(bgtile, current_bg_tile, tile_data, false, false, false);
 			}
 			//Window stuff
 			if(get_lcdc(LCDC_WIN_DISPLAY_ON) && window_x <= 166 && window_x <= i && window_y <= ly)
@@ -178,13 +168,12 @@ void scanline()
 				temptile = memory_get8(get_tile_address(ly - window_y, i - window_x, map_win));
 				if(temptile != current_win_tile || wintile == NULL)
 				{
-					if(wintile) free_tile(wintile, false);
 					current_win_tile = temptile;
-					wintile = get_tile(current_win_tile, tile_data, false, false, false);
+					get_tile(wintile, current_win_tile, tile_data, false, false, false);
 				}
 			}
 			else use_window = false;
-			PIXEL(ly, i) = use_window ? wintile[ly & 7][i & 7] : bg_palette_data[bgtile[tile_y][tile_x]];
+			PIXEL(ly, i) = use_window ? bg_palette_data[wintile[ly & 7][i & 7]] : bg_palette_data[bgtile[tile_y][tile_x]];
 		}
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
@@ -195,7 +184,6 @@ void scanline()
 		{
 			current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
 			if(!current_entry) continue;
-			//printf("Found current entry %X\n", current_entry);
 			yc = OAM_Y_COORD(current_entry);
 			xc = OAM_X_COORD(current_entry);
 			if(yc == 0 || xc == 0) continue;
@@ -203,8 +191,7 @@ void scanline()
 			xc -= 8;
 			oam_options = OAM_OPTIONS(current_entry);
 			tile_no = OAM_TILE_NO(current_entry);
-			oamtile = get_tile(tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
-			//printf("Got tile... X=%d, Y=%d\n", xc, yc);
+			get_tile(oamtile, tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
 			if(yc <= ly && (yc + sprite_size_y) > ly)
 			{
 				if(big_sprites) tile_y = (ly - yc) & 0xF;
@@ -226,13 +213,12 @@ void scanline()
 					}
 				}
 			}
-			if(oamtile) free_tile(oamtile, big_sprites);
 		}
 
 	}
 }
 
-void dump_tile(pixel_value **tile)
+void dump_tile(pixel_value tile[][SPRITE_SIZE])
 {
 	for(unsigned j=0;j<8;j++)
 	{
@@ -247,12 +233,12 @@ void dump_tile(pixel_value **tile)
 
 void dump_oam()
 {
+	pixel_value oamtile[SPRITE_SIZE_LARGE][SPRITE_SIZE] = {0};
 	for(unsigned i=0;i<NUM_OAM_ENTRIES;i++)
 	{
 		byte current_entry = (oam_entry) memory_get32(oam.lower + (i * sizeof(oam_entry)));
-		pixel_value **oamtile = get_tile(OAM_TILE_NO(current_entry), TILE_DATA_1_BEGIN, false, false, false);
+		get_tile(oamtile, OAM_TILE_NO(current_entry), TILE_DATA_1_BEGIN, false, false, false);
 		dump_tile(oamtile);
-		free(oamtile);
 	}
 }
 
@@ -269,7 +255,7 @@ void debug_printscreen()
 		printf("\n");
 	}
 	fflush(stdout);
-	usleep(50000);
+	usleep(10000);
 	/*
 	for(unsigned i=0;i<SCREEN_RES_Y-1;i+=2)
 	{

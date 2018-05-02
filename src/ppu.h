@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define SPRITE_SIZE 8
+#define SPRITE_SIZE_LARGE 16
+
 #define SCREEN_RES_X 160
 #define SCREEN_RES_Y 144
 #define BACKGROUND_MAP_SIZE 255
@@ -107,7 +110,7 @@ void clear_tiles(void);
 void update_tiles(void);
 void scanline(void);
 void debug_printscreen(void);
-void dump_tile(pixel_value**);
+void dump_tile(pixel_value[][SPRITE_SIZE]);
 void dump_oam(void);
 
 static inline void set_stat(byte, bool);
@@ -115,7 +118,7 @@ static inline void set_mode_flag(ppu_mode);
 static inline bool get_stat(stat_bit);
 static inline bool get_lcdc(lcdc_bit);
 static inline word get_tile_address(byte, byte, word);
-static inline pixel_value** get_tile(byte, word, bool, bool, bool);
+static inline void get_tile(pixel_value[][SPRITE_SIZE], byte, word, bool, bool, bool);
 static inline void free_tile(pixel_value**, bool);
 static inline void set_palette(byte, pixel_value*);
 static inline byte get_color(pixel_value);
@@ -146,30 +149,27 @@ static inline word get_tile_address(byte y, byte x, word base)
 	x >>= 3;
 	return (base + (y * 32) + x);
 }
-static inline pixel_value** get_tile(byte tileno, word base, bool flip_x, bool flip_y, bool is_large)
+static inline void get_tile(pixel_value pixels[][SPRITE_SIZE], byte tileno, word base, bool flip_x, bool flip_y, bool is_large)
 {
 	word address;
 	if(is_large) tileno &= 0xFE;
-	byte sprite_y = is_large ? 16 : 8;
+	byte sprite_y = is_large ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
 	//16 bytes per tile
 	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - ((((~tileno & 0xFF) + 1)*16));
 	else address = base + (tileno * 16);
-	pixel_value **pixels = malloc(sprite_y * sizeof(pixel_value*));
-	for(unsigned a=0;a<sprite_y;a++) pixels[a] = malloc(8 * sizeof(pixel_value));
 	word temp;
 	for(unsigned i=0;i<sprite_y*2;i+=2)
 	{
 		temp = memory_get16(address + i);
-		for(unsigned j=0;j<8;j++)
+		for(unsigned j=0;j<SPRITE_SIZE;j++)
 		{
 			pixels[flip_y ? (sprite_y-1)-(i>>1): i>>1][flip_x ? 7-j : j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
 		}
 	}
-	return pixels;
 }
 static inline void free_tile(pixel_value **tile, bool big_sprites)
 {
-	byte sprite_y = big_sprites ? 16 : 8;
+	byte sprite_y = big_sprites ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
 	for(unsigned i=0;i<sprite_y;i++) free(tile[i]);
 	free(tile);
 }
