@@ -25,8 +25,7 @@
 
 #define WINDOW_TITLE "Kozoume"
 #define FRAME_TIME (1.0 / 60.0)
-#define WIN_WIDTH 800
-#define WIN_HEIGHT 600
+#define DEFAULT_SCALE 5
 
 #define DC cool //Default Colorset
 color vapor[4] = { 0xCCFFFF, 0xF1DAFF, 0xE3E8FF, 0xFFCCFF };
@@ -44,7 +43,7 @@ void render_init()
 {
 	if(initialized) return;
 	SDL_Init(SDL_INIT_VIDEO);
-	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_RES_X * DEFAULT_SCALE, SCREEN_RES_Y * DEFAULT_SCALE, SDL_WINDOW_SHOWN);
 	SDL_SetWindowResizable(window, SDL_TRUE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);

@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 	{
 		if(!strcmp(argv[2], "debug")) debug_print = true;
 	}
+	else run = 1;
 	cartridge *this_cart = load_cart(argv[1]);
 	//basic_sanity_check();
 	while(go)
