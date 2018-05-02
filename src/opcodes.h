@@ -19,12 +19,13 @@
 #pragma once
 
 typedef void (*opcode_func)(void);
-extern opcode_func *standard_opcodes;
-extern opcode_func *prefix_opcodes;
 
 #define TABLE_SIZE 0x100
 #define STD_OP_PREFIX opcode
 #define CB_OP_PREFIX opcb
+
+extern opcode_func standard_opcodes[TABLE_SIZE];
+extern opcode_func prefix_opcodes[TABLE_SIZE];
 
 #define H0 0
 #define H1 1
@@ -60,38 +61,17 @@ extern opcode_func *prefix_opcodes;
 
 
 //ADD OPCODES TO TABLE
-#define F5(I, F) ( standard_opcodes[I] = &F )
+#define F5(I, F) [I] = &F
 //3. You can't explain that!
 #define F6(B) 0x ## B
 #define F4(P, I) F5(F6(I), P ## _ ## I)
 #define F3(P, I, J) F4(P, I ## J)
 #define F2(P, I, J) F3(P, I, J)
 //2. And again
-#define F1(P, I) do{F2(P, I, H0); F2(P, I, H1); F2(P, I, H2); F2(P, I, H3); F2(P, I, H4); F2(P, I, H5); F2(P, I, H6); F2(P, I, H7); F2(P, I, H8); F2(P, I, H9); F2(P, I, HA); F2(P, I, HB); F2(P, I, HC); F2(P, I, HD); F2(P, I, HE); F2(P, I, HF);}while(0)
+#define F1(P, I) F2(P, I, H0), F2(P, I, H1), F2(P, I, H2), F2(P, I, H3), F2(P, I, H4), F2(P, I, H5), F2(P, I, H6), F2(P, I, H7), F2(P, I, H8), F2(P, I, H9), F2(P, I, HA), F2(P, I, HB), F2(P, I, HC), F2(P, I, HD), F2(P, I, HE), F2(P, I, HF)
 //1. Divide and conquer. Split it all into the consituent hex digits
-#define GET_FN(P) do{F1(P, H0); F1(P, H1); F1(P, H2); F1(P, H3); F1(P, H4); F1(P, H5); F1(P, H6); F1(P, H7); F1(P, H8); F1(P, H9); F1(P, HA); F1(P, HB); F1(P, HC); F1(P, HD); F1(P, HE); F1(P, HF);}while(0)
+#define GET_FN(P) { F1(P, H0), F1(P, H1), F1(P, H2), F1(P, H3), F1(P, H4), F1(P, H5), F1(P, H6), F1(P, H7), F1(P, H8), F1(P, H9), F1(P, HA), F1(P, HB), F1(P, HC), F1(P, HD), F1(P, HE), F1(P, HF) }
 
-
-//ADD CB OPCODES TO TABLE
-//Yes, this is completely wasteful and redundant, but I ain't touching that macro again
-#define P5(I, F) ( prefix_opcodes[I] = &F )
-//3. You can't explain that!
-#define P6(B) 0x ## B
-#define P4(P, I) P5(P6(I), P ## _ ## I)
-#define P3(P, I, J) P4(P, I ## J)
-#define P2(P, I, J) P3(P, I, J)
-//2. And again
-#define P1(P, I) do{P2(P, I, H0); P2(P, I, H1); P2(P, I, H2); P2(P, I, H3); P2(P, I, H4); P2(P, I, H5); P2(P, I, H6); P2(P, I, H7); P2(P, I, H8); P2(P, I, H9); P2(P, I, HA); P2(P, I, HB); P2(P, I, HC); P2(P, I, HD); P2(P, I, HE); P2(P, I, HF);}while(0)
-//1. Divide and conquer. Split it all into the consituent hex digits
-#define GET_CB(P) do{P1(P, H0); P1(P, H1); P1(P, H2); P1(P, H3); P1(P, H4); P1(P, H5); P1(P, H6); P1(P, H7); P1(P, H8); P1(P, H9); P1(P, HA); P1(P, HB); P1(P, HC); P1(P, HD); P1(P, HE); P1(P, HF);}while(0)
-
-
-/*
-	Function Prototypes
-	(Now with more macros!)
-*/
-void allocate_bytecode_tables(void);
-void free_bytecode_tables(void);
 //All function prototypes for opcodes
-DEC_FN(STD_OP_PREFIX);
-DEC_FN(CB_OP_PREFIX);
+DEC_FN(STD_OP_PREFIX)
+DEC_FN(CB_OP_PREFIX)

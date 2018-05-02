@@ -29,9 +29,6 @@
 #include "console.h"
 #include "ppu.h" //can be removed when debugging is finished
 
-#define INIT_PC() (*PC = 0x100)
-
-//void basic_sanity_check(void);
 void powerup(void);
 
 int main(int argc, char *argv[])
@@ -53,8 +50,6 @@ int main(int argc, char *argv[])
 		if(!strcmp(argv[2], "debug")) debug_print = true;
 	}
 	cartridge *this_cart = load_cart(argv[1]);
-	INIT_PC();
-	allocate_bytecode_tables();
 	//basic_sanity_check();
 	while(go)
 	{
@@ -148,53 +143,9 @@ cmdagain:
 		//if(*PC >= 0x8000) go = 0;
 		//if(*PC < 100 && memory_get8(*PC) > 0xf0) go = 0;
 	}
-	free_bytecode_tables();
 	memory_free();
 	return 0;
 }
-
-/*
-void basic_sanity_check()
-{
-	bool doOnce = true;
-	dbgwrite("Testing memory values per power up sequence...\n");
-	dbgwrite("FF10 is %X - %s\n", memory_get8(0xFF10), memory_get8(0xFF10) == 0x80 ? "OK" : "FAIL");
-	dbgwrite("FF1E is %X - %s\n", memory_get8(0xFF1E), memory_get8(0xFF1E) == 0xBF ? "OK" : "FAIL");
-	dbgwrite("FF26 is %X - %s\n", memory_get8(0xFF26), memory_get8(0xFF26) == 0xF1 ? "OK" : "FAIL");
-	dbgwrite("Testing opcode function addresses...\n");
-	dbgwrite("opcode_00 is %llX, standard_opcodes[0x00] is %llX\n", &opcode_00, standard_opcodes[0x00]);
-	dbgwrite("opcode_aa is %llX, standard_opcodes[0xaa] is %llX\n", &opcode_aa, standard_opcodes[0xaa]);
-	dbgwrite("Testing sanity with some basic arithmetic and flags...\n");
-	unsigned i;
-	memory_set8(*PC+1,0xFF);
-	ld_nn_n(A);
-	dbgwrite("Value of A after LD: %X\n",*A);
-	*A = 0;
-	for(i=0;i<100;i++)
-	{
-		memory_set8(*PC + 1,0x09);
-		add_a_n();
-		//dbgwrite("Value of A: %X\n", *A);
-		//dbgwrite("Value of AF: %X\n", *AF);
-		if(*F & 0b00100000)
-		{
-			if(doOnce)
-			{
-				dbgwrite("Half Carry OK\n");
-				doOnce = false;
-			}
-			*F &= 0b11011111;
-		}
-		if(*F & 0b00010000)
-		{
-			dbgwrite("Carry OK\n");
-			return;
-		}
-	}
-	dbgwrite("Too many iterations. Something's wrong.\n");
-	exit(1);
-}
-*/
 
 //set memory/register values to defaults
 void powerup()
@@ -205,6 +156,7 @@ void powerup()
 	*DE = 0xD8;
 	*HL = 0x14D;
 	*SP = 0xFFFE;
+	*PC = 0x100;
 	//The following addresses are 0x00 and will be automatically set by calloc()
 	//FF05, FF06, FF07, FF17, FF21, FF22, FF42, FF43, FF45, FF4A, FF4B, FFFF
 	memory_set8(0xFF10, 0x80);

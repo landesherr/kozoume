@@ -22,9 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-opcode_func *standard_opcodes;
-opcode_func *prefix_opcodes;
-
 /*
 	All those opcodes!
 
@@ -37,18 +34,6 @@ opcode_func *prefix_opcodes;
 //PREFIX
 #include "opcodes/prefixops.c"
 
-/*
-	Other functions
-*/
-void allocate_bytecode_tables()
-{
-	standard_opcodes = calloc(TABLE_SIZE, sizeof(opcode_func));
-	GET_FN(STD_OP_PREFIX);
-	prefix_opcodes = calloc(TABLE_SIZE, sizeof(opcode_func));
-	GET_CB(CB_OP_PREFIX);
-}
-void free_bytecode_tables()
-{
-	free(standard_opcodes);
-	free(prefix_opcodes);
-}
+opcode_func standard_opcodes[TABLE_SIZE] = GET_FN(STD_OP_PREFIX);
+opcode_func prefix_opcodes[TABLE_SIZE] = GET_FN(CB_OP_PREFIX);
+
