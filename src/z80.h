@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #define Z80_CYCLES 0x400000
+#define DELTA_CYCLES (cycles - cycles_prev)
 
 typedef byte* reg8;
 typedef word* reg16;

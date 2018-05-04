@@ -68,7 +68,7 @@ void tima_tick()
 				break;
 		}
 		cycles_per_tick = Z80_CYCLES / input_clock;
-		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick || (input_clock == FASTCLOCK && cycles - cycles_prev >= 16))
+		if(cycles % cycles_per_tick < cycles_prev % cycles_per_tick || (input_clock == FASTCLOCK && DELTA_CYCLES >= 16))
 		{
 			value = memory_get8(TIMA) + 1;
 			if(!value)
@@ -100,7 +100,7 @@ void dma_transfer()
 	if(dma_cycles)
 	{
 		//dbgwrite("                                                                ### Processing DMA ###\n");
-		dma_cycles -= (cycles - cycles_prev);
+		dma_cycles -= DELTA_CYCLES;
 		if(dma_cycles <= 0)
 		{
 			dma_cycles = 0;

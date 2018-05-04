@@ -51,7 +51,7 @@ void ppu_tick()
 	//(80 mode 2, 172 mode 3, 204 mode 0)
 	//vblank = 4560 cycles
 	//refresh = 70224 cycles
-	mode_cycles += (cycles - cycles_prev);
+	mode_cycles += DELTA_CYCLES;
 	switch(gfxmode)
 	{
 		case HBLANK:
@@ -83,7 +83,7 @@ void ppu_tick()
 				hblank_count = 0;
 				UPDATE_LY();
 			}
-			else if(mode_cycles % (MODE_0_CYCLES + MODE_2_CYCLES + MODE_3_CYCLES) == 0)
+			else if(mode_cycles % HBLANK_CYCLES < (mode_cycles - DELTA_CYCLES) % HBLANK_CYCLES)
 			{
 				hblank_count++;
 				UPDATE_LY();
