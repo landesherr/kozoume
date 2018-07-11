@@ -36,10 +36,15 @@ color bw[4] = { 0xCCCCCC, 0x999999, 0x666666, 0x000000 };
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+SDL_Texture *texture;
 clock_t timer = 0;
 bool initialized = false;
 
+static unsigned rgba_array[SCREEN_RES_X * SCREEN_RES_Y] = {0};
+
 static inline void set_color(byte, color[]);
+static inline unsigned get_rgba_color(byte, color[]);
+static inline void gb_pixel_array_to_rgba(void);
 
 void render_init()
 {
@@ -50,6 +55,7 @@ void render_init()
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
 	SDL_RenderSetLogicalSize(renderer, SCREEN_RES_X, SCREEN_RES_Y);
+	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_RES_X, SCREEN_RES_Y);
 	initialized = true;
 }
 
@@ -81,16 +87,9 @@ void render_screen()
 		if(delta < FRAME_TIME) SDL_Delay((FRAME_TIME - delta) * 1000);
 		timer = current;
 	}
-	SDL_RenderClear(renderer);
-	for(int y=0;y<SCREEN_RES_Y;y++)
-	{
-		for(int x=0;x<SCREEN_RES_X;x++)
-		{
-			//TODO Clean this up w/ a macro and avoid numeric literals
-			set_color(PIXEL(y,x), DC);
-			SDL_RenderDrawPoint(renderer, x, y);
-		}
-	}
+	gb_pixel_array_to_rgba();
+	SDL_UpdateTexture(texture, NULL, &rgba_array[0], SCREEN_RES_X * sizeof(unsigned));
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
 }
 
@@ -99,4 +98,19 @@ static inline void set_color(byte colorno, color colorset[])
 	colorno &= 3;
 	color c = colorset[colorno];
 	SDL_SetRenderDrawColor(renderer, GET_R(c), GET_G(c), GET_B(c), ALPHA);
+}
+
+static inline unsigned get_rgba_color(byte colorno, color colorset[])
+{
+	colorno &= 3;
+	unsigned colorout = 0xFF000000;
+	colorout |= colorset[colorno];
+	return colorout;
+}
+static inline void gb_pixel_array_to_rgba()
+{
+	for(int i=0;i<SCREEN_RES_Y*SCREEN_RES_X;i++)
+	{
+		rgba_array[i] = get_rgba_color(screen_bitmap[i], DC);
+	}
 }
