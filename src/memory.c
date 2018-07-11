@@ -135,7 +135,6 @@ void memory_set8_logical(word address, byte value)
 	{
 		if(address == P1)
 		{
-			printf("Write to P1: [%X]\n", value);
 			if(value & 0x20) check_joypad(CHECK_JOYPAD_P15);
 			else if(value & 0x10) check_joypad(CHECK_JOYPAD_P14);
 			return;

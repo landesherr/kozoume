@@ -134,7 +134,6 @@ void dma_transfer()
 
 void set_joypad_state(SDL_Event *event)
 {
-	word old_state = joypad_state;
 	unsigned keymod = 0;
 	if(event->type != SDL_KEYDOWN && event->type != SDL_KEYUP) return;
 	switch(event->key.keysym.scancode)
@@ -169,7 +168,6 @@ void set_joypad_state(SDL_Event *event)
 	}
 	if(event->type == SDL_KEYDOWN) joypad_state |= keymod;
 	else joypad_state &= ~keymod;
-	if(joypad_state != old_state) printf("Joypad state changed to %X\n", joypad_state);
 }
 
 void check_joypad(bool upper)
