@@ -147,7 +147,8 @@ void scanline()
 	static byte current_bg_tile, current_win_tile;
 	static pixel_value bgtile[SPRITE_SIZE][SPRITE_SIZE] = {0}, oamtile[SPRITE_SIZE_LARGE][SPRITE_SIZE] = {0}, wintile[SPRITE_SIZE][SPRITE_SIZE] = {0};
 	oam_entry current_entry;
-	byte yc, xc, tile_no, oam_options;
+	byte tile_no, oam_options;
+	short xc, yc;
 
 	byte oam_palette;
 	pixel_value bg_palette_data[4], oam_palette_data[4];
@@ -217,7 +218,6 @@ void scanline()
 				}
 			}
 		}
-
 	}
 }
 
