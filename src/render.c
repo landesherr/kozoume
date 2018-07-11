@@ -20,6 +20,7 @@
 #include <SDL2/SDL_render.h>
 #include <stdbool.h>
 #include <time.h>
+#include "io.h"
 #include "ppu.h"
 #include "render.h"
 
@@ -69,6 +70,7 @@ void render_screen()
 		render_teardown();
 		exit(0);
 	}
+	set_joypad_state(&event);
 	if(!initialized) return;
 	if(!timer) timer = clock();
 	else

@@ -27,12 +27,13 @@
 #define FASTCLOCK 262144
 #define CLOCKS_PER_BYTE 4
 
+static byte joypad_state = 0;
+
 void io_tick()
 {
 	div_tick();
 	tima_tick();
 	dma_transfer();
-	check_joypad();
 }
 
 void div_tick()
@@ -131,16 +132,54 @@ void dma_transfer()
 	*/
 }
 
-void check_joypad()
+void set_joypad_state(SDL_Event *event)
 {
-	byte temp = memory_get8(P1);
-	//TODO insert actual joypad values here, instead of none
-	if(temp & 0x20)
+	word old_state = joypad_state;
+	unsigned keymod = 0;
+	if(event->type != SDL_KEYDOWN && event->type != SDL_KEYUP) return;
+	switch(event->key.keysym.scancode)
 	{
-		memory_set8(P1, 0x0F);
+		//TODO make these configurable variables, rather than hard-coded
+		case SDL_SCANCODE_UP:
+			keymod = JOY_UP;
+			break;
+		case SDL_SCANCODE_DOWN:
+			keymod = JOY_DOWN;
+			break;
+		case SDL_SCANCODE_LEFT:
+			keymod = JOY_LEFT;
+			break;
+		case SDL_SCANCODE_RIGHT:
+			keymod = JOY_RIGHT;
+			break;
+		case SDL_SCANCODE_X:
+			keymod = JOY_A;
+			break;
+		case SDL_SCANCODE_Z:
+			keymod = JOY_B;
+			break;
+		case SDL_SCANCODE_RSHIFT:
+			keymod = JOY_SELECT;
+			break;
+		case SDL_SCANCODE_RETURN:
+			keymod = JOY_START;
+			break;
+		default:
+			return;
 	}
-	else if(temp & 0x10)
+	if(event->type == SDL_KEYDOWN) joypad_state |= keymod;
+	else joypad_state &= ~keymod;
+	if(joypad_state != old_state) printf("Joypad state changed to %X\n", joypad_state);
+}
+
+void check_joypad(bool upper)
+{
+	if(upper)
 	{
-		memory_set8(P1, 0x0F);
+		memory_set8(P1, (~joypad_state) & 0xF);
+	}
+	else
+	{
+		memory_set8(P1, (~(joypad_state >> 4)) & 0xF);
 	}
 }

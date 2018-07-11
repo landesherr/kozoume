@@ -17,6 +17,7 @@
 */
 
 #include "globaldefs.h"
+#include "io.h"
 #include "memory.h"
 #include "ppu.h"
 #include "cartridge.h"
@@ -129,6 +130,16 @@ void memory_set8_logical(word address, byte value)
 			}
 		}
 		return;
+	}
+	else if(MEMORY_IN_RANGE(address, hardware_io))
+	{
+		if(address == P1)
+		{
+			printf("Write to P1: [%X]\n", value);
+			if(value & 0x20) check_joypad(CHECK_JOYPAD_P15);
+			else if(value & 0x10) check_joypad(CHECK_JOYPAD_P14);
+			return;
+		}
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available
 	memory_map[address] = value;

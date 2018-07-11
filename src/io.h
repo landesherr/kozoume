@@ -20,10 +20,24 @@
 
 #include "memory.h"
 #include <stdbool.h>
+#include <SDL2/SDL.h>
+
+#define JOY_RIGHT  0x1
+#define JOY_LEFT   0x2
+#define JOY_UP     0x4
+#define JOY_DOWN   0x8
+#define JOY_A      0x10
+#define JOY_B      0x20
+#define JOY_SELECT 0x40
+#define JOY_START  0x80
+
+#define CHECK_JOYPAD_P15 true
+#define CHECK_JOYPAD_P14 false
 
 void io_tick(void);
 void div_tick(void);
 void tima_tick(void);
 
 void dma_transfer(void);
-void check_joypad(void);
+void check_joypad(bool);
+void set_joypad_state(SDL_Event*);
