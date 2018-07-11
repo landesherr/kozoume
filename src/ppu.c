@@ -133,7 +133,9 @@ void scanline()
 	byte scroll_x = memory_get8(SCX);
 	byte scroll_y = memory_get8(SCY);
 	byte window_y = memory_get8(WY);
-	byte window_x = memory_get8(WX) - 7;
+	byte window_x = memory_get8(WX);
+	if(window_x < 7) window_x = 0;
+	else window_x -= 7;
 	bool use_window;
 
 	byte y = ly + scroll_y;
