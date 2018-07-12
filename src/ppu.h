@@ -164,7 +164,7 @@ static inline void get_tile(pixel_value pixels[][SPRITE_SIZE], byte tileno, word
 		temp = memory_get16(address + i);
 		for(unsigned j=0;j<SPRITE_SIZE;j++)
 		{
-			pixels[flip_y ? (sprite_y-1)-(i>>1): i>>1][flip_x ? 7-j : j] = (((temp >> 8) >> (7 - j)) & 1) | (((temp >> (7 - j)) & 1) << 1);
+			pixels[flip_y ? (sprite_y-1)-(i>>1): i>>1][flip_x ? 7-j : j] = (((temp >> 8) >> (7 - j)) & 1) << 1 | ((temp >> (7 - j)) & 1);
 		}
 	}
 }
