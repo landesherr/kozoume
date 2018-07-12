@@ -62,7 +62,7 @@ typedef enum cart_type
 typedef struct cartridge
 {
 	char *filename;
-	char *gamename;
+	char gamename[17];
 	byte bank;
 	byte ram_bank;
 	cart_type type;

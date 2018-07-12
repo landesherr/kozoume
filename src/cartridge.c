@@ -34,6 +34,18 @@ static inline byte calc_rom_banks(byte);
 static inline unsigned calc_ram_size(byte);
 static inline bool calculate_checksum(FILE*);
 
+static const char* translate_cart_name(char *name)
+{
+	static char safename[16] = {0};
+	for(byte i=0;i<16;i++)
+	{
+		//No control chars, no symbols
+		if(name[i] == 0 || (name[i] >= 0x30 && name[i] < 0x7B)) safename[i] = name[i];
+		else safename[i] = '_'; //If such a character is found, replace it with an underscore
+	}
+	return safename;
+}
+
 cartridge* load_cart(char *path)
 {
 	FILE *cart;
@@ -54,13 +66,11 @@ cartridge* load_cart(char *path)
 	//load base ROM
 	dbgwrite("Reading from ROM...\n");
 	fread(memory_map, BANK_SIZE, 1, cart);
-	char name[17];
 	for(unsigned i=0;i<16;i++)
 	{
-		name[i] = memory_get8(0x134 + i);
+		(loaded_cart->gamename)[i] = memory_get8(0x134 + i);
 	}
-	name[16] = '\0';
-	loaded_cart->gamename = name;
+	(loaded_cart->gamename)[16] = '\0';
 	loaded_cart->filename = path;
 	loaded_cart->bank = 0;
 	loaded_cart->ram_bank = 0;
@@ -91,7 +101,7 @@ cartridge* load_cart(char *path)
 	dbgwrite("Current ROM is type %X\n", loaded_cart->type);
 	dbgwrite("Current ROM %s a GBC ROM\n", loaded_cart->is_gbc ? "IS" : "IS NOT");
 	dbgwrite("%d banks ROM, %d bytes RAM\n", loaded_cart->rom_banks, loaded_cart->ram_bytes);
-	dbgwrite("Name - %s\n", name);
+	dbgwrite("Name - %s\n", loaded_cart->gamename);
 	calculate_checksum(cart);
 	fclose(cart);
 	mycart = loaded_cart;
@@ -118,7 +128,6 @@ void store_ram_bank(cartridge *c)
 	if(available_banks < 2) return;
 	unsigned offset = RAM_BANK_SIZE * c->ram_bank;
 	memcpy(&(c->ram[offset]), &memory_map[cart_ram.lower], RAM_BANK_SIZE);
-	sync_ram_to_disk(c);
 }
 void ram_bank_switch(cartridge *c, byte bankno)
 {
@@ -128,17 +137,22 @@ void ram_bank_switch(cartridge *c, byte bankno)
 	store_ram_bank(c);
 	unsigned offset = RAM_BANK_SIZE * bankno;
 	memcpy(&memory_map[cart_ram.lower], &(c->ram[offset]), RAM_BANK_SIZE);
+	c->ram_bank = bankno;
 }
 void sync_ram_to_disk(cartridge *c)
 {
 	if(!HAS_BATT(c)) return;
 	byte available_banks = c->ram_bytes / RAM_BANK_SIZE;
 	char savename[32] = {0};
-	sprintf(savename, "%s.kzsav", c->gamename);
+	sprintf(savename, "%s.kzsav", translate_cart_name(c->gamename));
 	FILE *ramfile = fopen(savename, "wb");
 	if(!ramfile) return; //TODO warn user that save could not be saved
 	if(available_banks < 2) fwrite(&memory_map[cart_ram.lower], sizeof(char), c->ram_bytes, ramfile);
-	else fwrite(c->ram, sizeof(char), c->ram_bytes, ramfile); //TODO check for ferror
+	else
+	{
+		store_ram_bank(c);
+		fwrite(c->ram, sizeof(char), c->ram_bytes, ramfile); //TODO check for ferror
+	}
 	fclose(ramfile);
 }
 void load_ram_from_file(cartridge *c)
@@ -146,7 +160,7 @@ void load_ram_from_file(cartridge *c)
 	if(!HAS_BATT(c)) return;
 	byte available_banks = c->ram_bytes / RAM_BANK_SIZE;
 	char savename[32] = {0};
-	sprintf(savename, "%s.kzsav", c->gamename);
+	sprintf(savename, "%s.kzsav", translate_cart_name(c->gamename));
 	FILE *ramfile = fopen(savename, "rb");
 	if(!ramfile) return;
 	if(available_banks < 2) fread(&memory_map[cart_ram.lower], sizeof(char), c->ram_bytes, ramfile);
