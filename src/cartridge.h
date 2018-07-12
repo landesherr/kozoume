@@ -59,6 +59,7 @@ typedef struct cartridge
 	bool is_gbc;
 	byte rom_banks;
 	unsigned ram_bytes;
+	byte *data;
 } cartridge;
 
 extern cartridge *mycart;

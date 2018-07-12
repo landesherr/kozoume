@@ -21,8 +21,10 @@
 #include "memory.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define BANK_SIZE 0x4000
+#define MAX_CART_SIZE 0x500000 //Reject carts bigger than 5 MiB
 
 cartridge *mycart;
 
@@ -41,9 +43,10 @@ cartridge* load_cart(char *path)
 		exit(1);
 	}
 	unsigned cart_filesize = get_cart_size(cart);
-	if(cart_filesize < BANK_SIZE || cart_filesize % 0x2000 != 0)
+	if(cart_filesize < BANK_SIZE || cart_filesize % 0x2000 != 0 || cart_filesize > MAX_CART_SIZE)
 	{
 		dbgwrite("Invalid ROM!\n");
+		fclose(cart);
 		exit(1);
 	}
 	cartridge *loaded_cart = malloc(sizeof(cartridge));
@@ -63,12 +66,20 @@ cartridge* load_cart(char *path)
 	loaded_cart->is_gbc = (memory_get8(0x143) == 0xC0);
 	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
 	loaded_cart->ram_bytes = calc_ram_size(memory_get8(0x149));
+	loaded_cart->data = NULL;
 	//load additional bank if multiple exist
-	if(loaded_cart->rom_banks > 0)
+	if(loaded_cart->rom_banks > 1)
 	{
 		fseek(cart, BANK_SIZE, SEEK_SET);
 		fread(&memory_map[BANK_SIZE], BANK_SIZE, 1, cart);
 		loaded_cart->bank = 1;
+		if(loaded_cart->rom_banks > 2)
+		{
+			//load whole cartridge into memory
+			loaded_cart->data = malloc(cart_filesize);
+			fseek(cart, 0, SEEK_SET);
+			fread(loaded_cart->data, sizeof(char), cart_filesize, cart);
+		}
 	}
 	dbgwrite("Current ROM is type %X\n", loaded_cart->type);
 	dbgwrite("Current ROM %s a GBC ROM\n", loaded_cart->is_gbc ? "IS" : "IS NOT");
@@ -82,18 +93,9 @@ cartridge* load_cart(char *path)
 
 void bank_switch(cartridge *c, byte bankno)
 {
-	//TODO: Don't use file I/O for this, ffs
-	FILE *cart;
-	cart = fopen(c->filename,"rb");
-	if(!cart)
-	{
-		dbgwrite("Unable to load ROM for bank switch!!!\n");
-		exit(1);
-	}
 	if(!bankno) bankno = 1;
-	fseek(cart, BANK_SIZE*bankno, SEEK_SET);
-	fread(&memory_map[BANK_SIZE], BANK_SIZE, 1, cart);
-	fclose(cart);
+	unsigned offset = BANK_SIZE * bankno;
+	memcpy(&memory_map[BANK_SIZE], &(c->data[offset]), BANK_SIZE);
 	c->bank = bankno;
 }
 
