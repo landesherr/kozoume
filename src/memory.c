@@ -174,7 +174,6 @@ void memory_set16_logical(word address, word value)
 	else if(MEMORY_IN_RANGE(address, cart_ram))
 	{
 		if(mycart->ram_enable == false) return;
-		else printf("Writing to cartridge RAM: [%X]\n", value);
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
@@ -192,7 +191,12 @@ void memory_set16_logical(word address, word value)
 
 static inline void do_mbc1(word address, byte value)
 {
-	if(address < 0x1FFF) mycart->ram_enable = (value & 0xF) == 0xA;
+	if(address < 0x1FFF)
+	{
+		bool prev_ram_enable = mycart->ram_enable;
+		mycart->ram_enable = (value & 0xF) == 0xA;
+		if(prev_ram_enable && !(mycart->ram_enable)) sync_ram_to_disk(mycart);
+	}
 	else if(address >= 0x2000 && address <= 0x3FFF) bank_switch(mycart, value & 0x1F);
 	else if(address >= 0x4000 && address <= 0x5FFF)
 	{
@@ -204,7 +208,7 @@ static inline void do_mbc1(word address, byte value)
 		}
 		else if(mycart->mode == MODE_SWITCH_RAM)
 		{
-			//TODO switch ram bank
+			ram_bank_switch(mycart, value & 0x3);
 		}
 	}
 	else if(address <= 0x7FFF) mycart->mode = (value & 1) ? MODE_SWITCH_RAM : MODE_SWITCH_ROM;
@@ -216,13 +220,18 @@ static inline void do_mbc2(word address, byte value)
 }
 static inline void do_mbc3(word address, byte value)
 {
-	if(address < 0x1FFF) mycart->ram_enable = (value & 0xF) == 0xA;
+	if(address < 0x1FFF)
+	{
+		bool prev_ram_enable = mycart->ram_enable;
+		mycart->ram_enable = (value & 0xF) == 0xA;
+		if(prev_ram_enable && !(mycart->ram_enable)) sync_ram_to_disk(mycart);
+	}
 	else if(address >= 0x2000 && address <= 0x3FFF) bank_switch(mycart, value);
 	else if(address >= 0x4000 && address <= 0x5FFF)
 	{
-		if(value < 0x3)
+		if(value <= 0x3)
 		{
-			//Map RAM bank
+			ram_bank_switch(mycart, value);
 		}
 		else if(value >= 0x8 && value <= 0xC)
 		{

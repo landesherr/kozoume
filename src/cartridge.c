@@ -24,6 +24,7 @@
 #include <string.h>
 
 #define BANK_SIZE 0x4000
+#define RAM_BANK_SIZE 0x2000
 #define MAX_CART_SIZE 0x500000 //Reject carts bigger than 5 MiB
 
 cartridge *mycart;
@@ -62,6 +63,7 @@ cartridge* load_cart(char *path)
 	loaded_cart->gamename = name;
 	loaded_cart->filename = path;
 	loaded_cart->bank = 0;
+	loaded_cart->ram_bank = 0;
 	loaded_cart->type = (cart_type) memory_get8(0x147);
 	loaded_cart->is_gbc = (memory_get8(0x143) == 0xC0);
 	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
@@ -93,6 +95,12 @@ cartridge* load_cart(char *path)
 	calculate_checksum(cart);
 	fclose(cart);
 	mycart = loaded_cart;
+	if(loaded_cart->ram_bytes > RAM_BANK_SIZE)
+	{
+		loaded_cart->ram = calloc(loaded_cart->ram_bytes, sizeof(char));
+	}
+	if(HAS_BATT(loaded_cart)) load_ram_from_file(loaded_cart);
+
 	return loaded_cart;
 }
 
@@ -102,6 +110,52 @@ void bank_switch(cartridge *c, byte bankno)
 	unsigned offset = BANK_SIZE * bankno;
 	memcpy(&memory_map[BANK_SIZE], &(c->data[offset]), BANK_SIZE);
 	c->bank = bankno;
+}
+void store_ram_bank(cartridge *c)
+{
+	//Copy current RAM bank back into the full RAM buffer
+	byte available_banks = c->ram_bytes / RAM_BANK_SIZE;
+	if(available_banks < 2) return;
+	unsigned offset = RAM_BANK_SIZE * c->ram_bank;
+	memcpy(&(c->ram[offset]), &memory_map[cart_ram.lower], RAM_BANK_SIZE);
+	sync_ram_to_disk(c);
+}
+void ram_bank_switch(cartridge *c, byte bankno)
+{
+	byte available_banks = c->ram_bytes / RAM_BANK_SIZE;
+	if(available_banks < 2) return;
+	if(bankno > available_banks) return;
+	store_ram_bank(c);
+	unsigned offset = RAM_BANK_SIZE * bankno;
+	memcpy(&memory_map[cart_ram.lower], &(c->ram[offset]), RAM_BANK_SIZE);
+}
+void sync_ram_to_disk(cartridge *c)
+{
+	if(!HAS_BATT(c)) return;
+	byte available_banks = c->ram_bytes / RAM_BANK_SIZE;
+	char savename[32] = {0};
+	sprintf(savename, "%s.kzsav", c->gamename);
+	FILE *ramfile = fopen(savename, "wb");
+	if(!ramfile) return; //TODO warn user that save could not be saved
+	if(available_banks < 2) fwrite(&memory_map[cart_ram.lower], sizeof(char), c->ram_bytes, ramfile);
+	else fwrite(c->ram, sizeof(char), c->ram_bytes, ramfile); //TODO check for ferror
+	fclose(ramfile);
+}
+void load_ram_from_file(cartridge *c)
+{
+	if(!HAS_BATT(c)) return;
+	byte available_banks = c->ram_bytes / RAM_BANK_SIZE;
+	char savename[32] = {0};
+	sprintf(savename, "%s.kzsav", c->gamename);
+	FILE *ramfile = fopen(savename, "rb");
+	if(!ramfile) return;
+	if(available_banks < 2) fread(&memory_map[cart_ram.lower], sizeof(char), c->ram_bytes, ramfile);
+	else
+	{
+		fread(c->ram, sizeof(char), c->ram_bytes, ramfile); //TODO check for ferror
+		memcpy(&memory_map[cart_ram.lower], c->ram, RAM_BANK_SIZE);
+	}
+	fclose(ramfile);
 }
 
 static inline unsigned get_cart_size(FILE *cart)
@@ -168,13 +222,13 @@ static inline unsigned calc_ram_size(byte identifier)
 		case 0:
 			return 0;
 		case 1:
-			return 0x800;
+			return 0x800; //2k, 1 bank (partial)
 		case 2:
-			return 0x2000;
+			return 0x2000; //8k, 1 bank (full)
 		case 3:
-			return 0x8000;
+			return 0x8000; //32k, 4 banks
 		case 4:
-			return 0x20000;
+			return 0x20000; //128k, 16 banks
 		default:
 			dbgwrite("Bad RAM size identifier\n");
 			exit(1);

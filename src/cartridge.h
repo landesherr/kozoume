@@ -27,6 +27,8 @@
 #define RTC_UNLATCHED false
 #define RTC_LATCHED true
 
+#define HAS_BATT(C) (C->type == 2 || C->type == 3 || C->type == 6 || C->type == 0xD || C->type == 0xF || C->type == 0x10 || C->type == 0x13 || C->type == 0x1B || C->type == 0x1E)
+
 typedef enum cart_type
 {
 	ROM_ONLY = 0,
@@ -62,6 +64,7 @@ typedef struct cartridge
 	char *filename;
 	char *gamename;
 	byte bank;
+	byte ram_bank;
 	cart_type type;
 	bool is_gbc;
 	byte rom_banks;
@@ -80,3 +83,7 @@ extern cartridge *mycart;
 cartridge* load_cart(char*);
 void free_cart(cartridge*);
 void bank_switch(cartridge*, byte);
+void store_ram_bank(cartridge*);
+void ram_bank_switch(cartridge*, byte);
+void sync_ram_to_disk(cartridge*);
+void load_ram_from_file(cartridge*);
