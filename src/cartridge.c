@@ -67,6 +67,11 @@ cartridge* load_cart(char *path)
 	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
 	loaded_cart->ram_bytes = calc_ram_size(memory_get8(0x149));
 	loaded_cart->data = NULL;
+	loaded_cart->ram = NULL;
+	loaded_cart->ram_enable = false;
+	loaded_cart->mode = MODE_SWITCH_ROM;
+	loaded_cart->latch_req = RTC_LATCH_NONE;
+	loaded_cart->latching = RTC_UNLATCHED;
 	//load additional bank if multiple exist
 	if(loaded_cart->rom_banks > 1)
 	{

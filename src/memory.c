@@ -23,6 +23,10 @@
 #include "cartridge.h"
 #include <stdlib.h>
 
+static inline void do_mbc1(word, byte);
+static inline void do_mbc2(word, byte);
+static inline void do_mbc3(word, byte);
+
 byte *memory_map;
 const mem_range \
 	restart_interrupt_vectors = {0x0000,0x00FF}, \
@@ -99,36 +103,37 @@ void memory_set8_logical(word address, byte value)
 	{
 		//if(gfxmode == TRANSFER) return;
 	}
+	else if(MEMORY_IN_RANGE(address, cart_ram))
+	{
+		if(mycart->ram_enable == false) return;
+	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
 		|| MEMORY_IN_RANGE(address, cart_header) \
 		|| MEMORY_IN_RANGE(address, restart_interrupt_vectors))
 	{
-		//can't write to ROM
-		if(address >= 0x2000 && address <= 0x3FFF)
+		switch(mycart->type)
 		{
-			switch(mycart->type)
-			{
-				case ROM_MBC1:
-				case ROM_MBC1_RAM:
-				case ROM_MBC1_RAM_BATT:
-					bank_switch(mycart, value & 0x1F);
-					break;
-				case ROM_MBC2:
-				case ROM_MBC2_BATT:
-					bank_switch(mycart, value & 0xF);
-					break;
-				case ROM_MBC3_TIMER_BATT:
-				case ROM_MBC3_TIMER_RAM_BATT:
-				case ROM_MBC3:
-				case ROM_MBC3_RAM:
-				case ROM_MBC3_RAM_BATT:
-					bank_switch(mycart, value);
-					break;
-				default:
-					break;
-			}
+			case ROM_MBC1:
+			case ROM_MBC1_RAM:
+			case ROM_MBC1_RAM_BATT:
+				do_mbc1(address, value);
+				break;
+			case ROM_MBC2:
+			case ROM_MBC2_BATT:
+				do_mbc2(address, value);
+				break;
+			case ROM_MBC3_TIMER_BATT:
+			case ROM_MBC3_TIMER_RAM_BATT:
+			case ROM_MBC3:
+			case ROM_MBC3_RAM:
+			case ROM_MBC3_RAM_BATT:
+				do_mbc3(address, value);
+				break;
+			default:
+				break;
 		}
+		//can't write to ROM
 		return;
 	}
 	else if(MEMORY_IN_RANGE(address, hardware_io))
@@ -166,6 +171,11 @@ void memory_set16_logical(word address, word value)
 	{
 		//if(gfxmode == TRANSFER) return;
 	}
+	else if(MEMORY_IN_RANGE(address, cart_ram))
+	{
+		if(mycart->ram_enable == false) return;
+		else printf("Writing to cartridge RAM: [%X]\n", value);
+	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
 		|| MEMORY_IN_RANGE(address, cart_header) \
@@ -178,4 +188,68 @@ void memory_set16_logical(word address, word value)
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available
 	*((word*)&memory_map[address]) = value;
+}
+
+static inline void do_mbc1(word address, byte value)
+{
+	if(address < 0x1FFF) mycart->ram_enable = (value & 0xF) == 0xA;
+	else if(address >= 0x2000 && address <= 0x3FFF) bank_switch(mycart, value & 0x1F);
+	else if(address >= 0x4000 && address <= 0x5FFF)
+	{
+		if(mycart->mode == MODE_SWITCH_ROM)
+		{
+			byte bank = mycart->bank;
+			value = (value & 0x3) << 5;
+			bank_switch(mycart, (bank & 0x1F) | value);
+		}
+		else if(mycart->mode == MODE_SWITCH_RAM)
+		{
+			//TODO switch ram bank
+		}
+	}
+	else if(address <= 0x7FFF) mycart->mode = (value & 1) ? MODE_SWITCH_RAM : MODE_SWITCH_ROM;
+}
+static inline void do_mbc2(word address, byte value)
+{
+	//TODO Handle MBC2's weird RAM
+	if(address >= 0x2000 && address <= 0x3FFF) bank_switch(mycart, value & 0xF);
+}
+static inline void do_mbc3(word address, byte value)
+{
+	if(address < 0x1FFF) mycart->ram_enable = (value & 0xF) == 0xA;
+	else if(address >= 0x2000 && address <= 0x3FFF) bank_switch(mycart, value);
+	else if(address >= 0x4000 && address <= 0x5FFF)
+	{
+		if(value < 0x3)
+		{
+			//Map RAM bank
+		}
+		else if(value >= 0x8 && value <= 0xC)
+		{
+			//Map RTC register
+		}
+	}
+	else if(address < 0x7FFF)
+	{
+		if(value == 0)
+		{
+			mycart->latch_req = RTC_LATCH_STEP;
+		}
+		if(value == 1)
+		{
+			if(mycart->latch_req == RTC_LATCH_STEP)
+			{
+				if(mycart->latching == RTC_UNLATCHED)
+				{
+					mycart->latching = RTC_LATCHED;
+				}
+				else
+				{
+					mycart->latching = RTC_UNLATCHED;
+				}
+			}
+			mycart->latch_req = RTC_LATCH_NONE;
+		}
+		else mycart->latch_req = RTC_LATCH_NONE;
+	}
 }

@@ -20,6 +20,13 @@
 #include "globaldefs.h"
 #include <stdbool.h>
 
+#define MODE_SWITCH_ROM false
+#define MODE_SWITCH_RAM true
+#define RTC_LATCH_NONE false
+#define RTC_LATCH_STEP true
+#define RTC_UNLATCHED false
+#define RTC_LATCHED true
+
 typedef enum cart_type
 {
 	ROM_ONLY = 0,
@@ -60,6 +67,12 @@ typedef struct cartridge
 	byte rom_banks;
 	unsigned ram_bytes;
 	byte *data;
+	byte *ram;
+	//MBC variables
+	bool ram_enable;
+	bool mode;
+	bool latch_req;
+	bool latching;
 } cartridge;
 
 extern cartridge *mycart;
