@@ -36,6 +36,12 @@ static unsigned hblank_count = 153, mode_cycles = 4500;
 const byte text_pixels[4] = {'#', '=', '-', ' '};
 byte *screen_bitmap;
 
+static inline void check_coincidence(void)
+{
+	set_stat(STAT_COINCIDENCE_FLAG, LY_COMPARE);
+	if(LY_COMPARE && COINCIDENCE_INTERRUPT) set_interrupt(INT_STAT, true);
+}
+
 void ppu_tick()
 {
 	if(!LCD_ON)
@@ -60,19 +66,21 @@ void ppu_tick()
 				mode_cycles -= MODE_0_CYCLES;
 				hblank_count++;
 				UPDATE_LY();
+				check_coincidence();
 				if(hblank_count == SCREEN_RES_Y)
 				{
 					render_screen();
 					gfxmode = VBLANK;
 					set_interrupt(INT_VBLANK, true);
+					if(VBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
 				}
 				else
 				{
 					gfxmode = SEARCH;
+					if(OAM_INTERRUPT) set_interrupt(INT_STAT, true);
 				}
 				set_mode_flag(gfxmode);
 			}
-			//TODO actual HBLANK logic
 			break;
 		case VBLANK:
 			if(mode_cycles >= MODE_1_CYCLES)
@@ -82,13 +90,14 @@ void ppu_tick()
 				set_mode_flag(gfxmode);
 				hblank_count = 0;
 				UPDATE_LY();
+				check_coincidence();
 			}
 			else if(mode_cycles % HBLANK_CYCLES < (mode_cycles - DELTA_CYCLES) % HBLANK_CYCLES)
 			{
 				hblank_count++;
 				UPDATE_LY();
+				check_coincidence();
 			}
-			//TODO actual VBLANK logic
 			break;
 		case SEARCH:
 			if(mode_cycles >= MODE_2_CYCLES)
@@ -98,7 +107,6 @@ void ppu_tick()
 				set_mode_flag(gfxmode);
 				mode_cycles = 0;
 			}
-			//TODO actual SEARCH logic
 			break;
 		case TRANSFER:
 			if(mode_cycles >= MODE_3_CYCLES)
@@ -107,18 +115,13 @@ void ppu_tick()
 				gfxmode = HBLANK;
 				set_mode_flag(gfxmode);
 				scanline();
+				if(HBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
 			}
-			//TODO actual TRANSFER logic
 			break;
 		default:
 			dbgwrite("Invalid PPU mode! How did this even happen?\n");
 	}
 	set_stat(STAT_COINCIDENCE_FLAG, LY_COMPARE);
-	//TODO is there any additional interrupt-specific logic needed below?
-	if(gfxmode == HBLANK && HBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
-	else if(gfxmode == VBLANK && VBLANK_INTERRUPT) set_interrupt(INT_STAT, true);
-	else if(gfxmode == SEARCH && OAM_INTERRUPT) set_interrupt(INT_STAT, true);
-	else if(LY_COMPARE && COINCIDENCE_INTERRUPT) set_interrupt(INT_STAT, true);
 }
 
 void scanline()
@@ -170,7 +173,7 @@ void scanline()
 			{
 				use_window = true;
 				temptile = memory_get8(get_tile_address(ly - window_y, i - window_x, map_win));
-				if(temptile != current_win_tile || wintile == NULL)
+				if(temptile != current_win_tile)
 				{
 					current_win_tile = temptile;
 					get_tile(wintile, current_win_tile, tile_data, false, false, false);
