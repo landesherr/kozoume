@@ -36,7 +36,7 @@ static inline bool calculate_checksum(FILE*);
 
 static const char* translate_cart_name(char *name)
 {
-	static char safename[16] = {0};
+	static char safename[17] = {0};
 	for(byte i=0;i<16;i++)
 	{
 		//No control chars, no symbols

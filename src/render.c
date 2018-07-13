@@ -28,7 +28,7 @@
 #define FRAME_TIME (1.0 / 60.0)
 #define DEFAULT_SCALE 5
 
-#define DC vapor //Default Colorset
+#define DC original //Default Colorset
 color vapor[4] = { 0xCCFFFF, 0xF1DAFF, 0xE3E8FF, 0xFFCCFF };
 color cool[4] = { 0xFF6AD5, 0xC774E8, 0xAD8CFF, 0x879E58 };
 color original[4] = { 0x9BBC0F, 0x8BAC0F, 0x306230, 0x0F380F };
