@@ -26,6 +26,7 @@
 static inline void do_mbc1(word, byte);
 static inline void do_mbc2(word, byte);
 static inline void do_mbc3(word, byte);
+static inline void do_mbc5(word, byte);
 
 byte *memory_map;
 const mem_range \
@@ -129,6 +130,14 @@ void memory_set8_logical(word address, byte value)
 			case ROM_MBC3_RAM:
 			case ROM_MBC3_RAM_BATT:
 				do_mbc3(address, value);
+				break;
+			case ROM_MBC5:
+			case ROM_MBC5_RAM:
+			case ROM_MBC5_RAM_BATT:
+			case ROM_MBC5_RUMBLE:
+			case ROM_MBC5_RUMBLE_SRAM:
+			case ROM_MBC5_RUMBLE_SRAM_BATT:
+				do_mbc5(address, value);
 				break;
 			default:
 				break;
@@ -260,5 +269,28 @@ static inline void do_mbc3(word address, byte value)
 			mycart->latch_req = RTC_LATCH_NONE;
 		}
 		else mycart->latch_req = RTC_LATCH_NONE;
+	}
+}
+static inline void do_mbc5(word address, byte value)
+{
+	if(address < 0x1FFF)
+	{
+		bool prev_ram_enable = mycart->ram_enable;
+		mycart->ram_enable = (value & 0xF) == 0xA;
+		if(prev_ram_enable && !(mycart->ram_enable)) sync_ram_to_disk(mycart);
+	}
+	else if(address >= 0x2000 && address <= 0x2FFF)
+	{
+		word bank = mycart->bank & 0x100;
+		bank_switch(mycart, bank | value);
+	}
+	else if(address >= 0x3000 && address <= 0x3FFF)
+	{
+		word bank = mycart->bank & 0xFF;
+		bank_switch(mycart, bank | (value << 8));
+	}
+	else if(address >= 0x4000 && address <= 0x5FFF)
+	{
+		ram_bank_switch(mycart, value & 0xF);
 	}
 }

@@ -63,7 +63,7 @@ typedef struct cartridge
 {
 	char *filename;
 	char gamename[17];
-	byte bank;
+	word bank;
 	byte ram_bank;
 	cart_type type;
 	bool is_gbc;
@@ -82,7 +82,7 @@ extern cartridge *mycart;
 
 cartridge* load_cart(char*);
 void free_cart(cartridge*);
-void bank_switch(cartridge*, byte);
+void bank_switch(cartridge*, word);
 void store_ram_bank(cartridge*);
 void ram_bank_switch(cartridge*, byte);
 void sync_ram_to_disk(cartridge*);

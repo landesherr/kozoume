@@ -114,7 +114,7 @@ cartridge* load_cart(char *path)
 	return loaded_cart;
 }
 
-void bank_switch(cartridge *c, byte bankno)
+void bank_switch(cartridge *c, word bankno)
 {
 	if(!bankno) bankno = 1;
 	unsigned offset = BANK_SIZE * bankno;
