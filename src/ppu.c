@@ -187,7 +187,7 @@ void scanline()
 	{
 		bool big_sprites = get_lcdc(LCDC_OBJ_SIZE);
 		byte sprite_size_y = big_sprites ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
-		for(unsigned j=0;j<NUM_OAM_ENTRIES;j++)
+		for(int j=NUM_OAM_ENTRIES-1;j>=0;j--)
 		{
 			current_entry = (oam_entry) memory_get32(oam.lower + (j * sizeof(oam_entry)));
 			if(!current_entry) continue;
