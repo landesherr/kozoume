@@ -27,6 +27,9 @@
 #define RTC_UNLATCHED false
 #define RTC_LATCHED true
 
+#define IS_MBC2(C) (C->type == 5 || C->type == 6)
+#define MBC2_RAM_SIZE 512
+
 #define HAS_BATT(C) (C->type == 2 || C->type == 3 || C->type == 6 || C->type == 0xD || C->type == 0xF || C->type == 0x10 || C->type == 0x13 || C->type == 0x1B || C->type == 0x1E)
 
 typedef enum cart_type

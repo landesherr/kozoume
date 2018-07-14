@@ -107,6 +107,7 @@ void memory_set8_logical(word address, byte value)
 	else if(MEMORY_IN_RANGE(address, cart_ram))
 	{
 		if(mycart->ram_enable == false) return;
+		else if(IS_MBC2(mycart)) value &= 0xF;
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
@@ -183,6 +184,7 @@ void memory_set16_logical(word address, word value)
 	else if(MEMORY_IN_RANGE(address, cart_ram))
 	{
 		if(mycart->ram_enable == false) return;
+		else if(IS_MBC2(mycart)) value &= 0x0F0F;
 	}
 	else if(MEMORY_IN_RANGE(address, rom_bank_0) \
 		|| MEMORY_IN_RANGE(address, rom_bank_switch) \
@@ -200,7 +202,7 @@ void memory_set16_logical(word address, word value)
 
 static inline void do_mbc1(word address, byte value)
 {
-	if(address < 0x1FFF)
+	if(address <= 0x1FFF)
 	{
 		bool prev_ram_enable = mycart->ram_enable;
 		mycart->ram_enable = (value & 0xF) == 0xA;
@@ -224,12 +226,20 @@ static inline void do_mbc1(word address, byte value)
 }
 static inline void do_mbc2(word address, byte value)
 {
-	//TODO Handle MBC2's weird RAM
+	if(address <= 0x1FFF)
+	{
+		if(!(address & 0x10))
+		{
+			bool prev_ram_enable = mycart->ram_enable;
+			mycart->ram_enable = (value & 0xF) == 0xA;
+			if(prev_ram_enable && !(mycart->ram_enable)) sync_ram_to_disk(mycart);
+		}
+	}
 	if(address >= 0x2000 && address <= 0x3FFF) bank_switch(mycart, value & 0xF);
 }
 static inline void do_mbc3(word address, byte value)
 {
-	if(address < 0x1FFF)
+	if(address <= 0x1FFF)
 	{
 		bool prev_ram_enable = mycart->ram_enable;
 		mycart->ram_enable = (value & 0xF) == 0xA;
@@ -247,7 +257,7 @@ static inline void do_mbc3(word address, byte value)
 			//Map RTC register
 		}
 	}
-	else if(address < 0x7FFF)
+	else if(address <= 0x7FFF)
 	{
 		if(value == 0)
 		{
@@ -273,7 +283,7 @@ static inline void do_mbc3(word address, byte value)
 }
 static inline void do_mbc5(word address, byte value)
 {
-	if(address < 0x1FFF)
+	if(address <= 0x1FFF)
 	{
 		bool prev_ram_enable = mycart->ram_enable;
 		mycart->ram_enable = (value & 0xF) == 0xA;

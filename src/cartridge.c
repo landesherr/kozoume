@@ -77,7 +77,7 @@ cartridge* load_cart(char *path)
 	loaded_cart->type = (cart_type) memory_get8(0x147);
 	loaded_cart->is_gbc = (memory_get8(0x143) == 0xC0);
 	loaded_cart->rom_banks = calc_rom_banks(memory_get8(0x148));
-	loaded_cart->ram_bytes = calc_ram_size(memory_get8(0x149));
+	loaded_cart->ram_bytes = IS_MBC2(loaded_cart) ? MBC2_RAM_SIZE : calc_ram_size(memory_get8(0x149));
 	loaded_cart->data = NULL;
 	loaded_cart->ram = NULL;
 	loaded_cart->ram_enable = false;
