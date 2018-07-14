@@ -180,7 +180,7 @@ void scanline()
 				}
 			}
 			else use_window = false;
-			PIXEL(ly, i) = use_window ? bg_palette_data[wintile[ly & 7][i & 7]] : bg_palette_data[bgtile[tile_y][tile_x]];
+			PIXEL(ly, i) = use_window ? bg_palette_data[wintile[(ly - window_y) & 7][(i - window_x) & 7]] : bg_palette_data[bgtile[tile_y][tile_x]];
 		}
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
