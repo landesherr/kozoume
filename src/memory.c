@@ -54,14 +54,10 @@ void memory_free()
 {
 	free(memory_map);
 }
-
+/*
 byte memory_get8(word address)
 {
 	return memory_map[address];
-}
-signed char memory_get8s(word address)
-{
-	return *(char*)&memory_map[address];
 }
 word memory_get16(word address)
 {
@@ -80,7 +76,7 @@ void memory_set16(word address, word value)
 {
 	*((word*)&memory_map[address]) = value;
 }
-
+*/
 void memory_set8_logical(word address, byte value)
 {
 	if(MEMORY_IN_RANGE(address, echo_ram))

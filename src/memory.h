@@ -91,14 +91,18 @@ typedef enum ioreg
 	IE = 0xFFFF
 } ioreg;
 
-byte memory_get8(word);
-signed char memory_get8s(word);
-word memory_get16(word);
-unsigned memory_get32(word);
+//byte memory_get8(word);
+//word memory_get16(word);
+//unsigned memory_get32(word);
+#define memory_get8(address) (memory_map[address])
+#define memory_get16(address) (*((word*)&memory_map[address]))
+#define memory_get32(address) (*((unsigned*)&memory_map[address]))
 
 //set memory values exactly as specified (faster, for use in emulator logic)
-void memory_set8(word, byte);
-void memory_set16(word, word);
+//void memory_set8(word, byte);
+//void memory_set16(word, word);
+#define memory_set8(address, value) memory_map[address] = value
+#define memory_set16(address, value) *((word*)&memory_map[address]) = value
 //set memory values per GB memory map logic (slower, for use in emulated ops)
 void memory_set8_logical(word, byte);
 void memory_set16_logical(word, word);
