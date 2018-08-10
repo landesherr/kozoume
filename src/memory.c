@@ -21,6 +21,7 @@
 #include "memory.h"
 #include "ppu.h"
 #include "cartridge.h"
+#include "audio.h"
 #include <stdlib.h>
 
 static inline void do_mbc1(word, byte);
@@ -149,6 +150,14 @@ void memory_set8_logical(word address, byte value)
 			if(value & 0x20) check_joypad(CHECK_JOYPAD_P15);
 			else if(value & 0x10) check_joypad(CHECK_JOYPAD_P14);
 			return;
+		}
+		else if(address == NR_14)
+		{
+			square1_enable = (value >> 7);
+		}
+		else if(address == NR_24)
+		{
+			square2_enable = (value >> 7);
 		}
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available

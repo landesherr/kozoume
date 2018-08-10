@@ -24,6 +24,7 @@
 #include "memory.h"
 #include "io.h"
 #include "ppu.h"
+#include "audio.h"
 #include <stdbool.h>
 
 unsigned cycles_prev;
@@ -33,8 +34,8 @@ void interpreter_step()
 {
 	if(isHalting)
 	{
-		cycles++;
-		cycles_prev++;
+		cycles+=4;
+		cycles_prev+=4;
 		io_tick();
 		ppu_tick();
 		if(check_interrupts())

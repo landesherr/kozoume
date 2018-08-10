@@ -22,6 +22,7 @@
 #include "interrupts.h"
 #include <stdio.h>
 #include "globaldefs.h"
+#include "audio.h"
 
 #define CLOCKS_TO_DMA 0x280
 #define FASTCLOCK 262144
@@ -33,6 +34,7 @@ void io_tick()
 {
 	div_tick();
 	tima_tick();
+	audio_tick();
 	dma_transfer();
 }
 

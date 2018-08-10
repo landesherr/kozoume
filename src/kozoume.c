@@ -29,6 +29,7 @@
 #include "console.h"
 #include "ppu.h" //can be removed when debugging is finished
 #include "render.h"
+#include "audio.h"
 
 void powerup(void);
 
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
 	memory_init();
 	powerup();
 	render_init();
+	audio_init();
 	if(argc < 2)
 	{
 		dbgwrite("No ROM specified\n");
