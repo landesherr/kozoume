@@ -35,6 +35,9 @@
 #define GET_VOLUME(ADDRESS) (memory_get8(ADDRESS) >> 4)
 #define SQUARE1_VOLUME GET_VOLUME(NR_12)
 #define SQUARE2_VOLUME GET_VOLUME(NR_22)
+#define GET_VOLUME_MODE(ADDRESS) ((memory_get8(ADDRESS) >> 3) & 1)
+#define SQUARE1_VOLUME_MODE GET_VOLUME_MODE(NR_12)
+#define SQUARE2_VOLUME_MODE GET_VOLUME_MODE(NR_22)
 #define GET_TRIGGER(ADDRESS) (memory_get8(ADDRESS) >> 7)
 #define SQUARE1_TRIGGER GET_TRIGGER(NR_14)
 #define SQUARE2_TRIGGER GET_TRIGGER(NR_24)
@@ -88,5 +91,6 @@ extern bool audio_enable;
 void audio_init(void);
 void audio_tick(void);
 void audio_tick_frame_sequencer(void);
+void audio_memory_write(word, byte);
 audio_sample audio_gen_square(duty_cycle, unsigned);
 audio_sample audio_gen_wave(unsigned);

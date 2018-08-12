@@ -151,13 +151,9 @@ void memory_set8_logical(word address, byte value)
 			else if(value & 0x10) check_joypad(CHECK_JOYPAD_P14);
 			return;
 		}
-		else if(address == NR_14)
+		else if(address >= NR_10 && address <= NR_52)
 		{
-			square1_enable = (value >> 7);
-		}
-		else if(address == NR_24)
-		{
-			square2_enable = (value >> 7);
+			audio_memory_write(address, value);
 		}
 	}
 	//TODO IO register behavior, OAM/VRAM, cart RAM if available
