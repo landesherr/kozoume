@@ -41,6 +41,7 @@ bool audio_enable = false;
 bool square1_enable = false;
 bool square2_enable = false;
 bool wave_enable = false;
+bool noise_enable = false;
 
 word square1_shadow = 0;
 byte square1_sweep_time = 0;
@@ -50,15 +51,23 @@ byte square1_length = 0;
 byte square1_length_remain = 0;
 byte square2_length = 0;
 byte square2_length_remain = 0;
+byte noise_length = 0;
+byte noise_length_remain = 0;
 
 byte square1_volume = 0xF;
 byte square1_volume_time = 0;
 byte square2_volume = 0xF;
 byte square2_volume_time = 0;
+byte noise_volume = 0;
+byte noise_volume_time = 0;
 
 byte volume_phase1 = 0;
 byte sweep_phase = 0;
 byte volume_phase2 = 0;
+byte volume_phase_noise = 0;
+
+word noise_lfsr = 0;
+bool noise_mode = 0;
 
 void audio_init()
 {
@@ -89,12 +98,18 @@ void audio_tick()
 			unsigned s1f = 131072 / (2048 - (SQUARE1_FREQ));
 			unsigned s2f = 131072 / (2048 - (SQUARE2_FREQ));
 			unsigned wf = 65536 / (2048 - (WAVE_FREQ));
-			char sample = square1_enable ? audio_gen_square(SQUARE1_DUTY, s1f) : 0;
+			unsigned nf;
+			if(!NOISE_DIV_RATIO) nf = (Z80_CYCLES / 4) / (2 << NOISE_SHIFT_CLOCK);
+			else nf = ((Z80_CYCLES / 8) / NOISE_DIV_RATIO) / (2 << NOISE_SHIFT_CLOCK);
+			audio_sample sample = square1_enable ? audio_gen_square(SQUARE1_DUTY, s1f) : 0;
 			sample = sample * (square1_volume / 16.0);
-			char sample2 = square2_enable ? audio_gen_square(SQUARE2_DUTY, s2f) : 0;
+			audio_sample sample2 = square2_enable ? audio_gen_square(SQUARE2_DUTY, s2f) : 0;
 			sample2 = sample2 * (square2_volume / 16.0);
-			char wave_sample = wave_enable ? audio_gen_wave(wf) : 0;
-			int mixed = sample + sample2 + wave_sample;
+			audio_sample wave_sample = wave_enable ? audio_gen_wave(wf) : 0;
+			audio_sample noise_sample = noise_enable ? audio_gen_noise(nf) : 0;
+			noise_sample = noise_sample * (noise_volume / 16.0);
+			//int mixed = sample + sample2 + wave_sample + noise_sample;
+			int mixed = noise_sample;
 			if(mixed > 127) mixed = 127;
 			if(mixed < -128) mixed = -128;
 			mixed *= DEFAULT_VOLUME;
@@ -129,6 +144,19 @@ void audio_tick_frame_sequencer()
 			break;
 	}
 	step = (step + 1) & 7;
+}
+
+static word quasirandom()
+{
+	static byte s = 0x4B, t = 0x7A;
+	word qr = 0;
+	s = (5 * s) + 1;
+	t = (((t >> 4) & 1) == ((t >> 7) * 1)) ? (t << 1) + 1 : t << 1;
+	qr = (s ^ t);
+	s = (5 * s) + 1;
+	t = (((t >> 4) & 1) == ((t >> 7) * 1)) ? (t << 1) + 1 : t << 1;
+	qr |= ((s ^ t) << 8);
+	return qr;
 }
 
 audio_sample audio_gen_square(duty_cycle dc, unsigned freq)
@@ -176,6 +204,22 @@ audio_sample audio_gen_wave(unsigned freq)
 	return *((char*)&sample);
 }
 
+audio_sample audio_gen_noise(unsigned freq)
+{
+	static audio_sample noise_sample = AS_HIGH;
+	if(freq < 20) return 0;
+	unsigned cycles_per_period = (Z80_CYCLES / freq);
+	if(cycles % cycles_per_period < cycles_prev % cycles_per_period)
+	{
+		bool xor_lower_two = ((noise_lfsr >> 1) ^ noise_lfsr) & 1;
+		noise_lfsr >>= 1;
+		noise_lfsr = (noise_lfsr & 0x3FFF) | (xor_lower_two << 14);
+		if(noise_mode == 1) noise_lfsr = (noise_lfsr & 0x3F) | (xor_lower_two << 6);
+		noise_sample = (noise_lfsr & 1)? AS_LOW : AS_HIGH;
+	}
+	return noise_sample;
+}
+
 void audio_memory_write(word address, byte value)
 {
 	if(address == NR_10)
@@ -213,6 +257,21 @@ void audio_memory_write(word address, byte value)
 		}
 		else square2_enable = false;
 	}
+	else if(address == NR_44)
+	{
+		if(value >> 7)
+		{
+			noise_enable = true;
+			noise_mode = NOISE_STEP_TYPE;
+			if(!noise_lfsr) noise_lfsr = quasirandom() & 0x7FFF;
+			noise_length = 64 - NOISE_LENGTH_LOAD;
+			noise_length_remain = noise_length;
+			noise_volume = NOISE_VOLUME;
+			noise_volume_time = NOISE_PERIOD;
+			volume_phase_noise = 0;
+		}
+		else noise_enable = false;
+	}
 	else if(address == NR_52) audio_enable = (value >> 7);
 }
 
@@ -222,6 +281,8 @@ static inline void update_length_counter()
 	else if(SQUARE1_LENGTH_ENABLE) square1_enable = false;
 	if(square2_length_remain) square2_length_remain--;
 	else if(SQUARE2_LENGTH_ENABLE) square2_enable = false;
+	if(noise_length_remain) noise_length_remain--;
+	else if(NOISE_LENGTH_ENABLE) noise_enable = false;
 }
 
 static inline void update_sweep()
@@ -247,20 +308,23 @@ static inline void update_volume_envelope()
 {
 	volume_phase1++;
 	volume_phase2++;
+	volume_phase_noise++;
 	if(square1_volume_time == volume_phase1)
 	{
 		volume_phase1 = 0;
-		//square1_volume_time--;
 		if(SQUARE1_VOLUME_MODE && square1_volume < 0xF) square1_volume++;
 		else if(!SQUARE1_VOLUME_MODE && square1_volume) square1_volume--;
 	}
-	//else square1_volume_time = SQUARE1_VOLUME_TIME;
 	if(square2_volume_time == volume_phase2)
 	{
 		volume_phase2 = 0;
-		//square2_volume_time--;
 		if(SQUARE2_VOLUME_MODE && square2_volume < 0xF) square2_volume++;
 		else if(!SQUARE2_VOLUME_MODE && square2_volume) square2_volume--;
 	}
-	//else square2_volume_time = SQUARE2_VOLUME_TIME;
+	if(noise_volume_time == volume_phase_noise)
+	{
+		volume_phase_noise = 0;
+		if(NOISE_VOLUME_MODE && noise_volume < 0xF) noise_volume++;
+		else if(!NOISE_VOLUME_MODE && noise_volume) noise_volume--;
+	}
 }

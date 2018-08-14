@@ -32,28 +32,34 @@
 #define GET_LENGTH_LOAD(ADDRESS) (memory_get8(ADDRESS) & 0x3F)
 #define SQUARE1_LENGTH_LOAD GET_LENGTH_LOAD(NR_11)
 #define SQUARE2_LENGTH_LOAD GET_LENGTH_LOAD(NR_21)
+#define NOISE_LENGTH_LOAD GET_LENGTH_LOAD(NR_41)
 #define GET_VOLUME(ADDRESS) (memory_get8(ADDRESS) >> 4)
 #define SQUARE1_VOLUME GET_VOLUME(NR_12)
 #define SQUARE2_VOLUME GET_VOLUME(NR_22)
+#define NOISE_VOLUME GET_VOLUME(NR_42)
 #define GET_VOLUME_MODE(ADDRESS) ((memory_get8(ADDRESS) >> 3) & 1)
 #define SQUARE1_VOLUME_MODE GET_VOLUME_MODE(NR_12)
 #define SQUARE2_VOLUME_MODE GET_VOLUME_MODE(NR_22)
+#define NOISE_VOLUME_MODE GET_VOLUME_MODE(NR_42)
 #define GET_TRIGGER(ADDRESS) (memory_get8(ADDRESS) >> 7)
 #define SQUARE1_TRIGGER GET_TRIGGER(NR_14)
 #define SQUARE2_TRIGGER GET_TRIGGER(NR_24)
 #define GET_LENGTH_ENABLE(ADDRESS) ((memory_get8(ADDRESS) >> 6) & 1)
 #define SQUARE1_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_14)
 #define SQUARE2_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_24)
+#define NOISE_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_44)
 #define GET_PERIOD(ADDRESS) (memory_get8(ADDRESS) & 7)
 #define SQUARE1_PERIOD GET_PERIOD(NR_12)
 #define SQUARE2_PERIOD GET_PERIOD(NR_22)
-#define GET_ADD_MODE(ADDRESS) ((memory_get8(ADDRESS) >> 3) & 1)
-#define SQUARE1_ADD_MODE GET_ADD_MODE(NR_12)
-#define SQUARE2_ADD_MODE GET_ADD_MODE(NR_22)
+#define NOISE_PERIOD GET_PERIOD(NR_42)
 
 #define SQUARE1_SWEEP_PERIOD ((memory_get8(NR_10) & 0x70) >> 4)
 #define SQUARE1_NEGATE ((memory_get8(NR_10) >> 3) & 1)
 #define SQUARE1_SHIFT (memory_get8(NR_10) & 7)
+
+#define NOISE_SHIFT_CLOCK (memory_get8(NR_43) >> 4)
+#define NOISE_STEP_TYPE ((memory_get8(NR_43) >> 3) & 1)
+#define NOISE_DIV_RATIO (memory_get8(NR_43) & 7)
 
 #define WAVE_ON (memory_get8(NR_30) & 0x80)
 //Setter macros
@@ -94,3 +100,4 @@ void audio_tick_frame_sequencer(void);
 void audio_memory_write(word, byte);
 audio_sample audio_gen_square(duty_cycle, unsigned);
 audio_sample audio_gen_wave(unsigned);
+audio_sample audio_gen_noise(unsigned);

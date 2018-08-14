@@ -207,7 +207,7 @@ void scanline()
 				set_palette(oam_palette, oam_palette_data);
 				for(unsigned k=0;k<SPRITE_SIZE;k++)
 				{
-					if((xc + k) >= 0 && (xc + k) < SCREEN_RES_X)
+					if((xc + (short)k) >= 0 && (xc + k) < SCREEN_RES_X)
 					{
 						tile_x = k;
 

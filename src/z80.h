@@ -175,6 +175,7 @@ void prefix_cb(void);
 
 
 //flag operations and other inline funcs
+/*
 static inline bool calc_carry_8(byte, byte, bool);
 static inline bool calc_halfcarry_16(word, word, bool);
 static inline bool calc_carry_8(byte, byte, bool);
@@ -192,6 +193,7 @@ static inline bool get_carry(void);
 
 static inline word do_signed_add_reg16_byte(reg16, byte);
 static inline word do_signed_add_word_byte(word, byte);
+*/
 
 //inline function defs
 static inline void set_flag(byte flag, bool set)
