@@ -47,6 +47,7 @@
 #define GET_LENGTH_ENABLE(ADDRESS) ((memory_get8(ADDRESS) >> 6) & 1)
 #define SQUARE1_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_14)
 #define SQUARE2_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_24)
+#define WAVE_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_34)
 #define NOISE_LENGTH_ENABLE GET_LENGTH_ENABLE(NR_44)
 #define GET_PERIOD(ADDRESS) (memory_get8(ADDRESS) & 7)
 #define SQUARE1_PERIOD GET_PERIOD(NR_12)
@@ -56,6 +57,8 @@
 #define SQUARE1_SWEEP_PERIOD ((memory_get8(NR_10) & 0x70) >> 4)
 #define SQUARE1_NEGATE ((memory_get8(NR_10) >> 3) & 1)
 #define SQUARE1_SHIFT (memory_get8(NR_10) & 7)
+
+#define WAVE_LENGTH (memory_get8(NR_31))
 
 #define NOISE_SHIFT_CLOCK (memory_get8(NR_43) >> 4)
 #define NOISE_STEP_TYPE ((memory_get8(NR_43) >> 3) & 1)

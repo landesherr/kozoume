@@ -51,6 +51,8 @@ byte square1_length = 0;
 byte square1_length_remain = 0;
 byte square2_length = 0;
 byte square2_length_remain = 0;
+byte wave_length = 0;
+byte wave_length_remain = 0;
 byte noise_length = 0;
 byte noise_length_remain = 0;
 
@@ -108,8 +110,7 @@ void audio_tick()
 			audio_sample wave_sample = wave_enable ? audio_gen_wave(wf) : 0;
 			audio_sample noise_sample = noise_enable ? audio_gen_noise(nf) : 0;
 			noise_sample = noise_sample * (noise_volume / 16.0);
-			//int mixed = sample + sample2 + wave_sample + noise_sample;
-			int mixed = noise_sample;
+			int mixed = sample + sample2 + wave_sample + noise_sample;
 			if(mixed > 127) mixed = 127;
 			if(mixed < -128) mixed = -128;
 			mixed *= DEFAULT_VOLUME;
@@ -191,33 +192,30 @@ audio_sample audio_gen_wave(unsigned freq)
 	if(cycles % cycles_per_sample < cycles_prev % cycles_per_sample) wave_index++;
 	if(wave_index == 64)
 	{
-		wave_enable = false;
+		//wave_enable = false;
 		wave_index = 0;
 	}
-	else
-	{
-		sample = memory_get8((0xFF30 + (wave_index & 0xFE)));
-		if(wave_index & 1) sample &= 0x0F;
-		else sample >>= 4;
-	}
+	sample = memory_get8((0xFF30 + (wave_index & 0xFE)));
+	if(wave_index & 1) sample &= 0x0F;
+	else sample >>= 4;
 	sample = (sample * 0x11) - 0x80;
 	return *((char*)&sample);
 }
 
 audio_sample audio_gen_noise(unsigned freq)
 {
-	static audio_sample noise_sample = AS_HIGH;
 	if(freq < 20) return 0;
 	unsigned cycles_per_period = (Z80_CYCLES / freq);
+	audio_sample output = (noise_lfsr & 1) ? AS_LOW : AS_HIGH;
 	if(cycles % cycles_per_period < cycles_prev % cycles_per_period)
 	{
 		bool xor_lower_two = ((noise_lfsr >> 1) ^ noise_lfsr) & 1;
 		noise_lfsr >>= 1;
 		noise_lfsr = (noise_lfsr & 0x3FFF) | (xor_lower_two << 14);
 		if(noise_mode == 1) noise_lfsr = (noise_lfsr & 0x3F) | (xor_lower_two << 6);
-		noise_sample = (noise_lfsr & 1)? AS_LOW : AS_HIGH;
 	}
-	return noise_sample;
+	//return (noise_lfsr & 1) ? AS_LOW : AS_HIGH;
+	return output;
 }
 
 void audio_memory_write(word address, byte value)
@@ -257,6 +255,15 @@ void audio_memory_write(word address, byte value)
 		}
 		else square2_enable = false;
 	}
+	else if(address == NR_34)
+	{
+		if(value >> 7)
+		{
+			wave_enable = true;
+			wave_length = 255 - WAVE_LENGTH;
+		}
+		else wave_enable = false;
+	}
 	else if(address == NR_44)
 	{
 		if(value >> 7)
@@ -281,6 +288,8 @@ static inline void update_length_counter()
 	else if(SQUARE1_LENGTH_ENABLE) square1_enable = false;
 	if(square2_length_remain) square2_length_remain--;
 	else if(SQUARE2_LENGTH_ENABLE) square2_enable = false;
+	if(wave_length_remain) wave_length_remain--;
+	else if(WAVE_LENGTH_ENABLE) wave_enable = false;
 	if(noise_length_remain) noise_length_remain--;
 	else if(NOISE_LENGTH_ENABLE) noise_enable = false;
 }
