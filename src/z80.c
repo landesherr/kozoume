@@ -20,9 +20,6 @@
 #include "memory.h"
 #include <stdbool.h>
 
-//TODO: refactor flag checks into macros like this
-#define NASZ(VARNAME) if(true) set_zero(!VARNAME)
-
 byte registers[12];
 
 reg8 A = &registers[1];
@@ -545,7 +542,7 @@ void dec_hl()
 void add_hl_reg16(reg16 reg)
 {
 	word result = *HL + *reg;
-	set_halfcarry(calc_halfcarry_16(*reg, *HL, false));
+	set_halfcarry(calc_halfcarry_16(*reg, *HL));
 	set_carry(calc_carry_16(result, *HL, false));
 	set_subtract(false);
 	*HL = result;
@@ -586,7 +583,7 @@ void swap_reg8(reg8 reg)
 	byte temp = *reg & 0xF;
 	*reg = (*reg >> 4);
 	*reg |= (temp << 4);
-	NASZ(*reg);
+	set_zero(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -689,7 +686,7 @@ void rlc_reg8(reg8 reg)
 	//8-bit rotation, bit 7 goes to both CF and bit 0
 	byte temp = *reg << 1;
 	temp |= (*reg >> 7);
-	NASZ(temp);
+	set_zero(temp);
 	set_carry((*reg & 0x80));
 	set_subtract(false);
 	set_halfcarry(false);
@@ -727,7 +724,7 @@ void rl_reg8(reg8 reg)
 	//9-bit rotation, CF to bit 0, bit 7 to CF
 	byte temp = *reg << 1;
 	temp |= get_carry();
-	NASZ(temp);
+	set_zero(temp);
 	set_carry(*reg >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -765,7 +762,7 @@ void rrc_reg8(reg8 reg)
 	//8-bit rotation, bit 0 goes to bit 7 and CF
 	byte temp = *reg >> 1;
 	temp |= (*reg << 7);
-	NASZ(temp);
+	set_zero(temp);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -803,7 +800,7 @@ void rr_reg8(reg8 reg)
 	//9-bit rotation, CF goes to bit 7, bit 0 to CF
 	byte temp = *reg >> 1;
 	temp |= get_carry() << 7;
-	NASZ(temp);
+	set_zero(temp);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -841,7 +838,7 @@ void sla_reg8(reg8 reg)
 	set_carry(*reg & 0x80);
 	*reg <<= 1;
 	//if(!*reg) set_zero(true);
-	NASZ(*reg);
+	set_zero(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -866,7 +863,7 @@ void sra_reg8(reg8 reg)
 	set_carry(*reg & 0x1);
 	*reg = (*reg & 0x80) | temp;
 	//if(!*reg) set_zero(true);
-	NASZ(*reg);
+	set_zero(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -891,7 +888,7 @@ void srl_reg8(reg8 reg)
 	set_carry(*reg & 0x1);
 	*reg >>= 1;
 	//if(!*reg) set_zero(true);
-	NASZ(*reg);
+	set_zero(*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;

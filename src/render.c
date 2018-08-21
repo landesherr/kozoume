@@ -29,10 +29,10 @@
 #define DEFAULT_SCALE 5
 
 #define DC original //Default Colorset
-color vapor[4] = { 0xCCFFFF, 0xF1DAFF, 0xE3E8FF, 0xFFCCFF };
-color cool[4] = { 0xFF6AD5, 0xC774E8, 0xAD8CFF, 0x879E58 };
-color original[4] = { 0x9BBC0F, 0x8BAC0F, 0x306230, 0x0F380F };
-color bw[4] = { 0xCCCCCC, 0x999999, 0x666666, 0x000000 };
+const color vapor[4] = { 0xCCFFFF, 0xF1DAFF, 0xE3E8FF, 0xFFCCFF };
+const color cool[4] = { 0xFF6AD5, 0xC774E8, 0xAD8CFF, 0x879E58 };
+const color original[4] = { 0x9BBC0F, 0x8BAC0F, 0x306230, 0x0F380F };
+const color bw[4] = { 0xCCCCCC, 0x999999, 0x666666, 0x000000 };
 
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -42,8 +42,8 @@ bool initialized = false;
 
 static unsigned rgba_array[SCREEN_RES_X * SCREEN_RES_Y] = {0};
 
-static inline void set_color(byte, color[]);
-static inline unsigned get_rgba_color(byte, color[]);
+static inline void set_color(byte, const color[]);
+static inline unsigned get_rgba_color(byte, const color[]);
 static inline void gb_pixel_array_to_rgba(void);
 
 void render_init()
@@ -93,14 +93,14 @@ void render_screen()
 	SDL_RenderPresent(renderer);
 }
 
-static inline void set_color(byte colorno, color colorset[])
+static inline void set_color(byte colorno, const color colorset[])
 {
 	colorno &= 3;
 	color c = colorset[colorno];
 	SDL_SetRenderDrawColor(renderer, GET_R(c), GET_G(c), GET_B(c), ALPHA);
 }
 
-static inline unsigned get_rgba_color(byte colorno, color colorset[])
+static inline unsigned get_rgba_color(byte colorno, const color colorset[])
 {
 	colorno &= 3;
 	unsigned colorout = 0xFF000000;

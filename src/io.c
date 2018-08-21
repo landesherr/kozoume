@@ -20,7 +20,6 @@
 #include "interpreter.h"
 #include "z80.h"
 #include "interrupts.h"
-#include <stdio.h>
 #include "globaldefs.h"
 #include "audio.h"
 

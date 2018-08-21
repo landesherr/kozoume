@@ -24,8 +24,8 @@
 #define Z80_CYCLES 0x400000
 #define DELTA_CYCLES (cycles - cycles_prev)
 
-typedef byte* reg8;
-typedef word* reg16;
+typedef byte* const reg8;
+typedef word* const reg16;
 
 extern byte registers[];
 
@@ -282,7 +282,7 @@ static inline bool calc_halfcarry_8(byte result, byte registervalue, bool isSubt
 	}
 	return false;
 }
-static inline bool calc_halfcarry_16(word a, word b, bool isSubtract)
+static inline bool calc_halfcarry_16(word a, word b)
 {
 	word res = a + b;
 	return (res ^ a ^ b) & 0x1000;

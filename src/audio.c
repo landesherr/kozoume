@@ -24,7 +24,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include <string.h>
-#include <stdio.h>
 
 #define DEFAULT_VOLUME .05
 

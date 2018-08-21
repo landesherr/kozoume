@@ -34,7 +34,7 @@
 ppu_mode gfxmode = VBLANK;
 static unsigned hblank_count = 153, mode_cycles = 4500;
 const byte text_pixels[4] = {'#', '=', '-', ' '};
-byte *screen_bitmap;
+byte screen_bitmap[SCREEN_RES_X * SCREEN_RES_Y] = {0};
 
 static inline void check_coincidence(void)
 {
@@ -126,7 +126,6 @@ void ppu_tick()
 
 void scanline()
 {
-	if(!screen_bitmap) screen_bitmap = calloc(SCREEN_RES_X * SCREEN_RES_Y, sizeof(byte));
 	word map_bg = get_lcdc(LCDC_BG_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
 	word map_win = get_lcdc(LCDC_WIN_TILEMAP) ? TILE_MAP_2_BEGIN : TILE_MAP_1_BEGIN;
 

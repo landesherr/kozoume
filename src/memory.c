@@ -29,7 +29,8 @@ static inline void do_mbc2(word, byte);
 static inline void do_mbc3(word, byte);
 static inline void do_mbc5(word, byte);
 
-byte *memory_map;
+byte memory_map[MEMORY_SIZE] = {0};
+
 const mem_range \
 	restart_interrupt_vectors = {0x0000,0x00FF}, \
 	cart_header = {0x0100,0x014F}, \
@@ -47,14 +48,6 @@ const mem_range \
 	hardware_io = {0xFF00,0xFF7F}, \
 	zero_page = {0xFF80,0xFFFE};
 
-void memory_init()
-{
-	memory_map = calloc(MEMORY_SIZE, sizeof(byte));
-}
-void memory_free()
-{
-	free(memory_map);
-}
 /*
 byte memory_get8(word address)
 {

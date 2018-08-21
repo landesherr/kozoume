@@ -104,7 +104,7 @@ typedef enum pixel_value
 typedef unsigned oam_entry;
 
 extern ppu_mode gfxmode;
-extern byte *screen_bitmap;
+extern byte screen_bitmap[];
 
 void ppu_tick(void);
 void clear_tiles(void);

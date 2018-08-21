@@ -19,8 +19,6 @@
 #include "opcodes.h"
 #include "globaldefs.h"
 #include "z80.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 /*
 	All those opcodes!

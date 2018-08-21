@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
 	byte triggerop;
 	runtil_condition rc = NO_RUNTIL;
 	console_command *cmd;
-	memory_init();
 	powerup();
 	render_init();
 	audio_init();
@@ -148,7 +147,6 @@ cmdagain:
 		//if(*PC >= 0x8000) go = 0;
 		//if(*PC < 100 && memory_get8(*PC) > 0xf0) go = 0;
 	}
-	memory_free();
 	render_teardown();
 	return 0;
 }

@@ -18,7 +18,7 @@
 
 #pragma once
 
-typedef void (*opcode_func)(void);
+typedef void (*const opcode_func)(void);
 
 #define TABLE_SIZE 0x100
 #define STD_OP_PREFIX opcode

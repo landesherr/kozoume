@@ -27,7 +27,7 @@ typedef struct mem_range
 	word lower, upper;
 } mem_range;
 
-extern byte *memory_map;
+extern byte memory_map[];
 extern const mem_range \
 	restart_interrupt_vectors, \
 	cart_header, \
@@ -106,6 +106,3 @@ typedef enum ioreg
 //set memory values per GB memory map logic (slower, for use in emulated ops)
 void memory_set8_logical(word, byte);
 void memory_set16_logical(word, word);
-
-void memory_init(void);
-void memory_free(void);
