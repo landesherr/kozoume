@@ -18,6 +18,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <time.h>
 #include "io.h"
@@ -34,9 +35,11 @@ color cool[4] = { 0xFF6AD5, 0xC774E8, 0xAD8CFF, 0x879E58 };
 color original[4] = { 0x9BBC0F, 0x8BAC0F, 0x306230, 0x0F380F };
 color bw[4] = { 0xCCCCCC, 0x999999, 0x666666, 0x000000 };
 
-SDL_Window *window;
-SDL_Renderer *renderer;
+SDL_Window *window, *consolewindow;
+SDL_Renderer *renderer, *consolerenderer;
 SDL_Texture *texture;
+TTF_Font consolefont;
+SDL_Color consolecolor = {255, 255, 255};
 clock_t timer = 0;
 bool initialized = false;
 
@@ -45,14 +48,18 @@ static unsigned rgba_array[SCREEN_RES_X * SCREEN_RES_Y] = {0};
 static inline void set_color(byte, color[]);
 static inline unsigned get_rgba_color(byte, color[]);
 static inline void gb_pixel_array_to_rgba(void);
+static inline void render_console(void);
 
 void render_init()
 {
 	if(initialized) return;
+	consolefont = TTF_OpenFont("./fonts/DroidSansMono.ttf");
 	SDL_Init(SDL_INIT_VIDEO);
 	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_RES_X * DEFAULT_SCALE, SCREEN_RES_Y * DEFAULT_SCALE, SDL_WINDOW_SHOWN);
+	consolewindow = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 800, SDL_WINDOW_SHOWN);
 	SDL_SetWindowResizable(window, SDL_TRUE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	consolerenderer = SDL_CreateRenderer(consolewindow, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
 	SDL_RenderSetLogicalSize(renderer, SCREEN_RES_X, SCREEN_RES_Y);
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_RES_X, SCREEN_RES_Y);
@@ -63,6 +70,8 @@ void render_teardown()
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(consolerenderer);
+	SDL_DestroyWindow(consolewindow);
 	SDL_Quit();
 	initialized = false;
 }
@@ -72,7 +81,7 @@ void render_screen()
 	//TODO: Event polling goes somewhere else (probably w/ input when that becomes a thing)
 	SDL_Event event;
 	SDL_PollEvent(&event);
-	if(event.type == SDL_QUIT)
+	if(event.type == SDL_QUIT || (event.type == SDL_WINDOWEVENT && (event.window.event == SDL_WINDOWEVENT_CLOSE)))
 	{
 		render_teardown();
 		exit(0);
@@ -87,10 +96,18 @@ void render_screen()
 		if(delta < FRAME_TIME) SDL_Delay((FRAME_TIME - delta) * 1000);
 		timer = current;
 	}
+	render_console();
 	gb_pixel_array_to_rgba();
 	SDL_UpdateTexture(texture, NULL, &rgba_array[0], SCREEN_RES_X * sizeof(unsigned));
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
+	SDL_RenderPresent(consolerenderer);
+}
+
+static inline void render_console()
+{
+	SDL_SetRenderDrawColor(consolerenderer, 0, 0, 0, 255);
+	SDL_RenderClear(consolerenderer);
 }
 
 static inline void set_color(byte colorno, color colorset[])
@@ -98,6 +115,9 @@ static inline void set_color(byte colorno, color colorset[])
 	colorno &= 3;
 	color c = colorset[colorno];
 	SDL_SetRenderDrawColor(renderer, GET_R(c), GET_G(c), GET_B(c), ALPHA);
+	SDL_Surface *currmsg = TTF_RenderText_Solid(consolefont, "Test", consolecolor);
+	SDL_Texture *currtxt = SDL_CreateTextureFromSurface(consolerenderer, currmsg);
+
 }
 
 static inline unsigned get_rgba_color(byte colorno, color colorset[])

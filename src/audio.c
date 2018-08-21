@@ -87,10 +87,12 @@ void audio_init()
 	}
 	memset(audio_buffer, 0, SAMPLES_PER_FRAME);
 	SDL_PauseAudio(0);
+	use_audio = false;
 }
 
 void audio_tick()
 {
+	if(!use_audio) return;
 	if(!audio_enable) return;
 	if(cycles % FRAME_SEQUENCER_TICKS < cycles_prev % FRAME_SEQUENCER_TICKS) audio_tick_frame_sequencer();
 	if(cycles % CYCLES_PER_SAMPLE < cycles_prev % CYCLES_PER_SAMPLE)

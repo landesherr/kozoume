@@ -17,6 +17,14 @@
 */
 
 #pragma once
+#include "util/linkedlist.h"
+
+#define GUI_CONSOLE_LINE_LENGTH 50
+#define GUI_CONSOLE_LINE_HEIGHT 100
+#define COMMAND_HISTORY_SIZE 10
+
+extern linkedlist *command_history;
+extern char **console_screen;
 
 typedef enum console_action
 {

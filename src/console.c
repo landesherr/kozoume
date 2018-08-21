@@ -22,6 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+linkedlist *command_history;
+char console_screen[100][51];
+
 console_command* console_get_command()
 {
 	char command[80];
