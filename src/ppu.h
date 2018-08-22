@@ -156,7 +156,7 @@ static inline void get_tile(pixel_value pixels[][SPRITE_SIZE], byte tileno, word
 	if(is_large) tileno &= 0xFE;
 	byte sprite_y = is_large ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
 	//16 bytes per tile
-	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - ((((~tileno & 0xFF) + 1)*16));
+	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - (((~tileno & 0xFF) + 1)*16);
 	else address = base + (tileno * 16);
 	word temp;
 	for(unsigned i=0;i<sprite_y*2;i+=2)

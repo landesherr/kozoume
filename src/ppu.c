@@ -195,11 +195,12 @@ void scanline()
 			if(yc == 0 || xc == 0) continue;
 			yc -= 16;
 			xc -= 8;
-			oam_options = OAM_OPTIONS(current_entry);
-			tile_no = OAM_TILE_NO(current_entry);
-			get_tile(oamtile, tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
 			if(yc <= ly && (yc + sprite_size_y) > ly)
 			{
+				oam_options = OAM_OPTIONS(current_entry);
+				tile_no = OAM_TILE_NO(current_entry);
+				get_tile(oamtile, tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
+
 				if(big_sprites) tile_y = (ly - yc) & 0xF;
 				else tile_y = (ly - yc) & 0x7;
 				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
