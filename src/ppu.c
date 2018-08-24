@@ -131,6 +131,7 @@ void scanline()
 
 	word tile_data= get_lcdc(LCDC_BG_WIN_TILE) ? TILE_DATA_1_BEGIN : TILE_DATA_2_BEGIN;
 
+	//Raw X, Y values and modifiers from memory
 	byte ly = memory_get8(LY);
 	byte scroll_x = memory_get8(SCX);
 	byte scroll_y = memory_get8(SCY);
@@ -145,15 +146,20 @@ void scanline()
 
 	byte tile_y = y & 7;
 	byte tile_x;
+
 	byte temptile;
-	static byte current_bg_tile, current_win_tile;
-	static pixel_value bgtile[SPRITE_SIZE][SPRITE_SIZE] = {0}, oamtile[SPRITE_SIZE_LARGE][SPRITE_SIZE] = {0}, wintile[SPRITE_SIZE][SPRITE_SIZE] = {0};
+	byte current_bg_tile, current_win_tile;
 	oam_entry current_entry;
-	byte tile_no, oam_options;
-	short xc, yc;
+	byte oam_tile_no, oam_options;
+	short xc, yc; //OAM coordinates
+
+	pixel_value tile_line_win[SPRITE_SIZE] = {0};
+	pixel_value tile_line_bg[SPRITE_SIZE] = {0};
+	pixel_value tile_line_oam[SPRITE_SIZE] = {0};
 
 	byte oam_palette;
 	pixel_value bg_palette_data[4], oam_palette_data[4];
+
 	if(get_lcdc(LCDC_BG_DISPLAY))
 	{
 		set_palette(memory_get8(BGP), bg_palette_data);
@@ -162,24 +168,24 @@ void scanline()
 			x = i + scroll_x;
 			tile_x = x & 7;
 			temptile = memory_get8(get_tile_address(y, x, map_bg));
-			if(temptile != current_bg_tile || i == 0)
+			if(i == 0 || temptile != current_bg_tile)
 			{
 				current_bg_tile = temptile;
-				get_tile(bgtile, current_bg_tile, tile_data, false, false, false);
+				get_tile_line(tile_line_bg, current_bg_tile, tile_data, false, false, false, tile_y);
 			}
 			//Window stuff
 			if(get_lcdc(LCDC_WIN_DISPLAY_ON) && window_x <= 166 && window_x <= i && window_y <= ly)
 			{
 				use_window = true;
 				temptile = memory_get8(get_tile_address(ly - window_y, i - window_x, map_win));
-				if(temptile != current_win_tile)
+				if(i == 0 || temptile != current_win_tile)
 				{
 					current_win_tile = temptile;
-					get_tile(wintile, current_win_tile, tile_data, false, false, false);
+					get_tile_line(tile_line_win, current_win_tile, tile_data, false, false, false, (ly - window_y) & 7);
 				}
 			}
 			else use_window = false;
-			PIXEL(ly, i) = use_window ? bg_palette_data[wintile[(ly - window_y) & 7][(i - window_x) & 7]] : bg_palette_data[bgtile[tile_y][tile_x]];
+			PIXEL(ly, i) = use_window ? bg_palette_data[tile_line_win[(i - window_x) & 7]] : bg_palette_data[tile_line_bg[tile_x]];
 		}
 	}
 	if(get_lcdc(LCDC_OBJ_ENABLE)) //if drawing sprites is enabled
@@ -198,11 +204,12 @@ void scanline()
 			if(yc <= ly && (yc + sprite_size_y) > ly)
 			{
 				oam_options = OAM_OPTIONS(current_entry);
-				tile_no = OAM_TILE_NO(current_entry);
-				get_tile(oamtile, tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites);
-
+				oam_tile_no = OAM_TILE_NO(current_entry);
 				if(big_sprites) tile_y = (ly - yc) & 0xF;
 				else tile_y = (ly - yc) & 0x7;
+
+				get_tile_line(tile_line_oam, oam_tile_no, TILE_DATA_1_BEGIN, (oam_options >> 5) & 1, (oam_options >> 6) & 1, big_sprites, tile_y);
+
 				oam_palette = (oam_options >> 4) & 1 ? memory_get8(OBP1) : memory_get8(OBP0);
 				set_palette(oam_palette, oam_palette_data);
 				for(unsigned k=0;k<SPRITE_SIZE;k++)
@@ -214,8 +221,10 @@ void scanline()
 						//only draw if high priority or no other pixel exists here
 						if(oam_options >> 7 == 0 || PIXEL(ly, xc+k) == PIXEL_OFF)
 						{
-							if(oamtile[tile_y][tile_x] <= 3 && oamtile[tile_y][tile_x] != 0)
-								PIXEL(ly, xc+k) = oam_palette_data[oamtile[tile_y][tile_x]];
+							if(tile_line_oam[tile_x] <= 3 && tile_line_oam[tile_x] != 0)
+							{
+								PIXEL(ly, xc+k) = oam_palette_data[tile_line_oam[tile_x]];
+							}
 						}
 					}
 				}

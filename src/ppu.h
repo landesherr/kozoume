@@ -168,6 +168,20 @@ static inline void get_tile(pixel_value pixels[][SPRITE_SIZE], byte tileno, word
 		}
 	}
 }
+static inline void get_tile_line(pixel_value *line, byte tileno, word base, bool flip_x, bool flip_y, bool is_large, byte tile_y)
+{
+	word address;
+	if(is_large) tileno &= 0xFE;
+	byte sprite_y = is_large ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
+	//16 bytes per tile
+	if(base == TILE_DATA_2_BEGIN && (tileno >> 7)) address = base - (((~tileno & 0xFF) + 1)*16);
+	else address = base + (tileno * 16);
+
+	byte true_y = flip_y ? ((sprite_y - 1) - tile_y) : tile_y;
+	word pixeldata = memory_get16(address + (2 * true_y));
+	if(!flip_x) for(unsigned i=0;i<SPRITE_SIZE;i++) line[i] = (((pixeldata >> 8) >> (7 - i)) & 1) << 1 | ((pixeldata >> (7 - i)) & 1);
+	else for(unsigned i=0;i<SPRITE_SIZE;i++) line[7 - i] = (((pixeldata >> 8) >> (7 - i)) & 1) << 1 | ((pixeldata >> (7 - i)) & 1);
+}
 static inline void free_tile(pixel_value **tile, bool big_sprites)
 {
 	byte sprite_y = big_sprites ? SPRITE_SIZE_LARGE : SPRITE_SIZE;
