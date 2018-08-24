@@ -11,7 +11,7 @@ The primary target is Unix-like platforms, though kozoume runs swell on Windows 
 * Commerical games can be booted, and seem to run just fine. MBC1/2/3/5 work for saving, but no RTC support yet.
 * Small graphical glitches are still common in some titles.
 * Input is still provided only via hard-coded keyboard mappings, but expect that to change soon.
-* Audio is still unimplemented.
+* Audio is still poorly understood and only partially implemented. Audio corruption is frequent, and for enjoyment's sake, it's best to manually disable it when playing games
 
 ## Compiling
 Currently, the Makefile leaves much to be desired. If you have SDL2 installed to somewhere other than `/usr/local/lib/`, you'll have to hand-edit the Makefile to reflect this.
