@@ -583,7 +583,7 @@ void swap_reg8(reg8 reg)
 	byte temp = *reg & 0xF;
 	*reg = (*reg >> 4);
 	*reg |= (temp << 4);
-	set_zero(*reg);
+	set_zero(!*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	set_carry(false);
@@ -621,7 +621,7 @@ void daa()
 	if(value & 0x100) set_carry(true);
 	set_halfcarry(false);
 	*A = value;
-	set_zero(*A == 0);
+	set_zero(!*A);
 	*PC += 1;
 	cycles += 4;
 }
@@ -686,7 +686,7 @@ void rlc_reg8(reg8 reg)
 	//8-bit rotation, bit 7 goes to both CF and bit 0
 	byte temp = *reg << 1;
 	temp |= (*reg >> 7);
-	set_zero(temp);
+	set_zero(!temp);
 	set_carry((*reg & 0x80));
 	set_subtract(false);
 	set_halfcarry(false);
@@ -724,7 +724,7 @@ void rl_reg8(reg8 reg)
 	//9-bit rotation, CF to bit 0, bit 7 to CF
 	byte temp = *reg << 1;
 	temp |= get_carry();
-	set_zero(temp);
+	set_zero(!temp);
 	set_carry(*reg >> 7);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -762,7 +762,7 @@ void rrc_reg8(reg8 reg)
 	//8-bit rotation, bit 0 goes to bit 7 and CF
 	byte temp = *reg >> 1;
 	temp |= (*reg << 7);
-	set_zero(temp);
+	set_zero(!temp);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -800,7 +800,7 @@ void rr_reg8(reg8 reg)
 	//9-bit rotation, CF goes to bit 7, bit 0 to CF
 	byte temp = *reg >> 1;
 	temp |= get_carry() << 7;
-	set_zero(temp);
+	set_zero(!temp);
 	set_carry(*reg & 0x1);
 	set_subtract(false);
 	set_halfcarry(false);
@@ -837,8 +837,7 @@ void sla_reg8(reg8 reg)
 {
 	set_carry(*reg & 0x80);
 	*reg <<= 1;
-	//if(!*reg) set_zero(true);
-	set_zero(*reg);
+	set_zero(!*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -862,8 +861,7 @@ void sra_reg8(reg8 reg)
 	byte temp = *reg >> 1;
 	set_carry(*reg & 0x1);
 	*reg = (*reg & 0x80) | temp;
-	//if(!*reg) set_zero(true);
-	set_zero(*reg);
+	set_zero(!*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
@@ -887,8 +885,7 @@ void srl_reg8(reg8 reg)
 	//bit 7 reset to 0
 	set_carry(*reg & 0x1);
 	*reg >>= 1;
-	//if(!*reg) set_zero(true);
-	set_zero(*reg);
+	set_zero(!*reg);
 	set_subtract(false);
 	set_halfcarry(false);
 	*PC += 1;
